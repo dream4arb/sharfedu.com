@@ -428,9 +428,11 @@ export default function Lesson() {
         }
       }
 
+      const idToUrlMap: Record<string, string> = {};
       for (const { url, fallbackTitle, fallbackChannel, fallbackDuration } of urlsToFetch) {
         const videoId = extractVideoId(url);
         if (!videoId) continue;
+        idToUrlMap[videoId] = url;
 
         try {
           const watchUrl = url.includes("/embed/") ? `https://www.youtube.com/watch?v=${videoId}` : url;
@@ -440,22 +442,38 @@ export default function Lesson() {
             metadata[url] = {
               title: data.title || fallbackTitle || "فيديو تعليمي",
               channelName: data.author_name || fallbackChannel || "قناة تعليمية",
-              duration: fallbackDuration || "غير محدد"
+              duration: fallbackDuration || "—"
             };
           } else {
             metadata[url] = {
               title: fallbackTitle || "فيديو تعليمي",
               channelName: fallbackChannel || "قناة تعليمية",
-              duration: fallbackDuration || "غير محدد"
+              duration: fallbackDuration || "—"
             };
           }
         } catch {
           metadata[url] = {
             title: fallbackTitle || "فيديو تعليمي",
             channelName: fallbackChannel || "قناة تعليمية",
-            duration: fallbackDuration || "غير محدد"
+            duration: fallbackDuration || "—"
           };
         }
+      }
+
+      const videoIds = Object.keys(idToUrlMap);
+      if (videoIds.length > 0) {
+        try {
+          const durResp = await fetch(`/api/youtube/durations?ids=${videoIds.join(",")}`);
+          if (durResp.ok) {
+            const durations: Record<string, string> = await durResp.json();
+            for (const [vid, dur] of Object.entries(durations)) {
+              const origUrl = idToUrlMap[vid];
+              if (origUrl && metadata[origUrl]) {
+                metadata[origUrl].duration = dur;
+              }
+            }
+          }
+        } catch {}
       }
 
       setVideoMetadata(metadata);
