@@ -10,6 +10,10 @@ packages = ["poppler_utils", "imagemagick", "unzip"]
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 9999
+externalPort = 3000
+
 [env]
 PORT = "5000"
 
