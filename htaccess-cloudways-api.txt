@@ -1,0 +1,24 @@
+# منصة شارف - Cloudways Hybrid Stack
+# توجيه /api إلى Node.js + SPA routing
+
+<IfModule mod_mime.c>
+  AddType application/javascript .js .mjs
+  AddType text/css .css
+  AddType text/html .html
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # توجيه طلبات /api إلى Node.js على المنفذ 5000
+  RewriteCond %{REQUEST_URI} ^/api
+  RewriteRule ^api(.*)$ http://127.0.0.1:5000/api$1 [P,L]
+
+  # لا نعيد كتابة الملفات والمجلدات الموجودة
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # توجيه الباقي إلى index.html (SPA)
+  RewriteRule ^ index.html [QSA,L]
+</IfModule>

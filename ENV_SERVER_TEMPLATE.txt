@@ -1,0 +1,24 @@
+# انسخ هذا المحتوى إلى ملف .env على السيرفر (داخل git_repo)
+# ثم عدّل القيم: SESSION_SECRET و ADMIN_EMAIL وما تحتاجه
+
+NODE_ENV=production
+PORT=5000
+HOST=127.0.0.1
+
+SESSION_SECRET=ضع-هنا-سلسلة-عشوائية-طويلة-وفريدة-32حرف
+ADMIN_EMAIL=your-admin@email.com
+
+# اختياري — تسجيل الدخول بجوجل
+# GOOGLE_CLIENT_ID=...
+# GOOGLE_CLIENT_SECRET=...
+# GOOGLE_CALLBACK_URL=https://sharfedu.com/api/auth/google/callback
+
+# اختياري — Gemini
+# GEMINI_API_KEY=...
+
+# اختياري — إرسال بريد (استعادة كلمة المرور)
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=...
+# SMTP_PASS=...
+# MAIL_FROM=noreply@sharfedu.com
