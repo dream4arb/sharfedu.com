@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>درس النسبة - المساعد الذكي</title>
+    <!-- استيراد خط Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- استيراد مكتبة Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #2563eb;
+            --accent-green: #10b981;
+            --bg-light: #f8fafc;
+            --alert-red: #fff1f2;
+            --alert-border: #ef4444;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-light);
+            color: #1f2937;
+            line-height: 1.8;
+        }
+
+        /* الهيدر المتدرج الجديد */
+        .header-card {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        /* صناديق المفاهيم */
+        .pa-concept-box {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .pa-concept-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .box-header {
+            background: #eff6ff;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dbeafe;
+            color: var(--primary-blue);
+            font-weight: 800;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .box-content {
+            padding: 1.5rem;
+        }
+
+        /* بطاقات التعريفات */
+        .def-card {
+            background: white;
+            border-right: 5px solid var(--accent-green);
+            padding: 1.2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+
+        /* تنسيق المعادلات والكسور (CSS Only) */
+        .highlight-formula {
+            background: #f0f9ff;
+            border: 2px dashed var(--secondary-blue);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* كلاس الكسر المخصص */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 0.5rem;
+            font-weight: bold;
+        }
+        .fraction .top {
+            border-bottom: 2px solid currentColor;
+            padding: 0 5px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .fraction .bottom {
+            padding-top: 2px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* الجداول */
+        .rich-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        .rich-table th {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 1rem;
+            text-align: right;
+        }
+        .rich-table td {
+            background-color: white;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+        .rich-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* فصل الرسم عن النص */
+        .split-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) {
+            .split-layout {
+                flex-direction: row;
+                align-items: center;
+            }
+            .visual-part {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                background: #f8fafc;
+                padding: 2rem;
+                border-radius: 12px;
+            }
+            .text-part {
+                flex: 1;
+            }
+        }
+
+        /* الأدوات التفاعلية */
+        .interactive-lab {
+            border: 2px solid var(--accent-green);
+            border-radius: 16px;
+            background: #f0fdf4;
+            padding: 1.5rem;
+        }
+
+        .calc-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .btn-action {
+            background-color: var(--accent-green);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #059669;
+        }
+        .btn-action:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #059669;
+        }
+        .btn-action:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* خطوات الحل */
+        .step-card {
+            background: white;
+            border-right: 4px solid var(--secondary-blue);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .alert-box {
+            background-color: var(--alert-red);
+            border-right: 5px solid var(--alert-border);
+            padding: 1.5rem;
+            border-radius: 8px;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الهيدر المطور (نفس تصميم زوايا المضلع) -->
+    <div class="max-w-4xl mx-auto px-4 mt-8 mb-8">
+        <header class="header-card text-white py-12 px-6 rounded-[2.5rem] text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4 tracking-tight">النسبة والنسب المتكافئة</h1>
+                <p class="text-blue-100 text-lg font-medium opacity-90">شرح مبسط + مولد حلول + تنبيهات ذكية</p>
+            </div>
+            <!-- زخرفة بسيطة للخلفية -->
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-gradient-to-t from-black to-transparent pointer-events-none"></div>
+        </header>
+    </div>
+
+    <main class="max-w-4xl mx-auto px-4 pb-12">
+
+        <!-- 1. القسم التمهيدي -->
+        <section class="pa-concept-box border-t-4 border-blue-600">
+            <div class="box-content">
+                <h2 class="text-2xl font-bold text-blue-900 mb-4">✨ تمهيد: ليش ندرس هذا الموضوع؟</h2>
+                <p class="text-gray-600 text-lg mb-6 leading-relaxed bg-blue-50 p-4 rounded-lg">
+                    حياكم الله يا أبطال وبطلات المستقبل! تخيلوا إنكم تبون تضبطون مقادير طبخة لذيذة، أو تحسبون مين اللاعب اللي أهدافه أكثر مقارنة بمحاولاته؟ هنا يجي دور "النسبة". هذا الدرس هو سلاحكم السري عشان تقارنون بين أي شيئين في الحياة بذكاء ودقة، وتصير لغتكم بالأرقام قوية ومقنعة!
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="def-card">
+                        <h3 class="font-bold text-lg text-blue-800 mb-1">النسبة (Ratio)</h3>
+                        <p class="text-gray-500 text-sm">هي عملية مقارنة بين كميتين باستخدام القسمة. (يعني كم مرة الجزء هذا يتكرر بالنسبة للكل، أو بالنسبة للجزء الثاني).</p>
+                    </div>
+                    <div class="def-card" style="border-right-color: #2563eb;">
+                        <h3 class="font-bold text-lg text-blue-800 mb-1">النسب المتكافئة</h3>
+                        <p class="text-gray-500 text-sm">هي نسب شكل أرقامها مختلف، بس قيمتها النهائية وحدة. (زي لما نقول نص ريال هو نفسه ربعين، القيمة ماتغيرت).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. المحتوى النظري: طرق الكتابة -->
+        <section class="pa-concept-box">
+            <div class="box-header">
+                <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                طرق كتابة النسبة
+            </div>
+            <div class="box-content">
+                <p class="text-gray-600 mb-4">
+                    يا جماعة الخير، النسبة نقدر ندلعها ونكتبها بأكثر من شكل، بس في النهاية المعنى واحد. أهم نقطة لازم نركز عليها هي "الترتيب". اللي ينذكر أول في السؤال، ينكتب أول (أو فوق).
+                </p>
+
+                <div class="highlight-formula">
+                    <span class="text-gray-500 text-sm w-full block mb-2 text-center">أشكال النسبة بين (أ) و (ب)</span>
+                    
+                    <!-- الشكل 1 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold">أ : ب</span>
+                        <span class="text-sm text-gray-400 mt-1">باستخدام النقطتين</span>
+                    </div>
+
+                    <div class="h-12 w-px bg-blue-200 hidden md:block"></div>
+
+                    <!-- الشكل 2 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold">أ إلى ب</span>
+                        <span class="text-sm text-gray-400 mt-1">لفظياً</span>
+                    </div>
+
+                    <div class="h-12 w-px bg-blue-200 hidden md:block"></div>
+
+                    <!-- الشكل 3 (الكسر) -->
+                    <div class="flex flex-col items-center">
+                        <div class="fraction text-3xl text-blue-800">
+                            <span class="top">أ</span>
+                            <span class="bottom">ب</span>
+                        </div>
+                        <span class="text-sm text-gray-400 mt-1">على صورة كسر</span>
+                    </div>
+                </div>
+
+                <!-- الرسم التوضيحي -->
+                <div class="split-layout mt-8">
+                    <!-- Visual Part -->
+                    <div class="visual-part">
+                        <svg width="240" height="160" viewBox="0 0 240 160">
+                            <!-- الصندوق -->
+                            <rect x="10" y="10" width="220" height="140" rx="15" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+                            <text x="120" y="140" text-anchor="middle" font-size="12" fill="#94a3b8">سلة الفواكه</text>
+                            
+                            <!-- تفاحات (أحمر) -->
+                            <circle cx="50" cy="50" r="18" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                            <circle cx="95" cy="50" r="18" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                            <circle cx="140" cy="50" r="18" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                            
+                            <!-- برتقالات (برتقالي) -->
+                            <circle cx="70" cy="95" r="18" fill="#f97316" stroke="#c2410c" stroke-width="2"/>
+                            <circle cx="115" cy="95" r="18" fill="#f97316" stroke="#c2410c" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <!-- Text Info Part -->
+                    <div class="text-part">
+                        <h4 class="font-bold text-lg text-blue-900 mb-3 border-b pb-2">مثال بصري:</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-center justify-between bg-red-50 p-2 rounded">
+                                <span>عدد التفاحات (الأحمر):</span>
+                                <span class="font-bold text-red-600 text-xl">3</span>
+                            </li>
+                            <li class="flex items-center justify-between bg-orange-50 p-2 rounded">
+                                <span>عدد البرتقالات (البرتقالي):</span>
+                                <span class="font-bold text-orange-600 text-xl">2</span>
+                            </li>
+                            <li class="mt-4 bg-gray-50 p-3 rounded border border-gray-200">
+                                <span class="block text-sm text-gray-500 mb-1">نسبة التفاح إلى البرتقال:</span>
+                                <div class="flex items-center gap-4 text-xl font-bold">
+                                    <span>3 : 2</span>
+                                    <span class="text-gray-300">|</span>
+                                    <div class="fraction text-lg">
+                                        <span class="top">3</span>
+                                        <span class="bottom">2</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. الجداول المقارنة: النسب المتكافئة -->
+        <section class="pa-concept-box">
+            <div class="box-header">
+                <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                كيف أعرف إن النسب متكافئة؟
+            </div>
+            <div class="box-content">
+                <p class="text-gray-600 mb-4">
+                    عشان نتأكد إن النسبتين "توأم" (متساويين في القيمة)، عندنا طريقتين سهلة. الجدول هذا يلخص لك الموضوع:
+                </p>
+                
+                <table class="rich-table">
+                    <thead>
+                        <tr>
+                            <th class="w-1/4">الطريقة</th>
+                            <th>كيف تطبقها؟</th>
+                            <th class="w-1/4">مثال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold text-blue-900 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"></path></svg>
+                                التبسيط (الأضمن)
+                            </td>
+                            <td>نقسم البسط والمقام على القاسم المشترك الأكبر (ق.م.أ) لين نوصل لأبسط صورة. إذا طلعوا نفس الكسر، يعني متكافئين.</td>
+                            <td>
+                                <div class="flex items-center gap-2 text-lg font-bold dir-ltr justify-end">
+                                    <div class="fraction"><span class="top">2</span><span class="bottom">4</span></div>
+                                    <span>=</span>
+                                    <div class="fraction"><span class="top">1</span><span class="bottom">2</span></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-blue-900 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                الضرب التبادلي
+                            </td>
+                            <td>نضرب "مقص" (بسط الأول × مقام الثاني) و (مقام الأول × بسط الثاني). إذا الناتج نفسه، يعني متكافئين.</td>
+                            <td class="text-sm">
+                                2 × 10 = 20<br>
+                                4 × 5 = 20<br>
+                                <span class="text-green-600 font-bold">متساوية ✅</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 4. الأدوات التفاعلية (Interactive Lab) -->
+        <section class="pa-concept-box interactive-lab">
+            <div class="flex items-center justify-between mb-6 border-b border-green-200 pb-4">
+                <h2 class="text-2xl font-bold text-green-800">🧪 المختبر التفاعلي: مولد خطوات الحل</h2>
+                <span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-xs font-bold">ذكاء اصطناعي</span>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Select Mode -->
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2">وش المشكلة اللي تواجهها؟</label>
+                    <select id="labMode" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-400 focus:outline-none">
+                        <option value="simplify">1️⃣ عندي نسبة وأبي أبسطها (أبسط صورة)</option>
+                        <option value="missing">2️⃣ عندي تناسب وفيه رقم ناقص (إيجاد المجهول)</option>
+                    </select>
+                </div>
+
+                <!-- Input Area: Simply -->
+                <div id="simplifyInputs" class="bg-white p-4 rounded-xl border border-gray-200">
+                    <p class="text-sm text-gray-500 mb-3 text-center">أدخل النسبة اللي عندك:</p>
+                    <div class="flex items-center justify-center gap-4">
+                        <input type="number" id="simp_num" class="calc-input" placeholder="البسط (الأول)">
+                        <span class="text-2xl font-bold text-gray-400">:</span>
+                        <input type="number" id="simp_den" class="calc-input" placeholder="المقام (الثاني)">
+                    </div>
+                    <button id="btnSimplify" type="button" class="btn-action mt-4">بسط لي النسبة بالخطوات 🚀</button>
+                </div>
+
+                <!-- Input Area: Missing Value -->
+                <div id="missingInputs" class="hidden bg-white p-4 rounded-xl border border-gray-200">
+                    <p class="text-sm text-gray-500 mb-3 text-center">عبي البيانات اللي عندك وخلي المجهول فاضي:</p>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                        <!-- النسبة المعلومة -->
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">النسبة المعلومة</span>
+                            <div class="flex items-center gap-2">
+                                <div class="flex flex-col gap-1">
+                                    <input type="number" id="known_num" class="calc-input w-24" placeholder="بسط">
+                                    <div class="h-0.5 w-full bg-gray-300"></div>
+                                    <input type="number" id="known_den" class="calc-input w-24" placeholder="مقام">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <span class="text-3xl font-bold text-gray-400">=</span>
+                        
+                        <!-- النسبة المجهولة -->
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">النسبة اللي فيها مجهول</span>
+                            <div class="flex items-center gap-2">
+                                <div class="flex flex-col gap-1">
+                                    <input type="number" id="unknown_num" class="calc-input w-24 border-red-300 bg-red-50" placeholder="?">
+                                    <div class="h-0.5 w-full bg-gray-300"></div>
+                                    <input type="number" id="unknown_den" class="calc-input w-24 border-red-300 bg-red-50" placeholder="?">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-red-500 mt-2 text-center">* اترك خانة واحدة فقط فارغة لتمثل المجهول</p>
+                    <button id="btnMissing" type="button" class="btn-action mt-4 bg-blue-600 shadow-blue-800 hover:shadow-blue-600">أوجد لي قيمة المجهول 🔍</button>
+                </div>
+
+                <!-- Output Area -->
+                <div id="solutionOutput" class="hidden bg-gray-50 p-4 rounded-lg border-t-2 border-gray-200">
+                    <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                        <span>📝</span> خطوات الحل:
+                    </h3>
+                    <div id="stepsContainer" class="space-y-2">
+                        <!-- Steps injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. أخطاء شائعة -->
+        <section class="alert-box mb-8">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                أخطاء شائعة (خلك نبيه!)
+            </h2>
+            <ul class="list-disc list-inside space-y-2">
+                <li><strong>الترتيب مهم:</strong> إذا قال السؤال "نسبة الملح إلى الماء"، لازم تحط الملح في البسط (فوق) والماء في المقام (تحت). لو عكستهم، الإجابة خطأ!</li>
+                <li><strong>التبسيط للنهاية:</strong> أحياناً تبسط النسبة مرة وحدة وتوقف، بس يكون لسه فيه مجال للقسمة. تأكد إنك وصلت لآخر حد (أبسط صورة).</li>
+                <li><strong>الوحدات المختلفة:</strong> انتبه تقارن "دقائق" مع "ساعات" بدون ما تحولهم لنفس الوحدة أول.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- الخاتمة -->
+    <footer class="bg-gray-800 text-gray-300 py-6 text-center text-sm mt-12">
+        <p>تم تطوير هذا المحتوى التعليمي بالـ AI ليكون مساعد تفاعلي ولا يغني عن الكتاب المدرسي</p>
+    </footer>
+
+    <!-- Logic Script - يستخدم addEventListener بدلاً من onclick -->
+    <script>
+        (function() {
+            function toggleMode() {
+                const mode = document.getElementById('labMode').value;
+                const simplifyInputs = document.getElementById('simplifyInputs');
+                const missingInputs = document.getElementById('missingInputs');
+                const solutionOutput = document.getElementById('solutionOutput');
+                if (!simplifyInputs || !missingInputs || !solutionOutput) return;
+                solutionOutput.classList.add('hidden');
+                if (mode === 'simplify') {
+                    simplifyInputs.classList.remove('hidden');
+                    missingInputs.classList.add('hidden');
+                } else {
+                    simplifyInputs.classList.add('hidden');
+                    missingInputs.classList.remove('hidden');
+                }
+            }
+            function getGCD(a, b) { return b === 0 ? a : getGCD(b, a % b); }
+            function solveSimplify() {
+                const num = parseInt(document.getElementById('simp_num').value, 10);
+                const den = parseInt(document.getElementById('simp_den').value, 10);
+                const container = document.getElementById('stepsContainer');
+                const output = document.getElementById('solutionOutput');
+                if (!container || !output) return;
+                if (isNaN(num) || isNaN(den) || den === 0) {
+                    alert('الرجاء إدخال أرقام صحيحة (والمقام لا يساوي صفر)');
+                    return;
+                }
+                const gcd = getGCD(num, den);
+                const sNum = num / gcd;
+                const sDen = den / gcd;
+                let steps = '';
+                steps += '<div class="step-card"><strong>1. نكتب النسبة:</strong> على شكل كسر <span class="text-blue-600 font-bold">' + num + '/' + den + '</span></div>';
+                if (gcd === 1) {
+                    steps += '<div class="step-card bg-green-50 border-green-500"><strong>2. التحقق:</strong> بحثنا عن قاسم مشترك، بس ما لقينا إلا الواحد. هذا يعني إن النسبة <strong>فعلاً في أبسط صورة</strong> وما تحتاج شغل زيادة! 👍</div>';
+                } else {
+                    steps += '<div class="step-card"><strong>2. البحث عن القاسم المشترك (G.C.D):</strong><br>وش أكبر رقم نقدر نقسم عليه ' + num + ' و ' + den + '؟ الإجابة هي: <span class="font-bold text-purple-600">' + gcd + '</span></div>';
+                    steps += '<div class="step-card"><strong>3. عملية القسمة:</strong><br>البسط: ' + num + ' ÷ ' + gcd + ' = <strong>' + sNum + '</strong><br>المقام: ' + den + ' ÷ ' + gcd + ' = <strong>' + sDen + '</strong></div>';
+                    steps += '<div class="step-card bg-green-50 border-green-500 text-lg"><strong>🎉 النتيجة النهائية:</strong><br>النسبة في أبسط صورة هي <span class="font-bold text-green-700">' + sNum + '/' + sDen + '</span> أو <span class="font-bold text-green-700">' + sNum + ' : ' + sDen + '</span></div>';
+                }
+                container.innerHTML = steps;
+                output.classList.remove('hidden');
+            }
+            function solveMissing() {
+                const kNum = document.getElementById('known_num').value;
+                const kDen = document.getElementById('known_den').value;
+                const uNum = document.getElementById('unknown_num').value;
+                const uDen = document.getElementById('unknown_den').value;
+                const container = document.getElementById('stepsContainer');
+                const output = document.getElementById('solutionOutput');
+                if (!container || !output) return;
+                let emptyCount = 0;
+                if (!kNum) emptyCount++; if (!kDen) emptyCount++;
+                if (!uNum) emptyCount++; if (!uDen) emptyCount++;
+                if (emptyCount !== 1) {
+                    alert('الرجاء ترك خانة واحدة فقط فارغة (المجهول) وتعبئة الباقي.');
+                    return;
+                }
+                let steps = '', result = '';
+                const kn = parseFloat(kNum), kd = parseFloat(kDen), un = parseFloat(uNum), ud = parseFloat(uDen);
+                if (!uNum) {
+                    if (kd === 0) { alert('خطأ: المقام لا يمكن أن يكون صفر'); return; }
+                    result = ((kn * ud) / kd).toFixed(2);
+                    steps += '<div class="step-card"><strong>1. تحديد المجهول:</strong> التناسب عندنا هو: <br><div class="fraction mx-2"><span class="top">' + kn + '</span><span class="bottom">' + kd + '</span></div> = <div class="fraction mx-2"><span class="top text-red-600">س</span><span class="bottom">' + ud + '</span></div></div>';
+                    steps += '<div class="step-card"><strong>2. الضرب التبادلي (المقص):</strong><br> س = (' + kn + ' × ' + ud + ') ÷ ' + kd + '</div>';
+                    steps += '<div class="step-card"><strong>3. الحساب:</strong><br> ' + kn + ' × ' + ud + ' = ' + (kn*ud) + '<br> ' + (kn*ud) + ' ÷ ' + kd + ' = <strong>' + result + '</strong></div>';
+                } else if (!uDen) {
+                    if (kn === 0) { alert('لا يمكن القسمة على صفر'); return; }
+                    result = ((kd * un) / kn).toFixed(2);
+                    steps += '<div class="step-card"><strong>1. تحديد المجهول:</strong> التناسب هو: <br><div class="fraction mx-2"><span class="top">' + kn + '</span><span class="bottom">' + kd + '</span></div> = <div class="fraction mx-2"><span class="top">' + un + '</span><span class="bottom text-red-600">س</span></div></div>';
+                    steps += '<div class="step-card"><strong>2. الضرب التبادلي:</strong><br> س = (' + kd + ' × ' + un + ') ÷ ' + kn + '</div>';
+                    steps += '<div class="step-card"><strong>3. الحساب:</strong><br> ' + kd + ' × ' + un + ' = ' + (kd*un) + '<br> ' + (kd*un) + ' ÷ ' + kn + ' = <strong>' + result + '</strong></div>';
+                } else if (!kNum) {
+                    if (ud === 0) { alert('خطأ: المقام صفر'); return; }
+                    result = ((kd * un) / ud).toFixed(2);
+                    steps += '<div class="step-card"><strong>1. تحديد المجهول:</strong> التناسب هو: <br><div class="fraction mx-2"><span class="top text-red-600">س</span><span class="bottom">' + kd + '</span></div> = <div class="fraction mx-2"><span class="top">' + un + '</span><span class="bottom">' + ud + '</span></div></div>';
+                    steps += '<div class="step-card"><strong>2. الضرب التبادلي:</strong><br> س = (' + kd + ' × ' + un + ') ÷ ' + ud + '</div>';
+                    steps += '<div class="step-card"><strong>3. الحساب:</strong><br> ' + kd + ' × ' + un + ' = ' + (kd*un) + '<br> ' + (kd*un) + ' ÷ ' + ud + ' = <strong>' + result + '</strong></div>';
+                } else if (!kDen) {
+                    if (un === 0) { alert('خطأ القسمة على صفر'); return; }
+                    result = ((kn * ud) / un).toFixed(2);
+                    steps += '<div class="step-card"><strong>1. تحديد المجهول:</strong> التناسب هو: <br><div class="fraction mx-2"><span class="top">' + kn + '</span><span class="bottom text-red-600">س</span></div> = <div class="fraction mx-2"><span class="top">' + un + '</span><span class="bottom">' + ud + '</span></div></div>';
+                    steps += '<div class="step-card"><strong>2. الضرب التبادلي:</strong><br> س = (' + kn + ' × ' + ud + ') ÷ ' + un + '</div>';
+                    steps += '<div class="step-card"><strong>3. الحساب:</strong><br> ' + kn + ' × ' + ud + ' = ' + (kn*ud) + '<br> ' + (kn*ud) + ' ÷ ' + un + ' = <strong>' + result + '</strong></div>';
+                }
+                if (result.endsWith('.00')) result = parseInt(result, 10).toString();
+                steps += '<div class="step-card bg-green-50 border-green-500 text-lg"><strong>🎉 قيمة المجهول:</strong><br> <span class="font-bold text-green-700">س = ' + result + '</span></div>';
+                container.innerHTML = steps;
+                output.classList.remove('hidden');
+            }
+            function init() {
+                const labMode = document.getElementById('labMode');
+                const btnSimplify = document.getElementById('btnSimplify');
+                const btnMissing = document.getElementById('btnMissing');
+                if (labMode) labMode.addEventListener('change', toggleMode);
+                if (btnSimplify) btnSimplify.addEventListener('click', solveSimplify);
+                if (btnMissing) btnMissing.addEventListener('click', solveMissing);
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{
+  "lessonId": "5-1",
+  "title": "زوايا المضلع",
+  "questions": [
+    {
+      "id": 1,
+      "questionText": "إذا كان مجموع قياسات الزوايا الداخلية لمضلع يساوي 900 درجة، فكم عدد أضلاعه؟",
+      "hasGeometricShape": false,
+      "shapeDescription": null,
+      "shapeAngles": [],
+      "options": {
+        "a": "5 أضلاع",
+        "b": "6 أضلاع",
+        "c": "7 أضلاع",
+        "d": "8 أضلاع"
+      },
+      "correctAnswer": "c",
+      "explanation": "القانون: المجموع = (ن - 2) × 180. إذن 900 = (ن - 2) × 180. بالقسمة على 180 ينتج 5 = ن - 2، إذن ن = 7."
+    },
+    {
+      "id": 2,
+      "questionText": "ما مجموع قياسات الزوايا الخارجية للمضلع العشاري (10 أضلاع)؟",
+      "hasGeometricShape": false,
+      "shapeDescription": null,
+      "shapeAngles": [],
+      "options": {
+        "a": "1440 درجة",
+        "b": "360 درجة",
+        "c": "1800 درجة",
+        "d": "3600 درجة"
+      },
+      "correctAnswer": "b",
+      "explanation": "مجموع الزوايا الخارجية لأي مضلع محدب يساوي دائمًا 360 درجة، بغض النظر عن عدد الأضلاع."
+    },
+    {
+      "id": 3,
+      "questionText": "كم قياس الزاوية الداخلية الواحدة للسداسي المنتظم؟",
+      "hasGeometricShape": false,
+      "shapeDescription": null,
+      "shapeAngles": [],
+      "options": {
+        "a": "108 درجات",
+        "b": "120 درجة",
+        "c": "135 درجة",
+        "d": "720 درجة"
+      },
+      "correctAnswer": "b",
+      "explanation": "المجموع = (6-2)×180 = 720. الزاوية الواحدة = 720 ÷ 6 = 120 درجة."
+    },
+    {
+      "id": 4,
+      "questionText": "إذا كان قياس الزاوية الداخلية لمضلع منتظم يساوي 135 درجة، فما عدد أضلاعه؟",
+      "hasGeometricShape": false,
+      "shapeDescription": null,
+      "shapeAngles": [],
+      "options": {
+        "a": "6",
+        "b": "8",
+        "c": "10",
+        "d": "12"
+      },
+      "correctAnswer": "b",
+      "explanation": "استخدم قانون الزاوية الخارجية: الخارجية = 180 - 135 = 45. عدد الأضلاع = 360 ÷ 45 = 8 أضلاع."
+    },
+    {
+      "id": 5,
+      "questionText": "أي مما يلي هو تعريف القطر في المضلع؟",
+      "hasGeometricShape": false,
+      "shapeDescription": null,
+      "shapeAngles": [],
+      "options": {
+        "a": "قطعة تصل بين رأسين متتاليين",
+        "b": "قطعة تصل بين رأسين غير متتاليين",
+        "c": "ضلع من أضلاع المضلع",
+        "d": "خط يقسم الزاوية"
+      },
+      "correctAnswer": "b",
+      "explanation": "القطر هو قطعة مستقيمة تصل بين أي رأسين غير متتاليين في المضلع."
+    }
+  ]
+}

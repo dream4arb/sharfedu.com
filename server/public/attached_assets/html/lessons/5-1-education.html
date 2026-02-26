@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملخص زوايا المضلع (نسخة الطالب الذكي)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            --primary-color: #2563eb;
+            --primary-dark: #1e3a8a;
+            --accent-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-bg: #fff1f2;
+            --warning-border: #f43f5e;
+            --text-color: #334155;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        /* --- الهيدر --- */
+        header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+            position: relative;
+            overflow: hidden;
+            max-width: 1000px;
+            margin: 0 auto 40px auto;
+        }
+        
+        header h1 { margin: 0; font-size: 2.2rem; font-weight: 800; }
+        header p { margin-top: 10px; font-size: 1.1rem; opacity: 0.95; font-weight: 500; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto 40px;
+            padding: 0 10px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- الصناديق المفاهيمية --- */
+        .pa-concept-box {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+        .pa-concept-box:hover { transform: translateY(-3px); }
+
+        .box-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        /* قسم التمهيد والفائدة */
+        .intro-benefit {
+            background: linear-gradient(to left, #f0f9ff, #fff);
+            border-right: 5px solid #0ea5e9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            color: #334155;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* تنسيق بطاقات التعريفات */
+        .def-card {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-right: 5px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        .def-card:hover {
+            background: #fff;
+            transform: translateX(-5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .def-title {
+            color: var(--primary-dark);
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* الشرح العامي */
+        .informal-text {
+            background-color: #f0f9ff;
+            border-right: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            color: #475569;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .highlight-formula {
+            background: #eff6ff;
+            border: 2px dashed var(--primary-color);
+            color: var(--primary-dark);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 20px 0;
+            direction: ltr;
+        }
+
+        /* --- الرسم الهندسي --- */
+        .diagram-layout {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .diagram-visual { flex: 1; min-width: 300px; display: flex; justify-content: center; }
+        .diagram-text { flex: 1; min-width: 280px; text-align: right; }
+        .info-card { background: white; padding: 15px; border-radius: 10px; border-right: 4px solid var(--accent-color); margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .info-label { color: #64748b; font-size: 0.9rem; font-weight: bold; }
+        .info-value { color: var(--primary-dark); font-size: 1.3rem; font-weight: 800; direction: ltr; display: inline-block; }
+        
+        svg { width: 100%; height: auto; max-height: 350px; }
+        .svg-text-bold { font-family: 'Tajawal'; font-weight: 800; font-size: 16px; fill: #ef4444; }
+        .svg-text-small { font-family: 'Tajawal'; font-weight: bold; font-size: 14px; fill: #1e3a8a; }
+
+        /* --- الجداول --- */
+        .rich-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .rich-table th { background: #f1f5f9; color: var(--primary-dark); padding: 15px; font-weight: 800; text-align: center; }
+        .rich-table td { padding: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-weight: 500; }
+        .mini-icon { width: 30px; height: 30px; fill: #cbd5e1; margin-bottom: 5px; display: block; margin: 0 auto; }
+
+        /* --- مولد خطوات الحل --- */
+        .solver-box {
+            background-color: #f0fdf4;
+            border: 2px dashed #22c55e;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-top: 30px;
+            text-align: center;
+            position: relative;
+        }
+        .solver-title {
+            color: #15803d;
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .input-group label { font-weight: bold; color: #374151; }
+        
+        .input-group select, 
+        .input-group input {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Tajawal';
+            font-size: 1.1rem;
+            outline: none;
+        }
+        .input-group select { background-color: white; min-width: 250px; cursor: pointer; }
+        .input-group select:focus, .input-group input:focus { border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1); }
+
+        .btn-calc {
+            background-color: #22c55e; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; font-family: 'Tajawal';
+        }
+        .btn-calc:hover { background-color: #16a34a; transform: translateY(-2px); }
+        
+        .steps-result {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: right;
+            border-right: 5px solid #22c55e;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .step-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #e2e8f0; }
+        .step-row:last-child { border-bottom: none; }
+        .step-num { font-weight: 800; color: #15803d; margin-left: 5px; }
+
+        /* --- أخطاء شائعة --- */
+        .common-mistakes {
+            background-color: var(--warning-bg);
+            border: 2px solid var(--warning-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 30px;
+            position: relative;
+        }
+        .mistake-title { color: #be123c; font-weight: 800; font-size: 1.3rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .mistake-list { list-style: none; padding: 0; margin: 0; }
+        .mistake-list li { position: relative; padding-right: 25px; margin-bottom: 10px; color: #881337; font-weight: 500; }
+        .mistake-list li::before { content: '•'; color: #f43f5e; font-size: 1.5rem; position: absolute; right: 0; top: -5px; }
+
+        footer { text-align: center; padding: 30px; color: #94a3b8; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>زوايا المضلع (5-1)</h1>
+    <p>شرح مبسط + مولد حلول + تنبيهات ذكية</p>
+</header>
+
+<div class="container">
+
+    <!-- القسم التمهيدي (الفائدة + التعريفات) -->
+    <div class="pa-concept-box">
+        <div class="box-title">
+            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            تمهيد: ليش ندرس هذا الموضوع؟
+        </div>
+        
+        <!-- فقرة الفائدة -->
+        <div class="intro-benefit">
+            بعد ما تخلص من هذا الدرس، بتصير قادر تحسب مجموع زوايا أي شكل هندسي (مثل الخماسي والسداسي) بكل سهولة! 
+            وراح تقدر تعرف قياس كل زاوية في "خلية النحل" أو "إشارات المرور" وتفهم ليش هي مصممة بهذا الشكل.
+            باختصار: بتصير مهندس زوايا محترف! 📐✨
+        </div>
+
+        <div style="border-top: 2px dashed #e2e8f0; margin: 30px 0;"></div>
+
+        <div class="box-title">
+            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            تعريفات أساسية
+        </div>
+        
+        <div class="def-card">
+            <div class="def-title">المضلع</div>
+            <p>هو أي شكل مسكر (مغلق) يتكون من 3 خطوط مستقيمة أو أكثر، وكل خطين يتقابلون في زاوية.</p>
+        </div>
+
+        <div class="def-card">
+            <div class="def-title">القطر</div>
+            <p>هو الخط اللي يوصل بين رأسين مو جيران (مو جنب بعض)، يعني تنقز رأس وتوصل للي بعده!</p>
+        </div>
+
+        <div class="def-card">
+            <div class="def-title">المضلع المنتظم</div>
+            <p>هذا الشكل "الكشخة" اللي كل أضلاعه قد بعض، وكل زواياه نفس القياس بالضبط.</p>
+        </div>
+    </div>
+
+    <!-- القسم الأول: مجموع الزوايا الداخلية -->
+    <div class="pa-concept-box">
+        <div class="box-title">
+            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM12 8l-4 4 4 4M16 12H8"/></svg>
+            1. مجموع الزوايا الداخلية
+        </div>
+        
+        <div class="informal-text">
+            تخيل إنك تبي تقسم البيت لغرف، نفس الشي هنا! 🏠 <br>
+            أي شكل مضلع نقدر نقسمه لمثلثات من زاوية وحدة بس. السالفة بسيطة جداً: <br>
+            <strong>شيل 2 من عدد الأضلاع</strong> واضرب الباقي في 180، وبس كذا يطلع لك المجموع! سهلة صح؟ 😉
+        </div>
+
+        <div class="highlight-formula">المجموع (S) = (n - 2) × 180°</div>
+
+        <div class="diagram-layout">
+            <div class="diagram-visual">
+                <svg viewBox="0 0 400 350">
+                    <defs>
+                        <marker id="dot" markerWidth="6" markerHeight="6" refX="3" refY="3">
+                            <circle cx="3" cy="3" r="2" fill="#1e3a8a" />
+                        </marker>
+                    </defs>
+                    <polygon points="140,71 260,71 320,175 260,279 140,279 80,175" 
+                             fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round"/>
+                    <circle cx="140" cy="279" r="6" fill="#1e3a8a"/>
+                    <line x1="140" y1="279" x2="80" y2="175" stroke="none"/>
+                    <line x1="140" y1="279" x2="140" y2="71" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,4"/>
+                    <line x1="140" y1="279" x2="260" y2="71" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,4"/>
+                    <line x1="140" y1="279" x2="320" y2="175" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,4"/>
+                    <text x="125" y="190" text-anchor="middle" class="svg-text-bold">مثلث 1</text>
+                    <text x="170" y="150" text-anchor="middle" class="svg-text-bold">مثلث 2</text>
+                    <text x="220" y="160" text-anchor="middle" class="svg-text-bold">مثلث 3</text>
+                    <text x="250" y="220" text-anchor="middle" class="svg-text-bold">مثلث 4</text>
+                    <text x="140" y="310" text-anchor="middle" class="svg-text-small">الرأس المختار</text>
+                </svg>
+            </div>
+            <div class="diagram-text">
+                <div class="info-card">
+                    <div class="info-label">الشكل الهندسي</div>
+                    <div class="info-value" style="color:var(--primary-color);">سداسي (n = 6)</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">عدد المثلثات (n - 2)</div>
+                    <div class="info-value" style="color:#ef4444;">6 - 2 = 4 مثلثات</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">مجموع الزوايا (القانون)</div>
+                    <div class="info-value">4 × 180° = 720°</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- القسم الثاني: المضلع المنتظم -->
+    <div class="pa-concept-box">
+        <div class="box-title">
+            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l10 20H2L12 2z"/></svg>
+            2. المضلع المنتظم
+        </div>
+
+        <div class="informal-text">
+            المضلع المنتظم يعني "المثالي" والكشخة ✨، كل أضلاعه قد بعض وزواياه نفس الشي.<br>
+            عشان تعرف زاوية وحدة بس، خذ المجموع كله وقسمه على عدد الأضلاع بالتساوي. عدل؟ 👌
+        </div>
+        
+        <table class="rich-table">
+            <thead>
+                <tr>
+                    <th>الشكل</th>
+                    <th>الأضلاع (n)</th>
+                    <th>المجموع (S)</th>
+                    <th>الزاوية الواحدة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><svg class="mini-icon" viewBox="0 0 24 24" style="fill:#fbbf24"><path d="M12 2L2 22h20L12 2z"/></svg>مثلث</td>
+                    <td>3</td><td>180°</td><td>60°</td>
+                </tr>
+                <tr>
+                    <td><svg class="mini-icon" viewBox="0 0 24 24" style="fill:#f87171"><rect x="4" y="4" width="16" height="16"/></svg>مربع</td>
+                    <td>4</td><td>360°</td><td>90°</td>
+                </tr>
+                <tr>
+                    <td><svg class="mini-icon" viewBox="0 0 24 24" style="fill:#60a5fa"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2z"/></svg>سداسي</td>
+                    <td>6</td><td>720°</td><td>120°</td>
+                </tr>
+                 <tr>
+                    <td><svg class="mini-icon" viewBox="0 0 24 24" style="fill:#a78bfa"><path d="M8 2h8l6 6v8l-6 6H8l-6-6V8l6-6z"/></svg>ثماني</td>
+                    <td>8</td><td>1080°</td><td>135°</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- القسم الثالث: الزوايا الخارجية -->
+    <div class="pa-concept-box">
+        <div class="box-title">
+            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            3. الزوايا الخارجية
+        </div>
+
+        <div class="informal-text">
+            هذي أسهل وحدة وخذها مني قاعدة! 🚀<br>
+            مهما كبر الشكل أو صغر، لو جمعت الزوايا اللي برا كلها، دايم بتطلع 360 درجة.<br>
+            كأنك تدور حول نفسك دورة كاملة وترجع لنفس المكان. بسيطة!
+        </div>
+        
+        <div class="diagram-layout">
+            <div class="diagram-text" style="text-align: right;">
+                <p><strong>قاعدة ذهبية:</strong> مجموع الزوايا الخارجية لأي مضلع محدب يساوي دائماً <strong>360 درجة</strong>، مهما كان عدد الأضلاع.</p>
+                <div class="info-card" style="background:#fffbeb; border-color:#f59e0b;">
+                    <div class="info-label">المجموع دائماً</div>
+                    <div class="info-value" style="color:#b45309;">360°</div>
+                </div>
+            </div>
+            <div class="diagram-visual">
+                <svg viewBox="0 0 300 200">
+                    <defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#ef4444"/></marker></defs>
+                    <polygon points="100,60 200,60 230,140 70,140" fill="none" stroke="#334155" stroke-width="2"/>
+                    <line x1="200" y1="60" x2="250" y2="60" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow)"/>
+                    <line x1="230" y1="140" x2="260" y2="180" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow)"/>
+                    <line x1="70" y1="140" x2="20" y2="140" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow)"/>
+                    <line x1="100" y1="60" x2="70" y2="20" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow)"/>
+                    <text x="150" y="110" text-anchor="middle" class="svg-text-small" style="font-size:16px;">المجموع = 360°</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- مولد خطوات الحل -->
+    <div class="solver-box">
+        <div class="solver-title">
+            <span style="font-size:1.5rem;">🧮</span>
+            مولد خطوات الحل
+        </div>
+        
+        <p style="color:#4b5563; margin-bottom:15px;">اختر نوع المسألة، أدخل الرقم، وشوف الحل بالتفصيل الممل!</p>
+
+        <div class="input-group">
+            <select id="calcMode">
+                <option value="mode1">عندي عدد الأضلاع (أبي الزوايا)</option>
+                <option value="mode2">عندي زاوية داخلية (أبي عدد الأضلاع)</option>
+            </select>
+            <input type="number" id="inputValue" placeholder="اكتب الرقم..." min="3">
+            <button type="button" class="btn-calc">توليد الحل</button>
+        </div>
+
+        <div id="stepsResult" class="steps-result"></div>
+    </div>
+
+    <!-- أخطاء شائعة -->
+    <div class="common-mistakes">
+        <div class="mistake-title">
+            <span>⚠️</span> أخطاء شائعة
+        </div>
+        <ul class="mistake-list">
+            <li>الخلط بين مجموع الزوايا الداخلية (لها قانون) والزوايا الخارجية (دائماً 360).</li>
+            <li>نسيان طرح 2 في القانون (n-2) قبل الضرب في 180.</li>
+            <li>اعتبار أن الزوايا الداخلية متساوية في أي مضلع (هذا صحيح فقط في المضلع المنتظم).</li>
+        </ul>
+    </div>
+
+</div>
+
+<footer>
+    تم تطوير هذا المحتوى التعليمي بالـ ai ليكون مساعد تفاعلي ولا يغني عن الكتاب المدرسي
+</footer>
+
+</body>
+</html>

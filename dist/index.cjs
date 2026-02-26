@@ -2,11 +2,35 @@ const path = require("path");
 const express = require("express");
 const fs = require("fs");
 const http = require("http");
+const https = require("https");
 
 const publicPath = path.resolve(__dirname, "..", "server", "public");
 const origCreateServer = http.createServer.bind(http);
 
 const SAFE_NAME = /^[a-zA-Z0-9._-]+$/;
+
+function downloadFile(url) {
+  return new Promise((resolve, reject) => {
+    const follow = (u, redirects) => {
+      if (redirects > 5) return reject(new Error("Too many redirects"));
+      const mod = u.startsWith("https") ? https : http;
+      mod.get(u, (resp) => {
+        if (resp.statusCode >= 300 && resp.statusCode < 400 && resp.headers.location) {
+          return follow(resp.headers.location, redirects + 1);
+        }
+        if (resp.statusCode !== 200) {
+          resp.resume();
+          return reject(new Error(`HTTP ${resp.statusCode}`));
+        }
+        const chunks = [];
+        resp.on("data", (c) => chunks.push(c));
+        resp.on("end", () => resolve({ buffer: Buffer.concat(chunks), contentType: resp.headers["content-type"] }));
+        resp.on("error", reject);
+      }).on("error", reject);
+    };
+    follow(url, 0);
+  });
+}
 
 http.createServer = function (app) {
   if (app && typeof app === "function") {
@@ -27,17 +51,15 @@ http.createServer = function (app) {
         }
         try {
           const upstream = `https://sharfedu.com/attached_assets/${encodeURIComponent(folder)}/${encodeURIComponent(filename)}`;
-          const response = await fetch(upstream);
-          if (!response.ok) return res.status(response.status).end();
-          const ct = response.headers.get("content-type");
-          if (ct) res.setHeader("Content-Type", ct);
+          const { buffer, contentType } = await downloadFile(upstream);
+          if (contentType) res.setHeader("Content-Type", contentType);
           res.setHeader("Cache-Control", "public, max-age=86400");
-          const buffer = Buffer.from(await response.arrayBuffer());
           const dir = path.dirname(localPath);
           fs.mkdirSync(dir, { recursive: true });
           fs.writeFileSync(localPath, buffer);
           res.send(buffer);
-        } catch {
+        } catch (err) {
+          console.error(`[proxy] Failed to fetch ${folder}/${filename}:`, err.message);
           next();
         }
       });

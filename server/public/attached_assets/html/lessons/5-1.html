@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معاينة بنك الأسئلة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            background-color: #f8fafc; 
+        }
+        .option-btn:hover:not(:disabled) { 
+            background-color: #f1f5f9; 
+            border-color: #3b82f6; 
+        }
+        .correct { 
+            background-color: #dcfce7 !important; 
+            border-color: #22c55e !important; 
+            color: #14532d; 
+        }
+        .wrong { 
+            background-color: #fee2e2 !important; 
+            border-color: #ef4444 !important; 
+            color: #7f1d1d; 
+        }
+        .final-result-card {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto">
+        <!-- الهيدر المحدث -->
+        <header class="bg-blue-600 text-white p-10 rounded-3xl shadow-lg mb-8 text-center">
+            <h1 class="text-3xl font-bold">زوايا المضلع</h1>
+        </header>
+
+        <div id="quiz-container">
+            <!-- سيتم توليد الأسئلة هنا -->
+        </div>
+
+        <!-- حاوية النتيجة النهائية -->
+        <div id="final-result" class="hidden mt-12 mb-8 p-8 bg-white rounded-3xl shadow-xl border-2 border-blue-500 text-center final-result-card">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">النتيجة النهائية</h2>
+            <div class="text-5xl font-black text-blue-600 mb-4" id="score-display">0 / 0</div>
+            <p class="text-lg text-slate-600" id="result-comment"></p>
+            <button onclick="location.reload()" class="mt-6 px-6 py-2 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition">إعادة الاختبار</button>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            "lessonId": "5-1",
+            "title": "زوايا المضلع",
+            "questions": [
+                {
+                    "id": 1,
+                    "questionText": "إذا كان مجموع قياسات الزوايا الداخلية لمضلع يساوي 900 درجة، فكم عدد أضلاعه؟",
+                    "options": { "a": "5 أضلاع", "b": "6 أضلاع", "c": "7 أضلاع", "d": "8 أضلاع" },
+                    "correctAnswer": "c",
+                    "explanation": "القانون: المجموع = (ن - 2) × 180. إذن 900 = (ن - 2) × 180. بالقسمة على 180 ينتج 5 = ن - 2، إذن ن = 7."
+                },
+                {
+                    "id": 2,
+                    "questionText": "ما مجموع قياسات الزوايا الخارجية للمضلع العشاري (10 أضلاع)؟",
+                    "options": { "a": "1440 درجة", "b": "360 درجة", "c": "1800 درجة", "d": "3600 درجة" },
+                    "correctAnswer": "b",
+                    "explanation": "مجموع الزوايا الخارجية لأي مضلع محدب يساوي دائمًا 360 درجة، بغض النظر عن عدد الأضلاع."
+                },
+                {
+                    "id": 3,
+                    "questionText": "كم قياس الزاوية الداخلية الواحدة للسداسي المنتظم؟",
+                    "options": { "a": "108 درجات", "b": "120 درجة", "c": "135 درجة", "d": "720 درجة" },
+                    "correctAnswer": "b",
+                    "explanation": "المجموع = (6-2)×180 = 720. الزاوية الواحدة = 720 ÷ 6 = 120 درجة."
+                },
+                {
+                    "id": 4,
+                    "questionText": "إذا كان قياس الزاوية الداخلية لمضلع منتظم يساوي 135 درجة، فما عدد أضلاعه؟",
+                    "options": { "a": "6", "b": "8", "c": "10", "d": "12" },
+                    "correctAnswer": "b",
+                    "explanation": "استخدم قانون الزاوية الخارجية: الخارجية = 180 - 135 = 45. عدد الأضلاع = 360 ÷ 45 = 8 أضلاع."
+                },
+                {
+                    "id": 5,
+                    "questionText": "أي مما يلي هو تعريف القطر في المضلع؟",
+                    "options": { "a": "قطعة تصل بين رأسين متتاليين", "b": "قطعة تصل بين رأسين غير متتاليين", "c": "ضلع من أضلاع المضلع", "d": "خط يقسم الزاوية" },
+                    "correctAnswer": "b",
+                    "explanation": "القطر هو قطعة مستقيمة تصل بين أي رأسين غير متتاليين في المضلع."
+                }
+            ]
+        };
+
+        const container = document.getElementById('quiz-container');
+        let correctAnswersCount = 0;
+        let answeredQuestionsCount = 0;
+
+        data.questions.forEach((q, index) => {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-2xl p-6 mb-6 shadow-sm border-t-4 border-blue-500';
+            
+            let optionsHtml = '';
+            for (const [key, value] of Object.entries(q.options)) {
+                optionsHtml += `
+                    <button class="option-btn w-full text-right p-4 mb-3 border-2 border-slate-200 rounded-xl transition-all duration-200 flex items-center gap-4" 
+                            onclick="checkAnswer(this, '${key}', '${q.correctAnswer}', 'exp-${q.id}')">
+                        <span class="bg-slate-100 text-blue-600 font-bold px-3 py-1 rounded-lg border border-slate-200">${key.toUpperCase()}</span>
+                        <span>${value}</span>
+                    </button>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">${index + 1}</span>
+                    <h3 class="text-xl font-bold text-slate-800">${q.questionText}</h3>
+                </div>
+                <div class="grid grid-cols-1 gap-1">
+                    ${optionsHtml}
+                </div>
+                <div id="exp-${q.id}" class="hidden mt-4 p-4 bg-amber-50 border-r-4 border-amber-400 text-amber-900 rounded-lg">
+                    <strong class="block mb-1">💡 التفسير:</strong>
+                    ${q.explanation}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        window.checkAnswer = function(btn, selected, correct, expId) {
+            const parent = btn.parentElement;
+            const buttons = parent.querySelectorAll('.option-btn');
+            
+            // تعطيل الضغط مرة أخرى على هذا السؤال
+            buttons.forEach(b => b.disabled = true);
+            answeredQuestionsCount++;
+            
+            if (selected === correct) {
+                correctAnswersCount++;
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+                // تظليل الإجابة الصحيحة
+                buttons.forEach(b => {
+                    const key = b.querySelector('span').innerText.toLowerCase();
+                    if (key === correct) b.classList.add('correct');
+                });
+            }
+            
+            document.getElementById(expId).classList.remove('hidden');
+
+            // فحص إذا انتهت جميع الأسئلة لإظهار النتيجة
+            if (answeredQuestionsCount === data.questions.length) {
+                showFinalResult();
+            }
+        };
+
+        function showFinalResult() {
+            const resultDiv = document.getElementById('final-result');
+            const scoreDisplay = document.getElementById('score-display');
+            const resultComment = document.getElementById('result-comment');
+            
+            scoreDisplay.innerText = `${correctAnswersCount} / ${data.questions.length}`;
+            
+            const percentage = (correctAnswersCount / data.questions.length) * 100;
+            if (percentage === 100) {
+                resultComment.innerText = "ممتاز! أنت بطل في زوايا المضلع 🌟";
+            } else if (percentage >= 70) {
+                resultComment.innerText = "عمل رائع! مستواك جيد جداً 👍";
+            } else {
+                resultComment.innerText = "محاولة جيدة، يمكنك مراجعة الدرس والمحاولة مرة أخرى 💪";
+            }
+            
+            resultDiv.classList.remove('hidden');
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
