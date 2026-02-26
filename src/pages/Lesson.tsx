@@ -143,7 +143,7 @@ function VideoTabContent({
       </div>
       <div className="mb-8">
         <h3 className="text-lg font-bold mb-4 text-foreground" id="video-list-heading">فيديوهات أخرى لنفس الدرس</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {videos.map((v, i) => {
             const emb = toEmbed(v.url);
             const vid = extractId(v.url);
@@ -160,20 +160,20 @@ function VideoTabContent({
                 role="button"
                 tabIndex={0}
                 aria-pressed={isActive === true ? true : isActive === false ? false : undefined}
-                className={`rounded-xl overflow-hidden border-2 cursor-pointer select-none transition-all duration-300 text-right ${
+                className={`rounded-xl overflow-hidden border-2 cursor-pointer select-none transition-all duration-300 text-right flex sm:flex-col flex-row ${
                   isActive ? "border-primary shadow-xl shadow-primary/30 ring-2 ring-primary/50 bg-primary/10" : "border-border hover:border-primary/50 hover:ring-2 hover:ring-primary/20"
                 }`}
                 onClick={() => setSelectedUrl(emb)}
                 onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedUrl(emb); } }}
               >
-                <div className="relative aspect-video bg-black">
+                <div className="relative aspect-video bg-black w-32 sm:w-full shrink-0">
                   <img src={thumb} alt="" className="absolute inset-0 w-full h-full object-cover" />
                   <div className={`absolute inset-0 flex items-center justify-center ${isActive ? "bg-black/20" : "bg-black/40 hover:bg-black/30"}`}>
-                    <Play className={`w-12 h-12 text-white ${isActive ? "opacity-100" : "opacity-80"}`} />
+                    <Play className={`w-8 h-8 sm:w-12 sm:h-12 text-white ${isActive ? "opacity-100" : "opacity-80"}`} />
                   </div>
                 </div>
-                <div className={`p-3 ${isActive ? "bg-primary/15" : "bg-card"}`}>
-                  <p className="font-semibold text-sm mb-1 line-clamp-2">{meta.title}</p>
+                <div className={`p-2.5 sm:p-3 flex-1 min-w-0 ${isActive ? "bg-primary/15" : "bg-card"}`}>
+                  <p className="font-semibold text-xs sm:text-sm mb-1 line-clamp-2">{meta.title}</p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span className="truncate">{meta.channelName}</span>
                     {meta.duration && meta.duration !== "—" && meta.duration !== "غير محدد" && (
@@ -1728,7 +1728,7 @@ export default function Lesson() {
                     transition={{ duration: 0.3 }}
                   >
                     {/* Lesson Info + Video Player + قائمة الفيديوهات — الكل داخل مستطيل واحد */}
-                    <div className="bg-white dark:bg-card rounded-2xl p-6 shadow-sm border border-border/50 mb-8">
+                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50 mb-8">
                       <div className="text-center mb-6">
                         <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white mb-4">
                           <Video className="w-8 h-8" />
@@ -1752,8 +1752,8 @@ export default function Lesson() {
                     </div>
 
                     {/* Auto Video Progress Tracker */}
-                    <div className="bg-white dark:bg-card rounded-2xl p-6 shadow-sm border border-border/50 mb-8">
-                      <div className="flex items-center justify-between">
+                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50 mb-8">
+                      <div className="flex items-center justify-between gap-2">
                         <div>
                           <h3 className="font-bold text-lg mb-1">تتبع المشاهدة التلقائي</h3>
                           <p className="text-sm text-muted-foreground">
@@ -1799,25 +1799,25 @@ export default function Lesson() {
                     transition={{ duration: 0.3 }}
                     className="w-full"
                   >
-                    <div className="bg-white dark:bg-card rounded-2xl p-6 shadow-sm border border-border/50 mb-8">
-                      <div className="text-center mb-6">
-                        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white mb-4">
-                          <FileText className="w-8 h-8" />
+                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50 mb-8">
+                      <div className="text-center mb-4 sm:mb-6">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white mb-3 sm:mb-4">
+                          <FileText className="w-6 h-6 sm:w-8 sm:h-8" />
                         </div>
-                        <h2 className="text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الملخص"}</h2>
+                        <h2 className="text-lg sm:text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الملخص"}</h2>
                       </div>
                       {(() => {
                         const summaryPdfUrl = (cmsSummaryContent?.contentType === "pdf" && cmsSummaryContent?.dataValue)
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto" style={{ overflow: 'hidden' }}>
+                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
                             <iframe
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block"
+                              className="border-0 block w-full sm:pdf-iframe-desktop"
                               scrolling="no"
                               loading="lazy"
-                              style={{ width: 'calc(100% + 50px)', height: '5000px', overflow: 'hidden', margin: '0 -25px' }}
+                              style={{ height: '5000px', overflow: 'hidden' }}
                               title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
                             />
                           </div>
@@ -1844,7 +1844,7 @@ export default function Lesson() {
                     className="w-full min-h-[500px]"
                   >
                     {loadingEducation ? (
-                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50">
+                      <div className="bg-white dark:bg-card rounded-2xl p-4 sm:p-8 shadow-sm border border-border/50">
                         <div className="flex items-center justify-center py-12">
                           <Loader2 className="w-8 h-8 animate-spin text-primary" />
                           <span className="mr-3 text-muted-foreground">جاري تحميل المحتوى التعليمي...</span>
@@ -1879,7 +1879,7 @@ export default function Lesson() {
                         dangerouslySetInnerHTML={{ __html: educationContent }}
                       />
                     ) : (
-                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50">
+                      <div className="bg-white dark:bg-card rounded-2xl p-4 sm:p-8 shadow-sm border border-border/50">
                         <div className="text-center py-12">
                           <GraduationCap className="w-16 h-16 mx-auto mb-4 text-purple-500 opacity-50" />
                           <p className="text-muted-foreground">لا يوجد محتوى تعليمي متاح حالياً</p>
@@ -1899,12 +1899,12 @@ export default function Lesson() {
                     transition={{ duration: 0.3 }}
                     className="w-full"
                   >
-                    <div className="bg-white dark:bg-card rounded-2xl p-6 shadow-sm border border-border/50">
-                      <div className="text-center mb-6">
-                        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white mb-4">
-                          <BookOpenCheck className="w-8 h-8" />
+                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50">
+                      <div className="text-center mb-4 sm:mb-6">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white mb-3 sm:mb-4">
+                          <BookOpenCheck className="w-6 h-6 sm:w-8 sm:h-8" />
                         </div>
-                        <h2 className="text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الدرس"}</h2>
+                        <h2 className="text-lg sm:text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الدرس"}</h2>
                       </div>
                       
                       {(() => {
@@ -1912,14 +1912,14 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto" style={{ overflow: 'hidden' }}>
+                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
                             <iframe
                               ref={pdfIframeRef}
                               src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block"
+                              className="border-0 block w-full sm:pdf-iframe-desktop"
                               scrolling="no"
                               loading="lazy"
-                              style={{ width: 'calc(100% + 50px)', height: '5000px', overflow: 'hidden', margin: '0 -25px' }}
+                              style={{ height: '5000px', overflow: 'hidden' }}
                               title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
                             />
                           </div>

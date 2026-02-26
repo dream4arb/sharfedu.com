@@ -232,3 +232,10 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
+
+@media (min-width: 640px) {
+  .pdf-iframe-container iframe {
+    width: calc(100% + 50px);
+    margin: 0 -25px;
+  }
+}
