@@ -10,18 +10,14 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pageCount, setPageCount] = useState(0);
-  const renderedRef = useRef(false);
 
   useEffect(() => {
-    renderedRef.current = false;
     const container = containerRef.current;
     if (!container) return;
 
     container.querySelectorAll("canvas").forEach((c) => c.remove());
     setLoading(true);
     setError(null);
-    setPageCount(0);
 
     let cancelled = false;
 
@@ -32,9 +28,7 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
 
         const loadingTask = pdfjsLib.getDocument(url);
         const pdf = await loadingTask.promise;
-
         if (cancelled) return;
-        setPageCount(pdf.numPages);
 
         const containerWidth = container.offsetWidth || 700;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -60,10 +54,9 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
           await page.render({ canvasContext: ctx, viewport }).promise;
           if (cancelled) return;
           container.appendChild(canvas);
-        }
 
-        renderedRef.current = true;
-        setLoading(false);
+          if (i === 1) setLoading(false);
+        }
       } catch (err: any) {
         if (!cancelled) {
           setError("تعذّر تحميل ملف PDF");
@@ -82,9 +75,7 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
       {loading && (
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
-          <p className="text-sm text-muted-foreground">
-            جاري تحميل الملف...{pageCount > 0 ? ` (${pageCount} صفحات)` : ""}
-          </p>
+          <p className="text-sm text-muted-foreground">جاري تحميل الملف...</p>
         </div>
       )}
       {error && (
@@ -94,7 +85,7 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
       )}
       <div
         ref={containerRef}
-        className="w-full space-y-1"
+        className="w-full"
         aria-label={title || "عارض PDF"}
       />
     </div>
