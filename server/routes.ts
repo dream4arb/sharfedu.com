@@ -16,7 +16,7 @@ import authRoutes from "./auth/authRoutes";
 import { createSessionStore } from "./auth/sessionStore";
 import { requireAdmin } from "./middleware/adminAuth";
 import path from "path";
-import fs from "fs";
+import { access } from "fs/promises";
 
 const SAFE_NAME = /^[a-zA-Z0-9._-]+$/;
 
@@ -39,9 +39,7 @@ export async function registerRoutes(httpServer: Server, app: Express) {
       path.join(process.cwd(), "server", "public", "attached_assets", folder, filename),
     ];
     for (const p of pathsToTry) {
-      if (fs.existsSync(p)) {
-        return res.sendFile(p);
-      }
+      try { await access(p); return res.sendFile(p); } catch {}
     }
     res.status(404).json({ error: "File not found" });
   });

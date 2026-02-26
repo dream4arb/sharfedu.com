@@ -14,16 +14,11 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 
 ## Architecture
 
-### Hybrid Build Strategy
-- **Frontend**: Pre-built static files from production (Cloudways) served from `server/public/`
-- **Backend**: `dist/server-original.cjs` (production compiled binary) loaded by `dist/index.cjs` wrapper
-- **Wrapper (`dist/index.cjs`)**: Adds static file serving + SPA fallback + trust proxy + cache headers
-- **Source code** (`server/`, `src/`, `shared/`): Full source for future builds via `npx tsx script/build.ts`
-
-### Startup
-- `bash start.sh` → `node dist/index.cjs` on port 5000
-- Static files: `server/public/` (146 code-split JS/CSS files + PDFs)
-- Database: `sqlite.db` (SQLite via LibSQL)
+### Build & Run
+- **Build**: `npx tsx script/build.ts` → produces `dist/index.cjs` (minified server bundle) + `server/public/` (Vite-built frontend)
+- **Post-build**: Copy `node_modules/pdfjs-dist/build/pdf.worker.min.mjs` to `server/public/`
+- **Start**: `bash start.sh` → `NODE_ENV=production node dist/index.cjs` on port 5000
+- **Database**: `sqlite.db` (SQLite via LibSQL/Drizzle ORM)
 
 ### Tech Stack
 **Frontend**: React 18, TypeScript, Wouter routing, TanStack Query, Tailwind CSS, shadcn/ui, Framer Motion
@@ -31,48 +26,49 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 
 ### Project Structure
 ```
-├── start.sh                 # Startup script
+├── start.sh                 # Startup script (sets NODE_ENV, PORT, runs dist/index.cjs)
+├── script/build.ts          # Build script (Vite frontend + esbuild backend)
 ├── src/                     # Frontend source
 │   ├── App.tsx              # Main app with routing
-│   ├── pages/               # Page components
+│   ├── pages/               # Page components (Home, Lesson, Stage, Dashboard, Admin, Auth)
 │   ├── components/          # UI components (home, layout, lessons, ui)
 │   ├── hooks/               # Custom hooks (auth, mobile, progress)
 │   └── lib/                 # Utilities (queryClient, seo, theme)
 ├── server/                  # Backend source
 │   ├── index.ts             # Express entry (CORS, security headers, trust proxy)
-│   ├── routes.ts            # API routes (auth, chat, progress, SEO)
+│   ├── routes.ts            # API routes (auth, chat, progress, SEO, attached_assets)
+│   ├── static.ts            # Static file serving with 1y cache + SPA fallback
 │   ├── db.ts                # Database connection
 │   ├── storage.ts           # Data access layer
-│   ├── static.ts            # Static file serving with caching
-│   ├── lib/gemini.ts        # Shared Gemini AI client
-│   ├── lib/sendMail.ts      # Email utility
-│   ├── auth/                # Authentication (Passport, sessions, OAuth)
-│   ├── admin/               # Admin CMS (routes, storage, hierarchy)
-│   ├── routes/              # Additional routes (pdf-extractor, extract-questions)
-│   └── middleware/           # Auth middleware
+│   ├── lib/gemini.ts        # Shared Gemini AI client (singleton)
+│   ├── lib/sendMail.ts      # Email utility (Nodemailer)
+│   ├── auth/                # Authentication (Passport, sessions, Google OAuth)
+│   ├── admin/               # Admin CMS (adminRoutes, cmsRoutes, cmsStorage, contentRoutes, hierarchyStore)
+│   ├── routes/              # AI routes (pdf-extractor, extract-questions)
+│   ├── data/                # cms-hierarchy (curriculum structure)
+│   └── middleware/           # Auth middleware (adminAuth)
 ├── shared/                  # Shared types and schemas
 │   ├── schema.ts            # Drizzle database schema
 │   └── routes.ts            # API route definitions
-├── dist/                    # Build output
-│   ├── index.cjs            # Wrapper (static serving + loads server-original)
-│   └── server-original.cjs  # Production server binary from Cloudways
-├── server/public/           # Production frontend + attached assets (PDFs)
-├── script/build.ts          # Build script (Vite + esbuild)
+├── dist/index.cjs           # Production server bundle (esbuild output)
+├── server/public/           # Production frontend (Vite output) + PDF worker
+├── attached_assets/         # User-uploaded files (uploads/, html/, json/)
 └── sqlite.db                # SQLite database
 ```
 
 ### Environment Variables
-**Secrets**: SESSION_SECRET, GEMINI_API_KEY, YOUTUBE_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL, SMTP_PASS, SSH_PASS
-**Config**: NODE_ENV=production, PORT=5000
+**Secrets**: SESSION_SECRET, GEMINI_API_KEY, YOUTUBE_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL, SMTP_PASS, SSH_PASS, GITHUB_TOKEN
+**Config**: NODE_ENV=production, PORT=5000, DATABASE_URL=file:sqlite.db
 
 ### Security Features
-- CORS: Strict origin whitelist (sharfedu.com + Replit domain only)
-- Security headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, HSTS
-- Path traversal protection on file serving routes
+- CORS: Strict origin whitelist (sharfedu.com + Replit domain; localhost only in dev)
+- Security headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, HSTS (production)
+- Path traversal protection on file serving routes (SAFE_NAME regex + path.basename)
 - Session: httpOnly, sameSite=lax, secure in production
 - Passwords: bcrypt hashed
-- File uploads: Size limited (20MB), random filenames, MIME type whitelist (PDF, PNG, JPEG, WebP, GIF, SVG)
+- File uploads: Size limited (20MB), random filenames, MIME type whitelist (PDF, PNG, JPEG, WebP, GIF, SVG) on both admin and CMS upload routes
 - Error messages: Generic in production (no stack trace leaks)
+- All file I/O uses async fs/promises (non-blocking)
 
 ### Key Pages
 1. **Home (/)**: Landing with Hero, SearchBar, StageSelector, Features
@@ -88,12 +84,12 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 2. Second: Upload to production server via SSH
 Never skip either step. Never deploy to server without pushing to GitHub first.
 
-### Production Server (Cloudways)
+### Production Server
 - Host: 165.227.236.121, User: SSH_USER env var
 - App path: /home/master/applications/cmkdrtgqcv/public_html/
-- Node app: /home/master/applications/cmkdrtgqcv/public_html/node_app/
-- Frontend: tar + scp to ~/  then extract in public_html/
-- Backend: tar + scp index.cjs + server-original.cjs to node_app/
+- Node app: node_app/index.cjs
+- Deploy frontend: `tar czf /tmp/file.tar.gz -C server/public --exclude='attached_assets' .` → scp → extract
+- Deploy backend: scp dist/index.cjs → node_app/
 
 ### GitHub
 - Repo: https://github.com/dream4arb/sharfedu.com

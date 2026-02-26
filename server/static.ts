@@ -1,11 +1,11 @@
 import express, { type Express } from "express";
-import fs from "fs";
+import { existsSync } from "fs";
 import path from "path";
 
 const publicPath = path.resolve(process.cwd(), "server", "public");
 
 export function serveStatic(app: Express) {
-  if (!fs.existsSync(publicPath)) {
+  if (!existsSync(publicPath)) {
     if (process.env.NODE_ENV === "production") {
       return;
     }

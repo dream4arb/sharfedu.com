@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getGeminiClient } from "../lib/gemini";
-import fs from "fs";
+import { access, readFile } from "fs/promises";
 import path from "path";
 
 const router = Router();
@@ -30,7 +30,7 @@ router.post("/api/extract-questions-from-file", async (req, res) => {
     const safePath = path.basename(imagePath);
     const fullPath = path.join(process.cwd(), "public", safePath);
     
-    if (!fs.existsSync(fullPath)) {
+    try { await access(fullPath); } catch {
       return res.status(404).json({ error: "Image not found" });
     }
 
@@ -47,7 +47,7 @@ router.post("/api/extract-questions-from-file", async (req, res) => {
       },
     });
 
-    const imageBuffer = fs.readFileSync(fullPath);
+    const imageBuffer = await readFile(fullPath);
     const base64Image = imageBuffer.toString("base64");
     const mimeType = fullPath.endsWith(".png") ? "image/png" : "image/jpeg";
 

@@ -1,9 +1,16 @@
 import { Router } from "express";
-import fs from "fs";
+import { access, readFile } from "fs/promises";
 import path from "path";
 import { getDirname } from "../resolve-dir";
 import * as storage from "./contentStorage";
 import * as cmsStorage from "./cmsStorage";
+
+async function fileExists(p: string): Promise<boolean> {
+  try { await access(p); return true; } catch { return false; }
+}
+async function readTextFile(p: string): Promise<string> {
+  return readFile(p, "utf-8");
+}
 
 const __dirname = getDirname();
 const attachedRoot = path.resolve(__dirname, "..", "..", "attached_assets");
@@ -62,8 +69,8 @@ router.get("/lesson/:lessonId/education-html", async (req, res) => {
       "lessons",
       `${lessonId}-education.html`
     );
-    if (fs.existsSync(fallbackPath)) {
-      const raw = fs.readFileSync(fallbackPath, "utf-8");
+    if (await fileExists(fallbackPath)) {
+      const raw = await readTextFile(fallbackPath);
       res.type("text/html").send(raw);
       return;
     }
@@ -95,8 +102,8 @@ router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
       path.resolve(process.cwd(), "attached_assets", "html", "lessons", `${lessonId}-ssa.html`),
     ];
     for (const ssaPath of pathsToTry) {
-      if (fs.existsSync(ssaPath)) {
-        const raw = fs.readFileSync(ssaPath, "utf-8");
+      if (await fileExists(ssaPath)) {
+        const raw = await readTextFile(ssaPath);
         res.type("text/html").send(raw);
         return;
       }
@@ -115,8 +122,8 @@ router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
       path.resolve(process.cwd(), "attached_assets", "html", "lessons", `${lessonId}-education.html`),
     ];
     for (const educationPath of eduPaths) {
-      if (fs.existsSync(educationPath)) {
-        const raw = fs.readFileSync(educationPath, "utf-8");
+      if (await fileExists(educationPath)) {
+        const raw = await readTextFile(educationPath);
         res.type("text/html").send(raw);
         return;
       }
@@ -159,8 +166,8 @@ router.get("/lesson/:lessonId/json", async (req, res) => {
         "lessons",
         `${lessonId}-questions.json`
       );
-      if (fs.existsSync(fallbackPath)) {
-        const raw = fs.readFileSync(fallbackPath, "utf-8");
+      if (await fileExists(fallbackPath)) {
+        const raw = await readTextFile(fallbackPath);
         res.type("application/json").send(raw);
         return;
       }

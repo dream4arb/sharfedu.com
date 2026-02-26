@@ -9,7 +9,6 @@ const root = path.resolve(__dirname, "..");
 
 const allowlist = [
   "@google/generative-ai",
-  "connect-pg-simple",
   "date-fns",
   "drizzle-orm",
   "drizzle-zod",

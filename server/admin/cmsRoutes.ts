@@ -16,15 +16,22 @@ import {
 import { saveHierarchyToDb } from "./hierarchyStore";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
+import { mkdir } from "fs/promises";
 import { getDirname } from "../resolve-dir";
 
 const __dirname = getDirname();
 
 const uploadsDir = path.join(__dirname, "..", "..", "attached_assets", "uploads");
-try {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-} catch {}
+mkdir(uploadsDir, { recursive: true }).catch(() => {});
+
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+]);
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -35,6 +42,12 @@ const upload = multer({
     },
   }),
   limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return cb(new Error("نوع الملف غير مسموح به."));
+    }
+    cb(null, true);
+  },
 });
 
 const router = Router();
