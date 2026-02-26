@@ -12,7 +12,7 @@ import { Link, useParams, useLocation } from "wouter";
 import { 
   Loader2, Play, FileText, Download, CheckCircle, 
   Lock, ArrowRight, Home, BookOpen, Check, Video,
-  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
+  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -41,8 +41,9 @@ type TabType = "lesson" | "video" | "summary" | "education" | "ssa";
 const tabs = [
   { id: "lesson" as TabType, label: "الدرس", icon: BookOpenCheck },
   { id: "video" as TabType, label: "الفيديو", icon: Video },
-  { id: "ssa" as TabType, label: "شارف AI", icon: Sparkles },
   { id: "summary" as TabType, label: "الملخص", icon: FileText },
+  { id: "education" as TabType, label: "التعليم", icon: GraduationCap },
+  { id: "ssa" as TabType, label: "الأسئلة", icon: HelpCircle },
 ];
 
 function scopeEducationCss(css: string, scopeClass = ".education-sandbox") {
@@ -1720,6 +1721,10 @@ export default function Lesson() {
                           <Video className="w-8 h-8" />
                         </div>
                         <h2 className="text-xl font-bold mb-2">{getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}</h2>
+                        <p className="text-muted-foreground leading-relaxed">
+                          في هذا الدرس سنتعلم {currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "—"} بطريقة مبسطة وسهلة الفهم. 
+                          تابع بتركيز وقم بحل التمارين المرفقة لتثبيت المعلومات.
+                        </p>
                       </div>
                     </div>
 
@@ -1792,6 +1797,10 @@ export default function Lesson() {
                           <FileText className="w-8 h-8" />
                         </div>
                         <h2 className="text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الملخص"}</h2>
+                        <p className="text-muted-foreground leading-relaxed">
+                          في هذا الدرس سنتعلم {currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "—"} بطريقة مبسطة وسهلة الفهم. 
+                          تابع بتركيز وقم بحل التمارين المرفقة لتثبيت المعلومات.
+                        </p>
                       </div>
                       <div className="w-full max-w-[1200px] mx-auto bg-accent/30 rounded-md overflow-hidden border border-border/50 shadow-lg" style={{ height: '850px', minHeight: '850px' }}>
                         {(() => {
@@ -1885,6 +1894,10 @@ export default function Lesson() {
                           <BookOpenCheck className="w-8 h-8" />
                         </div>
                         <h2 className="text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الدرس"}</h2>
+                        <p className="text-muted-foreground leading-relaxed">
+                          في هذا الدرس سنتعلم {currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "—"} بطريقة مبسطة وسهلة الفهم. 
+                          تابع بتركيز وقم بحل التمارين المرفقة لتثبيت المعلومات.
+                        </p>
                       </div>
                       
                       <div className="w-full max-w-[1200px] mx-auto bg-accent/30 rounded-md overflow-hidden border border-border/50 shadow-lg" style={{ height: '850px', minHeight: '850px' }}>
