@@ -52,7 +52,7 @@ expertMode = true
 [userenv.shared]
 NODE_ENV = "production"
 PORT = "5000"
-BASE_URL = "https://sharfedu.com"
+BASE_URL = "https://39cfad42-331c-4fa6-90d7-5af1414fa56a-00-hd49areow3rx.spock.replit.dev"
 ADMIN_EMAIL = "arb998@gmail.com"
 SMTP_HOST = "webhost-mail-out.dynadot.com"
 SMTP_PORT = "465"
