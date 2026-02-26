@@ -80,31 +80,31 @@ const PageLoader = () => (
 
 function Router() {
   return (
-    <Suspense fallback={<PageLoader />}>
-      <SeoHead />
-      <ScrollToTop />
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/login" component={LoginPage} />
-        <Route path="/register" component={RegisterPage} />
-        <Route path="/forgot-password" component={ForgotPasswordPage} />
-        <Route path="/reset-password" component={ResetPasswordPage} />
-        <Route path="/dashboard" component={ProtectedDashboard} />
-        <Route path="/complete-profile" component={ProtectedDashboard} />
-        <Route path="/profile" component={ProtectedProfile} />
-        <Route path="/admin/pdf-extractor" component={PdfExtractor} />
-        <Route path="/admin">
-          <ErrorBoundary>
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <SeoHead />
+        <ScrollToTop />
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/login" component={LoginPage} />
+          <Route path="/register" component={RegisterPage} />
+          <Route path="/forgot-password" component={ForgotPasswordPage} />
+          <Route path="/reset-password" component={ResetPasswordPage} />
+          <Route path="/dashboard" component={ProtectedDashboard} />
+          <Route path="/complete-profile" component={ProtectedDashboard} />
+          <Route path="/profile" component={ProtectedProfile} />
+          <Route path="/admin/pdf-extractor" component={PdfExtractor} />
+          <Route path="/admin">
             <ProtectedAdmin />
-          </ErrorBoundary>
-        </Route>
-        <Route path="/courses/:gradeLevel" component={Courses} />
-        <Route path="/stage/:stageId" component={Stage} />
-        <Route path="/lesson/:stage/:subject/:lessonId?" component={Lesson} />
-        <Route path="/pdf-viewer" component={PdfViewer} />
-        <Route component={NotFound} />
-      </Switch>
-    </Suspense>
+          </Route>
+          <Route path="/courses/:gradeLevel" component={Courses} />
+          <Route path="/stage/:stageId" component={Stage} />
+          <Route path="/lesson/:stage/:subject/:lessonId?" component={Lesson} />
+          <Route path="/pdf-viewer" component={PdfViewer} />
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
