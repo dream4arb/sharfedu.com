@@ -65,7 +65,6 @@ export async function registerRoutes(httpServer: Server, app: Express) {
   app.use(passport.session());
 
   app.use("/api/auth", authRoutes);
-  app.use("/api/user", authRoutes);
 
   app.get("/api/school-year", async (_req, res) => {
     try {

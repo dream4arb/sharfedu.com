@@ -5,7 +5,7 @@ import { useCmsTabContent } from "@/hooks/use-cms-tab-content";
 import { usePublicStructure } from "@/hooks/use-public-structure";
 import { lessonsData, getSubjectName, subjectsData, getSemestersForSidebar, ensureTwoSemestersWithAttachments, type SemesterData, type LessonData } from "@/data/lessons";
 import { setPageMeta } from "@/lib/seo";
-import { allMathTestsFinal, type MathTestData } from "@/data/math-tests-final";
+import { type MathTestData } from "@/data/math-tests-final";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams, useLocation } from "wouter";
@@ -29,12 +29,6 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import PolygonAnglesQuizSSA from "@/components/lessons/PolygonAnglesQuizSSA";
-
-const attachmentsData = [
-  { id: "1", name: "ملخص الدرس", type: "pdf", size: "2.5 MB", icon: FileText },
-  { id: "2", name: "تمارين إضافية", type: "pdf", size: "1.8 MB", icon: FileText },
-  { id: "3", name: "الحلول النموذجية", type: "pdf", size: "1.2 MB", icon: FileText },
-];
 
 type TabType = "lesson" | "video" | "summary" | "education" | "ssa";
 
@@ -216,7 +210,6 @@ export default function Lesson() {
   const [canCompleteVideo, setCanCompleteVideo] = useState(false);
   const [pdfScrollProgress, setPdfScrollProgress] = useState(0);
   const pdfIframeRef = useRef<HTMLIFrameElement>(null);
-  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
   const [educationContent, setEducationContent] = useState<string>("");
   const [educationRawHtml, setEducationRawHtml] = useState<string | null>(null); // للعرض في iframe عند وجود scripts
   const [loadingEducation, setLoadingEducation] = useState(false);
@@ -276,18 +269,6 @@ export default function Lesson() {
       if (match) return match[1];
     }
     return null;
-  };
-
-  // Convert YouTube URL to embed URL
-  const convertToEmbedUrl = (url: string): string => {
-    // If already an embed URL, return as is (but convert to nocookie)
-    if (url.includes("/embed/")) {
-      return url.replace("youtube.com", "youtube-nocookie.com");
-    }
-    
-    const videoId = extractVideoId(url);
-    if (!videoId) return url;
-    return `https://www.youtube-nocookie.com/embed/${videoId}`;
   };
 
   // Map URL stage names to internal stage IDs

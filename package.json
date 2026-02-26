@@ -9,19 +9,9 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development npx tsx server/index.ts",
     "build": "npx tsx script/build.ts",
-    "build:upload": "npx tsx script/build.ts && node script/zip-for-upload.cjs",
-    "upload:public": "node script/upload-to-server.cjs",
-    "build:static": "npx vite build --outDir public_html",
     "start": "cross-env NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
-    "db:push": "drizzle-kit push",
-    "migrate:admin": "npx tsx scripts/migrate-admin.ts",
-    "migrate:cms": "npx tsx scripts/migrate-cms.ts",
-    "migrate:legacy": "npx tsx scripts/migrate-legacy-to-cms.ts",
-    "migrate:seo-og": "npx tsx scripts/migrate-seo-og.ts",
-    "migrate:student-profile": "npx tsx scripts/migrate-student-profile.ts",
-    "server:list": "pwsh -NoProfile -File scripts/list-server.ps1",
-    "deploy": "pwsh -NoProfile -File scripts/deploy.ps1"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

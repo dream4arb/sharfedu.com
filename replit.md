@@ -16,7 +16,7 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 
 ### Build & Run
 - **Build**: `npx tsx script/build.ts` → produces `dist/index.cjs` (minified server bundle) + `server/public/` (Vite-built frontend)
-- **Post-build**: Copy `node_modules/pdfjs-dist/build/pdf.worker.min.mjs` to `server/public/`
+- **Post-build**: PDF worker (`pdf.worker.min.mjs`) is auto-copied to `server/public/` by the build script
 - **Start**: `bash start.sh` → `NODE_ENV=production node dist/index.cjs` on port 5000
 - **Database**: `sqlite.db` (SQLite via LibSQL/Drizzle ORM)
 
@@ -61,10 +61,9 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 **Config**: NODE_ENV=production, PORT=5000, DATABASE_URL=file:sqlite.db
 
 ### YouTube Video Metadata
-- **Strategy**: Three-tier approach for fetching video title, channel, duration
+- **Strategy**: Two-tier server-side approach (no client-side API loading for performance)
   1. **YouTube Data API** (server-side) — full metadata when quota available
   2. **YouTube oEmbed API** (server-side fallback) — title + channel, no API key needed
-  3. **YouTube IFrame Player API** (browser-side) — duration extraction from browser
 - **Cache**: Server-side with TTL (1h) and max size (500 entries)
 - **Endpoint**: `GET /api/content/youtube-video-info?ids=id1,id2` — max 20 IDs per request
 

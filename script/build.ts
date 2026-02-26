@@ -1,6 +1,6 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
-import { rm, readFile } from "fs/promises";
+import { rm, readFile, copyFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -51,6 +51,10 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+
+  const pdfWorkerSrc = path.resolve(root, "node_modules/pdfjs-dist/build/pdf.worker.min.mjs");
+  const pdfWorkerDst = path.resolve(root, "server/public/pdf.worker.min.mjs");
+  await copyFile(pdfWorkerSrc, pdfWorkerDst);
 
   console.log("Build complete. Output: dist/index.cjs + server/public/");
 }
