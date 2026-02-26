@@ -1813,7 +1813,7 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
+                          <div className="w-full max-w-[1200px] mx-auto overflow-x-auto sm:overflow-hidden pdf-iframe-container">
                             <iframe
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="border-0 block w-full sm:pdf-iframe-desktop"
@@ -1914,7 +1914,7 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
+                          <div className="w-full max-w-[1200px] mx-auto overflow-x-auto sm:overflow-hidden pdf-iframe-container">
                             <iframe
                               ref={pdfIframeRef}
                               src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}

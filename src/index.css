@@ -233,16 +233,6 @@
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-@media (max-width: 639px) {
-  .pdf-iframe-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .pdf-iframe-container iframe {
-    min-width: 100%;
-  }
-}
-
 @media (min-width: 640px) {
   .pdf-iframe-container iframe {
     width: calc(100% + 50px);
