@@ -130,7 +130,7 @@ function VideoTabContent({
   return (
     <>
       <div className="mb-8">
-        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl">
+        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl yt-hide-branding">
           <iframe
             key={selectedUrl}
             src={finalSrc}
