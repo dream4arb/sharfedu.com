@@ -1333,7 +1333,7 @@ export default function Lesson() {
             <header className="sticky top-0 z-20 bg-white/95 dark:bg-card/95 backdrop-blur-lg shadow-sm border-b border-border/50">
               <div className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-4">
-                  <SidebarTrigger data-testid="button-toggle-lessons-sidebar" />
+                  <SidebarTrigger aria-label="فتح قائمة الدروس" data-testid="button-toggle-lessons-sidebar" />
                   <div>
                     <div className="text-sm text-muted-foreground">{subjectDisplayName}</div>
                     <h1 className="font-bold text-lg" data-testid="text-lesson-title">
@@ -1341,7 +1341,7 @@ export default function Lesson() {
                     </h1>
                   </div>
                 </div>
-                {currentLesson && lessonId && (
+                {currentLesson && lessonId ? (
                   <div className="flex items-center gap-3">
                     <span className="text-sm text-muted-foreground">
                       {Math.round(getLessonProgress(subjectId, lessonId))}%
@@ -1365,6 +1365,14 @@ export default function Lesson() {
                       )}
                     </Button>
                   </div>
+                ) : (
+                  <div className="flex items-center gap-3 invisible">
+                    <span className="text-sm">0%</span>
+                    <Button variant="outline" className="gap-2" tabIndex={-1}>
+                      <Check className="w-4 h-4" />
+                      تم الإكمال
+                    </Button>
+                  </div>
                 )}
               </div>
               
@@ -1379,6 +1387,7 @@ export default function Lesson() {
                         <button
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id)}
+                          aria-label={tab.label}
                           className={`
                             flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm
                             transition-all duration-300
