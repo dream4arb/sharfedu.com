@@ -1798,11 +1798,12 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto rounded-md overflow-hidden border border-border/50 shadow-lg">
+                          <div className="w-full max-w-[1200px] mx-auto">
                             <iframe
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="w-full border-0"
-                              style={{ width: '100%', height: '80vh', minHeight: '600px' }}
+                              scrolling="no"
+                              style={{ width: '100%', height: '5000px', overflow: 'hidden' }}
                               title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
                             />
                           </div>
@@ -1842,7 +1843,15 @@ export default function Lesson() {
                           sandbox="allow-scripts allow-same-origin"
                           title="المحتوى التعليمي"
                           className="w-full border-0 block"
-                          style={{ minHeight: "700px", height: "700px", width: "100%" }}
+                          scrolling="no"
+                          style={{ minHeight: "700px", width: "100%", overflow: "hidden" }}
+                          onLoad={(e) => {
+                            try {
+                              const iframe = e.currentTarget;
+                              const h = iframe.contentDocument?.documentElement?.scrollHeight;
+                              if (h && h > 100) iframe.style.height = h + 40 + "px";
+                            } catch (_) {}
+                          }}
                         />
                       </div>
                     ) : educationContent && educationContent.trim().length > 0 ? (
@@ -1889,12 +1898,13 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto rounded-md overflow-hidden border border-border/50 shadow-lg">
+                          <div className="w-full max-w-[1200px] mx-auto">
                             <iframe
                               ref={pdfIframeRef}
                               src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="w-full border-0"
-                              style={{ width: '100%', height: '80vh', minHeight: '600px' }}
+                              scrolling="no"
+                              style={{ width: '100%', height: '5000px', overflow: 'hidden' }}
                               title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
                             />
                           </div>
@@ -1962,8 +1972,16 @@ export default function Lesson() {
                         key={currentLesson.id}
                         src={`/api/content/lesson/${currentLesson.id}/ssa-html`}
                         className="w-full border-0 block"
-                        style={{ minHeight: "3000px" }}
-                        title="محتوى الأسئلة"
+                        scrolling="no"
+                        style={{ minHeight: "3000px", overflow: "hidden" }}
+                        title="محتوى شارف AI"
+                        onLoad={(e) => {
+                          try {
+                            const iframe = e.currentTarget;
+                            const h = iframe.contentDocument?.documentElement?.scrollHeight;
+                            if (h && h > 100) iframe.style.height = h + 40 + "px";
+                          } catch (_) {}
+                        }}
                       />
                     ) : (
                       <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50">
