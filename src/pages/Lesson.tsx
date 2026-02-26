@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams, useLocation } from "wouter";
 import { 
   Loader2, Play, FileText, Download, CheckCircle, 
-  Lock, ArrowRight, Home, BookOpen, Check, Video,
+  Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
   ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -182,7 +182,7 @@ function VideoTabContent({
                   <p className="font-semibold text-sm mb-1 line-clamp-2">{meta.title}</p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span className="truncate">{meta.channelName}</span>
-                    <span className="shrink-0 mr-2">{meta.duration}</span>
+                    <span className="shrink-0 mr-2 flex items-center gap-1"><Clock className="w-3 h-3" />{meta.duration}</span>
                   </div>
                 </div>
               </div>
