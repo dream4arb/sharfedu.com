@@ -84,7 +84,7 @@ export function Navbar() {
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   location === link.href || (link.href.startsWith('#') && location.includes(link.href))
                     ? "text-primary bg-primary/10" 
-                    : "text-foreground/70 hover:text-foreground"
+                    : "text-foreground hover:text-primary"
                 }`}
                 data-testid={`link-nav-${link.href.replace('#', '').replace('/', 'home')}`}
               >
@@ -98,7 +98,7 @@ export function Navbar() {
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1 ${
                   location.startsWith('/stage') 
                     ? "text-primary bg-primary/10" 
-                    : "text-foreground/70"
+                    : "text-foreground"
                 }`}
                 data-testid="button-stages-dropdown"
               >
