@@ -122,10 +122,30 @@ export async function registerRoutes(httpServer: Server, app: Express) {
 
   const durationCache = new Map<string, string>();
 
+  async function scrapeDuration(videoId: string): Promise<string | null> {
+    try {
+      const resp = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+        headers: { "Accept-Language": "en", "User-Agent": "Mozilla/5.0" },
+      });
+      if (!resp.ok) return null;
+      const html = await resp.text();
+      const match = html.match(/"lengthSeconds":"(\d+)"/);
+      if (!match) return null;
+      const total = parseInt(match[1]);
+      if (total <= 0) return null;
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      return h > 0
+        ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+        : `${m}:${String(s).padStart(2, "0")}`;
+    } catch {
+      return null;
+    }
+  }
+
   app.get("/api/youtube/durations", async (req, res) => {
     try {
-      const apiKey = process.env.YOUTUBE_API_KEY?.trim();
-      if (!apiKey) return res.status(503).json({ error: "YouTube API not configured" });
       const ids = (req.query.ids as string || "").split(",").filter(Boolean).slice(0, 20);
       if (ids.length === 0) return res.json({});
 
@@ -138,22 +158,42 @@ export async function registerRoutes(httpServer: Server, app: Express) {
       }
 
       if (uncached.length > 0) {
-        const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${uncached.join(",")}&key=${apiKey}`;
-        const resp = await fetch(url);
-        if (resp.ok) {
-          const data = await resp.json() as { items?: { id: string; contentDetails?: { duration?: string } }[] };
-          for (const item of data.items || []) {
-            const iso = item.contentDetails?.duration || "";
-            const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-            if (match) {
-              const h = parseInt(match[1] || "0");
-              const m = parseInt(match[2] || "0");
-              const s = parseInt(match[3] || "0");
-              const dur = h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
-              result[item.id] = dur;
-              durationCache.set(item.id, dur);
+        const apiKey = process.env.YOUTUBE_API_KEY?.trim();
+        let apiSuccess = false;
+        if (apiKey) {
+          try {
+            const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${uncached.join(",")}&key=${apiKey}`;
+            const resp = await fetch(url);
+            if (resp.ok) {
+              const data = await resp.json() as { items?: { id: string; contentDetails?: { duration?: string } }[] };
+              for (const item of data.items || []) {
+                const iso = item.contentDetails?.duration || "";
+                const m2 = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+                if (m2) {
+                  const h = parseInt(m2[1] || "0");
+                  const m = parseInt(m2[2] || "0");
+                  const s = parseInt(m2[3] || "0");
+                  const dur = h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+                  result[item.id] = dur;
+                  durationCache.set(item.id, dur);
+                }
+              }
+              apiSuccess = true;
             }
-          }
+          } catch {}
+        }
+
+        const stillMissing = uncached.filter(id => !result[id]);
+        if (stillMissing.length > 0) {
+          const scrapeResults = await Promise.allSettled(
+            stillMissing.map(async (id) => {
+              const dur = await scrapeDuration(id);
+              if (dur) {
+                result[id] = dur;
+                durationCache.set(id, dur);
+              }
+            })
+          );
         }
       }
       res.json(result);
