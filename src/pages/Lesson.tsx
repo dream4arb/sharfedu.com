@@ -1798,12 +1798,12 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden">
+                          <div className="w-full max-w-[1200px] mx-auto" style={{ overflow: 'hidden' }}>
                             <iframe
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="border-0 block"
                               scrolling="no"
-                              style={{ width: 'calc(100% + 20px)', height: '5000px', overflow: 'hidden' }}
+                              style={{ width: 'calc(100% + 50px)', height: '5000px', overflow: 'hidden', margin: '0 -25px' }}
                               title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
                             />
                           </div>
@@ -1898,13 +1898,13 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden">
+                          <div className="w-full max-w-[1200px] mx-auto" style={{ overflow: 'hidden' }}>
                             <iframe
                               ref={pdfIframeRef}
                               src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="border-0 block"
                               scrolling="no"
-                              style={{ width: 'calc(100% + 20px)', height: '5000px', overflow: 'hidden' }}
+                              style={{ width: 'calc(100% + 50px)', height: '5000px', overflow: 'hidden', margin: '0 -25px' }}
                               title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
                             />
                           </div>
