@@ -34,9 +34,14 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     if (!SAFE_NAME.test(folder) || !SAFE_NAME.test(filename)) {
       return res.status(400).json({ error: "Invalid path" });
     }
-    const localPath = path.join(process.cwd(), "server", "public", "attached_assets", folder, filename);
-    if (fs.existsSync(localPath)) {
-      return res.sendFile(localPath);
+    const pathsToTry = [
+      path.join(process.cwd(), "attached_assets", folder, filename),
+      path.join(process.cwd(), "server", "public", "attached_assets", folder, filename),
+    ];
+    for (const p of pathsToTry) {
+      if (fs.existsSync(p)) {
+        return res.sendFile(p);
+      }
     }
     res.status(404).json({ error: "File not found" });
   });
