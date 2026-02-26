@@ -431,51 +431,45 @@ export default function Lesson() {
       }
 
       const idToUrlMap: Record<string, string> = {};
+      const fallbacks: Record<string, { title: string; channel: string; duration: string }> = {};
       for (const { url, fallbackTitle, fallbackChannel, fallbackDuration } of urlsToFetch) {
         const videoId = extractVideoId(url);
         if (!videoId) continue;
         idToUrlMap[videoId] = url;
-
-        try {
-          const watchUrl = url.includes("/embed/") ? `https://www.youtube.com/watch?v=${videoId}` : url;
-          const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`);
-          if (response.ok) {
-            const data = await response.json();
-            metadata[url] = {
-              title: data.title || fallbackTitle || "فيديو تعليمي",
-              channelName: data.author_name || fallbackChannel || "قناة تعليمية",
-              duration: fallbackDuration || "—"
-            };
-          } else {
-            metadata[url] = {
-              title: fallbackTitle || "فيديو تعليمي",
-              channelName: fallbackChannel || "قناة تعليمية",
-              duration: fallbackDuration || "—"
-            };
-          }
-        } catch {
-          metadata[url] = {
-            title: fallbackTitle || "فيديو تعليمي",
-            channelName: fallbackChannel || "قناة تعليمية",
-            duration: fallbackDuration || "—"
-          };
-        }
+        fallbacks[url] = {
+          title: fallbackTitle || "فيديو تعليمي",
+          channel: fallbackChannel || "قناة تعليمية",
+          duration: fallbackDuration || "—",
+        };
       }
 
       const videoIds = Object.keys(idToUrlMap);
-      if (videoIds.length > 0) {
+      const oEmbedPromises = urlsToFetch.map(async ({ url }) => {
+        const videoId = extractVideoId(url);
+        if (!videoId) return;
+        const watchUrl = url.includes("/embed/") ? `https://www.youtube.com/watch?v=${videoId}` : url;
         try {
-          const durResp = await fetch(`/api/youtube/durations?ids=${videoIds.join(",")}`);
-          if (durResp.ok) {
-            const durations: Record<string, string> = await durResp.json();
-            for (const [vid, dur] of Object.entries(durations)) {
-              const origUrl = idToUrlMap[vid];
-              if (origUrl && metadata[origUrl]) {
-                metadata[origUrl].duration = dur;
-              }
-            }
+          const resp = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`);
+          if (resp.ok) {
+            const data = await resp.json();
+            const fb = fallbacks[url];
+            metadata[url] = { title: data.title || fb.title, channelName: data.author_name || fb.channel, duration: fb.duration };
           }
         } catch {}
+        if (!metadata[url]) {
+          const fb = fallbacks[url];
+          metadata[url] = { title: fb.title, channelName: fb.channel, duration: fb.duration };
+        }
+      });
+
+      const durPromise = videoIds.length > 0
+        ? fetch(`/api/youtube/durations?ids=${videoIds.join(",")}`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+        : Promise.resolve({});
+
+      const [, durations] = await Promise.all([Promise.allSettled(oEmbedPromises), durPromise]) as [PromiseSettledResult<void>[], Record<string, string>];
+      for (const [vid, dur] of Object.entries(durations)) {
+        const origUrl = idToUrlMap[vid];
+        if (origUrl && metadata[origUrl]) metadata[origUrl].duration = dur;
       }
 
       setVideoMetadata(metadata);
@@ -1817,6 +1811,7 @@ export default function Lesson() {
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="border-0 block"
                               scrolling="no"
+                              loading="lazy"
                               style={{ width: 'calc(100% + 50px)', height: '5000px', overflow: 'hidden', margin: '0 -25px' }}
                               title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
                             />
@@ -1918,6 +1913,7 @@ export default function Lesson() {
                               src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="border-0 block"
                               scrolling="no"
+                              loading="lazy"
                               style={{ width: 'calc(100% + 50px)', height: '5000px', overflow: 'hidden', margin: '0 -25px' }}
                               title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
                             />
