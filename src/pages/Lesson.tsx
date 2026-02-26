@@ -1857,11 +1857,32 @@ export default function Lesson() {
                           scrolling="no"
                           style={{ minHeight: "700px", minWidth: "700px", overflow: "hidden" }}
                           onLoad={(e) => {
+                            const iframe = e.currentTarget;
+                            const resize = () => {
+                              try {
+                                const doc = iframe.contentDocument;
+                                if (!doc) return;
+                                const body = doc.body;
+                                const html = doc.documentElement;
+                                if (!body || !html) return;
+                                const h = Math.max(
+                                  body.scrollHeight, body.offsetHeight,
+                                  html.scrollHeight, html.offsetHeight
+                                );
+                                if (h > 100) iframe.style.height = h + 60 + "px";
+                              } catch (_) {}
+                            };
+                            resize();
+                            const t1 = setTimeout(resize, 500);
+                            const t2 = setTimeout(resize, 1500);
+                            const t3 = setTimeout(resize, 3000);
+                            const obs = new MutationObserver(resize);
                             try {
-                              const iframe = e.currentTarget;
-                              const h = iframe.contentDocument?.documentElement?.scrollHeight;
-                              if (h && h > 100) iframe.style.height = h + 40 + "px";
+                              if (iframe.contentDocument?.body) {
+                                obs.observe(iframe.contentDocument.body, { childList: true, subtree: true, attributes: true });
+                              }
                             } catch (_) {}
+                            iframe.addEventListener("beforeunload", () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); obs.disconnect(); }, { once: true });
                           }}
                         />
                       </div>
@@ -1978,14 +1999,35 @@ export default function Lesson() {
                         src={`/api/content/lesson/${currentLesson.id}/ssa-html`}
                         className="w-full border-0 block"
                         scrolling="no"
-                        style={{ minHeight: "3000px", overflow: "hidden" }}
+                        style={{ overflow: "hidden" }}
                         title="محتوى شارف AI"
                         onLoad={(e) => {
+                          const iframe = e.currentTarget;
+                          const resize = () => {
+                            try {
+                              const doc = iframe.contentDocument;
+                              if (!doc) return;
+                              const body = doc.body;
+                              const html = doc.documentElement;
+                              if (!body || !html) return;
+                              const h = Math.max(
+                                body.scrollHeight, body.offsetHeight,
+                                html.scrollHeight, html.offsetHeight
+                              );
+                              if (h > 100) iframe.style.height = h + 60 + "px";
+                            } catch (_) {}
+                          };
+                          resize();
+                          const t1 = setTimeout(resize, 500);
+                          const t2 = setTimeout(resize, 1500);
+                          const t3 = setTimeout(resize, 3000);
+                          const obs = new MutationObserver(resize);
                           try {
-                            const iframe = e.currentTarget;
-                            const h = iframe.contentDocument?.documentElement?.scrollHeight;
-                            if (h && h > 100) iframe.style.height = h + 40 + "px";
+                            if (iframe.contentDocument?.body) {
+                              obs.observe(iframe.contentDocument.body, { childList: true, subtree: true, attributes: true });
+                            }
                           } catch (_) {}
+                          iframe.addEventListener("beforeunload", () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); obs.disconnect(); }, { once: true });
                         }}
                       />
                     ) : (
