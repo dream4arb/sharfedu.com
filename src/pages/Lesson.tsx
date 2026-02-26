@@ -1830,16 +1830,27 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container" style={pdfZoom < 1 ? { height: `${5000 * pdfZoom}px` } : undefined}>
+                          pdfZoom < 1 ? (
+                          <div className="w-full mx-auto rounded-xl overflow-hidden" style={{ height: '80vh' }}>
                             <iframe
-                              src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block"
-                              scrolling="no"
+                              src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(summaryPdfUrl.startsWith('http') ? summaryPdfUrl : `https://sharfedu.com${summaryPdfUrl}`)}`}
+                              className="border-0 block w-full h-full"
                               loading="lazy"
-                              style={pdfZoom < 1 ? { width: `${100 / pdfZoom}%`, height: '5000px', transform: `scale(${pdfZoom})`, transformOrigin: 'top right' } : { width: '100%', height: '5000px' }}
                               title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
                             />
                           </div>
+                          ) : (
+                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
+                            <iframe
+                              src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                              className="border-0 block w-full"
+                              scrolling="no"
+                              loading="lazy"
+                              style={{ height: '5000px' }}
+                              title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
+                            />
+                          </div>
+                          )
                         ) : (
                           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                             <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
@@ -1931,17 +1942,29 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container" style={pdfZoom < 1 ? { height: `${5000 * pdfZoom}px` } : undefined}>
+                          pdfZoom < 1 ? (
+                          <div className="w-full mx-auto rounded-xl overflow-hidden" style={{ height: '80vh' }}>
                             <iframe
                               ref={pdfIframeRef}
-                              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block"
-                              scrolling="no"
+                              src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl.startsWith('http') ? pdfUrl : `https://sharfedu.com${pdfUrl}`)}`}
+                              className="border-0 block w-full h-full"
                               loading="lazy"
-                              style={pdfZoom < 1 ? { width: `${100 / pdfZoom}%`, height: '5000px', transform: `scale(${pdfZoom})`, transformOrigin: 'top right' } : { width: '100%', height: '5000px' }}
                               title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
                             />
                           </div>
+                          ) : (
+                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
+                            <iframe
+                              ref={pdfIframeRef}
+                              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                              className="border-0 block w-full"
+                              scrolling="no"
+                              loading="lazy"
+                              style={{ height: '5000px' }}
+                              title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
+                            />
+                          </div>
+                          )
                         ) : (
                           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                             <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
