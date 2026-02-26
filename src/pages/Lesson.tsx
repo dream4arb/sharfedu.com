@@ -211,7 +211,6 @@ export default function Lesson() {
   const [pdfScrollProgress, setPdfScrollProgress] = useState(0);
   const pdfIframeRef = useRef<HTMLIFrameElement>(null);
   const [pdfZoom, setPdfZoom] = useState(1);
-  const pdfContainerMeasureRef = useRef<HTMLDivElement>(null);
   const [educationContent, setEducationContent] = useState<string>("");
   const [educationRawHtml, setEducationRawHtml] = useState<string | null>(null); // للعرض في iframe عند وجود scripts
   const [loadingEducation, setLoadingEducation] = useState(false);
@@ -652,12 +651,11 @@ export default function Lesson() {
 
   useEffect(() => {
     const measure = () => {
-      const el = pdfContainerMeasureRef.current;
-      if (!el) return;
-      const w = el.offsetWidth;
-      if (w > 0 && w < 640) {
+      const vw = window.innerWidth;
+      if (vw < 640) {
+        const containerW = vw - 36;
         const PDF_WIDTH = 700;
-        setPdfZoom(Math.min(w / PDF_WIDTH, 1));
+        setPdfZoom(Math.min(containerW / PDF_WIDTH, 1));
       } else {
         setPdfZoom(1);
       }
@@ -665,7 +663,7 @@ export default function Lesson() {
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [activeTab]);
+  }, []);
 
   // Load Education HTML content when tab is active (من API المحتوى — ينعكس فوراً مع لوحة التحكم)
   useEffect(() => {
@@ -1832,7 +1830,7 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div ref={pdfContainerMeasureRef} className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container" style={pdfZoom < 1 ? { height: `${5000 * pdfZoom}px` } : undefined}>
+                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container" style={pdfZoom < 1 ? { height: `${5000 * pdfZoom}px` } : undefined}>
                             <iframe
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                               className="border-0 block"
