@@ -101,3 +101,6 @@ Never skip either step. Never deploy to server without pushing to GitHub first.
 ### GitHub
 - Repo: https://github.com/dream4arb/sharfedu.com
 - Push: `git push "https://${GITHUB_TOKEN}@github.com/dream4arb/sharfedu.com.git" HEAD:main`
+
+### Cleanup Status
+All cleanup completed — no dead code, no unused files, no console.log in frontend, no proxy code, no duplicate utilities. Build script allowlist matches actual bundled dependencies.

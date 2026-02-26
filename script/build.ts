@@ -20,7 +20,6 @@ const allowlist = [
   "passport-google-oauth20",
   "passport-local",
   "zod",
-  "zod-validation-error",
 ];
 
 async function buildAll() {

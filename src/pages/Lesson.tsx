@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams, useLocation } from "wouter";
 import { 
-  Loader2, Play, FileText, Download, CheckCircle, 
+  Loader2, Play, FileText, Download, CheckCircle, Maximize2,
   Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
   ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
 } from "lucide-react";
@@ -130,15 +130,27 @@ function VideoTabContent({
   return (
     <>
       <div className="mb-8">
-        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl">
+        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl group">
           <iframe
             key={selectedUrl}
             src={finalSrc}
             className="absolute inset-0 w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowFullScreen
             title={lessonTitle}
           />
+          {selectedUrl && (
+            <a
+              href={selectedUrl.replace("youtube-nocookie.com/embed/", "youtube.com/watch?v=").replace(/\?.*$/, "")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-black/70 text-white text-xs font-bold hover:bg-black/90 transition-all backdrop-blur-sm sm:opacity-0 sm:group-hover:opacity-100"
+              data-testid="button-fullscreen-video"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span>ملء الشاشة</span>
+            </a>
+          )}
         </div>
       </div>
       <div className="mb-8">
