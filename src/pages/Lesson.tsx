@@ -109,6 +109,7 @@ function VideoTabContent({
     return id ? `https://www.youtube-nocookie.com/embed/${id}` : url;
   };
 
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   const firstEmbed = videos[0] ? toEmbed(videos[0].url) : null;
   const [selectedUrl, setSelectedUrl] = useState<string | null>(firstEmbed);
 
@@ -130,7 +131,7 @@ function VideoTabContent({
   return (
     <>
       <div className="mb-8">
-        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl group">
+        <div ref={videoContainerRef} className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl group">
           <iframe
             key={selectedUrl}
             src={finalSrc}
@@ -139,17 +140,24 @@ function VideoTabContent({
             allowFullScreen
             title={lessonTitle}
           />
+          <div className="yt-overlay-top" />
           {selectedUrl && (
-            <a
-              href={selectedUrl.replace("youtube-nocookie.com/embed/", "youtube.com/watch?v=").replace(/\?.*$/, "")}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => {
+                const el = videoContainerRef.current;
+                if (!el) return;
+                if (document.fullscreenElement) {
+                  document.exitFullscreen();
+                } else {
+                  el.requestFullscreen().catch(() => {});
+                }
+              }}
               className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-black/70 text-white text-xs font-bold hover:bg-black/90 transition-all backdrop-blur-sm sm:opacity-0 sm:group-hover:opacity-100"
               data-testid="button-fullscreen-video"
             >
               <Maximize2 className="w-4 h-4" />
               <span>ملء الشاشة</span>
-            </a>
+            </button>
           )}
         </div>
       </div>
