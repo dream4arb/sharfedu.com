@@ -109,7 +109,7 @@ export function Footer() {
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
                   <Phone className="w-4 h-4 text-primary" />
                 </div>
-                +966 50 000 0000
+                0555005547
               </li>
               <li className="flex items-center gap-3 text-white/60">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
