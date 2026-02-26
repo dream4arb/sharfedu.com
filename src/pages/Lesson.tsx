@@ -1832,7 +1832,7 @@ export default function Lesson() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {/* Lesson Info */}
+                    {/* Lesson Info + Video Player + قائمة الفيديوهات — الكل داخل مستطيل واحد */}
                     <div className="bg-white dark:bg-card rounded-2xl p-6 shadow-sm border border-border/50 mb-8">
                       <div className="text-center mb-6">
                         <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white mb-4">
@@ -1840,22 +1840,21 @@ export default function Lesson() {
                         </div>
                         <h2 className="text-xl font-bold mb-2">{getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}</h2>
                       </div>
-                    </div>
 
-                    {/* Video Player + قائمة الفيديوهات — مكوّن مستقل بحالة داخلية */}
-                    {(() => {
-                      const allVideosFromCms = cmsVideoUrls.length > 0 ? cmsVideoUrls.map(url => ({ url })) : [];
-                      const legacyMain = currentLesson?.videoUrl;
-                      const legacyOthers = (currentLesson?.additionalVideos || []).map(v => ({ url: v.url, title: v.title, channelName: v.channelName, duration: v.duration }));
-                      const videoList = allVideosFromCms.length > 0 ? allVideosFromCms : legacyMain ? [{ url: legacyMain, title: "", channelName: "", duration: "" }, ...legacyOthers] : legacyOthers;
-                      return (
-                        <VideoTabContent
-                          videos={videoList}
-                          metadata={videoMetadata}
-                          lessonTitle={currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "فيديو تعليمي"}
-                        />
-                      );
-                    })()}
+                      {(() => {
+                        const allVideosFromCms = cmsVideoUrls.length > 0 ? cmsVideoUrls.map(url => ({ url })) : [];
+                        const legacyMain = currentLesson?.videoUrl;
+                        const legacyOthers = (currentLesson?.additionalVideos || []).map(v => ({ url: v.url, title: v.title, channelName: v.channelName, duration: v.duration }));
+                        const videoList = allVideosFromCms.length > 0 ? allVideosFromCms : legacyMain ? [{ url: legacyMain, title: "", channelName: "", duration: "" }, ...legacyOthers] : legacyOthers;
+                        return (
+                          <VideoTabContent
+                            videos={videoList}
+                            metadata={videoMetadata}
+                            lessonTitle={currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "فيديو تعليمي"}
+                          />
+                        );
+                      })()}
+                    </div>
 
                     {/* Auto Video Progress Tracker */}
                     <div className="bg-white dark:bg-card rounded-2xl p-6 shadow-sm border border-border/50 mb-8">
