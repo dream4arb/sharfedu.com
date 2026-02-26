@@ -13,11 +13,7 @@ import { eq } from "drizzle-orm";
 const __dirname = getDirname();
 
 const uploadsDir = path.join(__dirname, "..", "..", "attached_assets", "uploads");
-try {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-} catch {
-  // ignore
-}
+fs.promises.mkdir(uploadsDir, { recursive: true }).catch(() => {});
 
 const upload = multer({
   storage: multer.diskStorage({

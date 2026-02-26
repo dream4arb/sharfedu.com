@@ -92,8 +92,6 @@ function Router() {
             <ProtectedAdmin />
           </ErrorBoundary>
         </Route>
-        {/* DISABLED: Smart Teacher feature temporarily disabled */}
-        {/* <Route path="/chat" component={ChatPage} /> */}
         <Route path="/courses/:gradeLevel" component={Courses} />
         <Route path="/stage/:stageId" component={Stage} />
         <Route path="/lesson/:stage/:subject/:lessonId?" component={Lesson} />

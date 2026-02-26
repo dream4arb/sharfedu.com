@@ -6,7 +6,6 @@ const publicPath = path.resolve(process.cwd(), "server", "public");
 
 export function serveStatic(app: Express) {
   if (!fs.existsSync(publicPath)) {
-    // في الإنتاج عندما Apache يخدم الواجهة (مثل Cloudways) قد لا يكون server/public موجوداً — نكتفي بـ /api
     if (process.env.NODE_ENV === "production") {
       return;
     }
@@ -18,10 +17,13 @@ export function serveStatic(app: Express) {
   app.use(
     express.static(publicPath, {
       index: "index.html",
+      maxAge: "1y",
+      immutable: true,
       setHeaders: (res, filePath) => {
         const ext = path.extname(filePath).toLowerCase();
-        if (filePath.endsWith(".html") || ext === ".html") {
+        if (ext === ".html") {
           res.setHeader("Content-Type", "text/html; charset=utf-8");
+          res.setHeader("Cache-Control", "no-cache");
         } else if (ext === ".js" || ext === ".mjs") {
           res.setHeader("Content-Type", "application/javascript; charset=utf-8");
         } else if (ext === ".css") {
@@ -31,7 +33,6 @@ export function serveStatic(app: Express) {
     }),
   );
 
-  // أي طلب /api يصل إلى هنا = مسار غير معروف → 404 JSON (لا نرجع HTML أبداً لـ /api)
   app.use((req, res, next) => {
     if (req.path.startsWith("/api")) {
       res.setHeader("Content-Type", "application/json");
@@ -40,11 +41,11 @@ export function serveStatic(app: Express) {
     next();
   });
 
-  // SPA fallback: أي طلب GET غير /api يُرجَع له index.html (لتجنب 404 لـ /admin وغيرها)
   app.use((req, res, next) => {
     if (req.method !== "GET" || req.path.startsWith("/api")) return next();
     const indexFile = path.resolve(publicPath, "index.html");
     res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
     res.sendFile(indexFile);
   });
 }

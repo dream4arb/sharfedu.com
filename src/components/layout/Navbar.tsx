@@ -54,8 +54,6 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "الرئيسية" },
-    // DISABLED: Smart Teacher feature temporarily disabled
-    // { href: "/chat", label: "المعلم الذكي" },
     { href: "#features", label: "المميزات" },
     { href: "#contact", label: "تواصل معنا" },
   ];

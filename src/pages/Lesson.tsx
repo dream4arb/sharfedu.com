@@ -744,12 +744,12 @@ export default function Lesson() {
 
       // If elements not found, retry after a short delay
       if (!calcMode || !inputValue || !resultBox) {
-        console.log("Education solver: Elements not found, retrying...");
+        
         setTimeout(initSolver, 100);
         return;
       }
 
-      console.log("Education solver: Elements found, binding handlers...");
+      
 
       // Define solver function
       const runSolver = () => {
@@ -859,11 +859,11 @@ export default function Lesson() {
         cloned.addEventListener("click", (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
-          console.log("Education solver: Button clicked!");
+          
           runSolver();
         });
         
-        console.log("Education solver: Button handler bound successfully");
+        
       } else {
         console.error("Education solver: Button not found!");
       }
@@ -880,14 +880,14 @@ export default function Lesson() {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             e.stopPropagation();
-            console.log("Education solver: Enter key pressed!");
+            
             runSolver();
           }
         };
         
         inputValue.addEventListener("keydown", handler);
         (inputValue as any).__solverHandler = handler;
-        console.log("Education solver: Enter key handler bound");
+        
       }
     };
 

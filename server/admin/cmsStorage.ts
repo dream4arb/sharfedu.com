@@ -222,11 +222,15 @@ export async function deleteCmsContent(id: number): Promise<boolean> {
   const row = await getCmsContentById(id);
   if (!row) return false;
   if ((row.contentType === "pdf" || row.contentType === "image") && row.dataValue.startsWith("/attached_assets/uploads/")) {
-    const filePath = path.join(__dirname, "..", "..", row.dataValue.replace(/^\//, ""));
-    try {
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    } catch (_) {
-      /* تجاهل أخطاء حذف الملف */
+    const fileName = path.basename(row.dataValue);
+    const filePath = path.join(__dirname, "..", "..", "attached_assets", "uploads", fileName);
+    const resolved = path.resolve(filePath);
+    const uploadsBase = path.resolve(__dirname, "..", "..", "attached_assets", "uploads");
+    if (resolved.startsWith(uploadsBase)) {
+      try {
+        await fs.promises.unlink(resolved);
+      } catch {
+      }
     }
   }
   await db.delete(cmsContent).where(eq(cmsContent.id, id));

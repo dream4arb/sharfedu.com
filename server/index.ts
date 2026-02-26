@@ -14,19 +14,20 @@ declare module "http" {
   }
 }
 
-// CORS: السماح بطلبات من الموقع وجوجل (Cloudways) — قبل أي routes
+const BASE_URL = process.env.BASE_URL || "";
 const allowedOrigins = [
   "https://sharfedu.com",
   "https://www.sharfedu.com",
-  "http://localhost:5000",
-  "http://127.0.0.1:5000",
 ];
+if (BASE_URL) allowedOrigins.push(BASE_URL);
+if (process.env.NODE_ENV !== "production") {
+  allowedOrigins.push("http://localhost:5000", "http://127.0.0.1:5000");
+}
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && allowedOrigins.some((o) => origin === o || origin.startsWith("http://localhost:"))) {
+  if (origin && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
-  } else if (req.path.startsWith("/api")) {
-    res.setHeader("Access-Control-Allow-Origin", "https://sharfedu.com");
   }
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
@@ -37,8 +38,20 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((_, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+  next();
+});
+
 app.use(
   express.json({
+    limit: "10mb",
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
@@ -60,24 +73,12 @@ export function log(message: string, source = "express") {
 
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
+  const reqPath = req.path;
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      log(logLine);
+    if (reqPath.startsWith("/api")) {
+      log(`${req.method} ${reqPath} ${res.statusCode} in ${duration}ms`);
     }
   });
 
@@ -91,7 +92,7 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    console.error("Internal Server Error:", err);
+    console.error("Server Error:", err.message);
 
     if (res.headersSent) {
       return next(err);
@@ -100,9 +101,6 @@ app.use((req, res, next) => {
     return res.status(status).json({ message });
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
@@ -110,31 +108,21 @@ app.use((req, res, next) => {
     await setupVite(httpServer, app);
   }
 
-  // المنفذ من .env (مطابق لبوابة .htaccess: localhost:5000)
   const port = parseInt(process.env.PORT || "5000", 10);
-  // محلياً: استمع على كل الواجهات حتى يعمل http://localhost:5000 و http://127.0.0.1:5000
-  const host = process.env.HOST || (process.env.NODE_ENV === "development" ? "0.0.0.0" : "127.0.0.1");
-  httpServer.listen(
-    port,
-    host,
-    () => {
-      const url = host === "0.0.0.0" ? `http://localhost:${port}` : `http://${host}:${port}`;
-      log(`serving on ${url}`);
-      const hasGoogle = !!(process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim());
-      log(`Google OAuth: ${hasGoogle ? "enabled" : "disabled (set GOOGLE_CLIENT_ID/SECRET in .env)"}`);
-      // في التطوير: فتح المتصفح تلقائياً ليعرض الموقع المحلي
-      if (process.env.NODE_ENV === "development") {
-        import("open").then(({ default: open }) => open(url).catch(() => {})).catch(() => {});
-      }
-    },
-  ).on("error", (err: any) => {
+  const host = process.env.HOST || "0.0.0.0";
+  httpServer.listen(port, host, () => {
+    log(`serving on http://${host === "0.0.0.0" ? "127.0.0.1" : host}:${port}`);
+    const hasGoogle = !!(process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim());
+    log(`Google OAuth: ${hasGoogle ? "enabled" : "disabled"}`);
+    const hasYoutube = !!process.env.YOUTUBE_API_KEY?.trim();
+    log(`YouTube Data API (مدة/مشاهدات الفيديو): ${hasYoutube ? "enabled" : "disabled"}`);
+  }).on("error", (err: any) => {
     if (err.code === "EADDRINUSE") {
-      log(`Port ${port} is already in use. Please stop the other process or use a different port.`, "error");
-      process.exit(1);
+      log(`Port ${port} is already in use.`, "error");
     } else {
       log(`Server error: ${err.message}`, "error");
-      process.exit(1);
     }
+    process.exit(1);
   });
 })().catch((err) => {
   console.error("Failed to start server:", err);
