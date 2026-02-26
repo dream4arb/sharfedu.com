@@ -1331,46 +1331,46 @@ export default function Lesson() {
           <main className="flex-1">
             {/* Header - بنفس تنسيق الموقع */}
             <header className="sticky top-0 z-20 bg-white/95 dark:bg-card/95 backdrop-blur-lg shadow-sm border-b border-border/50">
-              <div className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-4">
-                  <SidebarTrigger aria-label="فتح قائمة الدروس" data-testid="button-toggle-lessons-sidebar" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">{subjectDisplayName}</div>
-                    <h1 className="font-bold text-lg" data-testid="text-lesson-title">
+              <div className="flex items-center justify-between gap-2 p-4 min-w-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <SidebarTrigger aria-label="فتح قائمة الدروس" data-testid="button-toggle-lessons-sidebar" className="shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs sm:text-sm text-muted-foreground truncate">{subjectDisplayName}</div>
+                    <h1 className="font-bold text-sm sm:text-lg truncate" data-testid="text-lesson-title">
                       {currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : subjectName}
                     </h1>
                   </div>
                 </div>
                 {currentLesson && lessonId ? (
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs sm:text-sm text-muted-foreground">
                       {Math.round(getLessonProgress(subjectId, lessonId))}%
                     </span>
                     <Button
                       variant={isCompleted(subjectId, lessonId) ? "default" : "outline"}
                       onClick={handleMarkComplete}
-                      className="gap-2"
+                      className="gap-1.5 text-xs sm:text-sm px-2.5 sm:px-4"
                       data-testid="button-mark-complete"
                     >
                       {isCompleted(subjectId, lessonId) ? (
                         <>
                           <CheckCircle className="w-4 h-4" />
-                          مكتمل
+                          <span className="hidden sm:inline">مكتمل</span>
                         </>
                       ) : (
                         <>
                           <Check className="w-4 h-4" />
-                          تم الإكمال
+                          <span className="hidden sm:inline">تم الإكمال</span>
                         </>
                       )}
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 invisible">
-                    <span className="text-sm">0%</span>
-                    <Button variant="outline" className="gap-2" tabIndex={-1}>
+                  <div className="flex items-center gap-2 shrink-0 invisible">
+                    <span className="text-xs sm:text-sm">0%</span>
+                    <Button variant="outline" className="gap-1.5 px-2.5 sm:px-4" tabIndex={-1}>
                       <Check className="w-4 h-4" />
-                      تم الإكمال
+                      <span className="hidden sm:inline">تم الإكمال</span>
                     </Button>
                   </div>
                 )}
@@ -1473,15 +1473,15 @@ export default function Lesson() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/50 p-12 flex flex-col items-center justify-center min-h-[500px] text-center"
+                  className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/50 p-6 sm:p-12 flex flex-col items-center justify-center min-h-[300px] sm:min-h-[500px] text-center"
                 >
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white mb-6 shadow-lg`}>
-                    <BookOpen className="w-10 h-10" />
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white mb-4 sm:mb-6 shadow-lg`}>
+                    <BookOpen className="w-8 h-8 sm:w-10 sm:h-10" />
                   </div>
-                  <h2 className="text-2xl font-bold mb-3 text-foreground">
+                  <h2 className="text-xl sm:text-2xl font-bold mb-3 text-foreground">
                     أهلاً بك في مادة {subjectName}
                   </h2>
-                  <p className="text-base text-muted-foreground mb-4 whitespace-nowrap overflow-x-auto">
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4 max-w-md">
                     {lessons.length === 0 
                       ? "لا توجد دروس متاحة حالياً في هذه المادة"
                       : "يرجى اختيار الفصل الدراسي والدرس المناسب لك من القائمة الجانبية للبدء"
