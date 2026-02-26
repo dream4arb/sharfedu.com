@@ -52,7 +52,7 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 │   └── routes.ts            # API route definitions
 ├── dist/index.cjs           # Production server bundle (esbuild output)
 ├── server/public/           # Production frontend (Vite output) + PDF worker
-├── attached_assets/         # User-uploaded files (uploads/, lessons/, images)
+├── attached_assets/         # User-uploaded files (uploads/, lessons/)
 └── sqlite.db                # SQLite database
 ```
 
