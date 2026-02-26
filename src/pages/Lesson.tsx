@@ -210,6 +210,8 @@ export default function Lesson() {
   const [canCompleteVideo, setCanCompleteVideo] = useState(false);
   const [pdfScrollProgress, setPdfScrollProgress] = useState(0);
   const pdfIframeRef = useRef<HTMLIFrameElement>(null);
+  const [pdfZoom, setPdfZoom] = useState(1);
+  const pdfContainerMeasureRef = useRef<HTMLDivElement>(null);
   const [educationContent, setEducationContent] = useState<string>("");
   const [educationRawHtml, setEducationRawHtml] = useState<string | null>(null); // للعرض في iframe عند وجود scripts
   const [loadingEducation, setLoadingEducation] = useState(false);
@@ -647,6 +649,23 @@ export default function Lesson() {
   useEffect(() => {
     if (lessonId) setAttachmentView(null);
   }, [lessonId]);
+
+  useEffect(() => {
+    const measure = () => {
+      const el = pdfContainerMeasureRef.current;
+      if (!el) return;
+      const w = el.offsetWidth;
+      if (w > 0 && w < 640) {
+        const PDF_WIDTH = 700;
+        setPdfZoom(Math.min(w / PDF_WIDTH, 1));
+      } else {
+        setPdfZoom(1);
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [activeTab]);
 
   // Load Education HTML content when tab is active (من API المحتوى — ينعكس فوراً مع لوحة التحكم)
   useEffect(() => {
@@ -1813,13 +1832,13 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto sm:overflow-hidden pdf-iframe-container">
+                          <div ref={pdfContainerMeasureRef} className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container" style={pdfZoom < 1 ? { height: `${5000 * pdfZoom}px` } : undefined}>
                             <iframe
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block w-full"
+                              className="border-0 block"
                               scrolling="no"
                               loading="lazy"
-                              style={{ height: '5000px', overflow: 'hidden' }}
+                              style={pdfZoom < 1 ? { width: `${100 / pdfZoom}%`, height: '5000px', transform: `scale(${pdfZoom})`, transformOrigin: 'top right' } : { width: '100%', height: '5000px' }}
                               title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
                             />
                           </div>
@@ -1914,14 +1933,14 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto sm:overflow-hidden pdf-iframe-container">
+                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container" style={pdfZoom < 1 ? { height: `${5000 * pdfZoom}px` } : undefined}>
                             <iframe
                               ref={pdfIframeRef}
                               src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block w-full"
+                              className="border-0 block"
                               scrolling="no"
                               loading="lazy"
-                              style={{ height: '5000px', overflow: 'hidden' }}
+                              style={pdfZoom < 1 ? { width: `${100 / pdfZoom}%`, height: '5000px', transform: `scale(${pdfZoom})`, transformOrigin: 'top right' } : { width: '100%', height: '5000px' }}
                               title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
                             />
                           </div>

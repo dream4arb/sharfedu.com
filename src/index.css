@@ -235,11 +235,7 @@
 
 @media (max-width: 639px) {
   .pdf-iframe-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .pdf-iframe-container iframe {
-    min-width: 700px;
+    overflow: hidden;
   }
   .education-sandbox {
     overflow-x: auto;
