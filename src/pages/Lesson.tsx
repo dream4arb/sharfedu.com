@@ -1793,30 +1793,27 @@ export default function Lesson() {
                         </div>
                         <h2 className="text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الملخص"}</h2>
                       </div>
-                      <div className="w-full max-w-[1200px] mx-auto bg-accent/30 rounded-md overflow-hidden border border-border/50 shadow-lg" style={{ height: '850px', minHeight: '850px' }}>
-                        {(() => {
-                          const summaryPdfUrl = (cmsSummaryContent?.contentType === "pdf" && cmsSummaryContent?.dataValue)
-                            ? cmsSummaryContent.dataValue
-                            : currentLesson?.summaryPdfUrl;
-                          return summaryPdfUrl ? (
-                          <iframe
-                            src={`${summaryPdfUrl}#toolbar=0&navpanes=0`}
-                            className="w-full h-full border-0"
-                            style={{ width: '100%', height: '100%', minHeight: '850px' }}
-                            title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
-                          />
-                          ) : null;
-                        })()}
-                        {!((cmsSummaryContent?.contentType === "pdf" && cmsSummaryContent?.dataValue) || currentLesson?.summaryPdfUrl) ? (
-                          <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                            <div className="text-center p-8">
-                              <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                              <p className="text-lg font-semibold mb-2">ملف PDF للملخص</p>
-                              <p className="text-sm">سيتم إضافة ملف الملخص (PDF) قريباً</p>
-                            </div>
+                      {(() => {
+                        const summaryPdfUrl = (cmsSummaryContent?.contentType === "pdf" && cmsSummaryContent?.dataValue)
+                          ? cmsSummaryContent.dataValue
+                          : currentLesson?.summaryPdfUrl;
+                        return summaryPdfUrl ? (
+                          <div className="w-full max-w-[1200px] mx-auto rounded-md overflow-hidden border border-border/50 shadow-lg">
+                            <iframe
+                              src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                              className="w-full border-0"
+                              style={{ width: '100%', height: '80vh', minHeight: '600px' }}
+                              title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
+                            />
                           </div>
-                        ) : null}
-                      </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                            <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                            <p className="text-lg font-semibold mb-2">ملف PDF للملخص</p>
+                            <p className="text-sm">سيتم إضافة ملف الملخص (PDF) قريباً</p>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </motion.div>
                 )}
@@ -1887,31 +1884,28 @@ export default function Lesson() {
                         <h2 className="text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الدرس"}</h2>
                       </div>
                       
-                      <div className="w-full max-w-[1200px] mx-auto bg-accent/30 rounded-md overflow-hidden border border-border/50 shadow-lg" style={{ height: '850px', minHeight: '850px' }}>
-                        {(() => {
-                          const pdfUrl = (cmsLessonContent?.contentType === "pdf" && cmsLessonContent?.dataValue)
-                            ? cmsLessonContent.dataValue
-                            : currentLesson?.pdfUrl;
-                          return pdfUrl ? (
-                          <iframe
-                            ref={pdfIframeRef}
-                            src={`${pdfUrl}#toolbar=0&navpanes=0`}
-                            className="w-full h-full"
-                            style={{ width: '100%', height: '100%', minHeight: '850px' }}
-                            title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
-                          />
-                          ) : null;
-                        })()}
-                        {!((cmsLessonContent?.contentType === "pdf" && cmsLessonContent?.dataValue) || currentLesson?.pdfUrl) ? (
-                          <div className="flex items-center justify-center h-full text-muted-foreground">
-                            <div className="text-center p-8">
-                              <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                              <p className="text-lg font-semibold mb-2">ملف PDF للدرس</p>
-                              <p className="text-sm">سيتم عرض ملف الشرح هنا</p>
-                            </div>
+                      {(() => {
+                        const pdfUrl = (cmsLessonContent?.contentType === "pdf" && cmsLessonContent?.dataValue)
+                          ? cmsLessonContent.dataValue
+                          : currentLesson?.pdfUrl;
+                        return pdfUrl ? (
+                          <div className="w-full max-w-[1200px] mx-auto rounded-md overflow-hidden border border-border/50 shadow-lg">
+                            <iframe
+                              ref={pdfIframeRef}
+                              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                              className="w-full border-0"
+                              style={{ width: '100%', height: '80vh', minHeight: '600px' }}
+                              title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
+                            />
                           </div>
-                        ) : null}
-                      </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                            <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                            <p className="text-lg font-semibold mb-2">ملف PDF للدرس</p>
+                            <p className="text-sm">سيتم عرض ملف الشرح هنا</p>
+                          </div>
+                        );
+                      })()}
 
                       {/* Auto Lesson Reading Tracker */}
                       <div className="mt-6 p-4 rounded-xl border border-border/50 bg-accent/30">
