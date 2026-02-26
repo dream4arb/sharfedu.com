@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Loader2, RefreshCw } from "lucide-react";
 
 interface PdfCanvasViewerProps {
   url: string;
@@ -8,26 +8,33 @@ interface PdfCanvasViewerProps {
 
 export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [fallback, setFallback] = useState(false);
 
-  useEffect(() => {
+  const renderPdf = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
 
     container.querySelectorAll("canvas").forEach((c) => c.remove());
-    setLoading(true);
-    setError(null);
+    setStatus("loading");
+    setFallback(false);
 
     let cancelled = false;
 
     (async () => {
       try {
         const pdfjsLib = await import("pdfjs-dist");
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
-        const loadingTask = pdfjsLib.getDocument(url);
-        const pdf = await loadingTask.promise;
+        if (typeof Worker !== "undefined") {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+        }
+
+        const pdf = await pdfjsLib.getDocument({
+          url,
+          cMapUrl: undefined,
+          cMapPacked: false,
+        }).promise;
+
         if (cancelled) return;
 
         const containerWidth = container.offsetWidth || 700;
@@ -55,32 +62,45 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
           if (cancelled) return;
           container.appendChild(canvas);
 
-          if (i === 1) setLoading(false);
+          if (i === 1) setStatus("ready");
         }
-      } catch (err: any) {
+
+        if (pdf.numPages === 0) setStatus("ready");
+      } catch {
         if (!cancelled) {
-          setError("تعذّر تحميل ملف PDF");
-          setLoading(false);
+          setFallback(true);
+          setStatus("ready");
         }
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [url]);
+
+  useEffect(() => {
+    const cleanup = renderPdf();
+    return cleanup;
+  }, [renderPdf]);
+
+  if (fallback) {
+    return (
+      <div className="w-full" data-testid="pdf-fallback-viewer">
+        <iframe
+          src={`${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+          className="border-0 block w-full rounded-lg"
+          style={{ height: "85vh", minHeight: "500px" }}
+          title={title || "عارض PDF"}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full" data-testid="pdf-canvas-viewer">
-      {loading && (
+      {status === "loading" && (
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
           <p className="text-sm text-muted-foreground">جاري تحميل الملف...</p>
-        </div>
-      )}
-      {error && (
-        <div className="text-center py-12 text-destructive">
-          <p className="font-semibold">{error}</p>
         </div>
       )}
       <div
