@@ -144,6 +144,5 @@ export async function initHierarchy(): Promise<void> {
   const fromDb = await loadHierarchyFromDb();
   if (fromDb) {
     setCurrentHierarchy(fromDb);
-    console.log("[hierarchyStore] Loaded from DB");
   }
 }

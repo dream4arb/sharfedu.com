@@ -134,7 +134,7 @@ router.get("/attachments", async (req, res) => {
   }
 });
 
-router.post("/attachments", upload.single("file"), async (req: Request & { file?: { originalname: string; mimetype: string; filename: string } }, res) => {
+router.post("/attachments", upload.single("file"), async (req: Request & { file?: { originalname: string; mimetype: string; filename: string; path: string } }, res) => {
   try {
     const file = req.file;
     const lessonId = req.body.lessonId as string;
@@ -142,6 +142,27 @@ router.post("/attachments", upload.single("file"), async (req: Request & { file?
     if (!file || !lessonId) {
       return res.status(400).json({ message: "يجب إرفاق ملف وتحديد معرف الدرس." });
     }
+
+    const MAGIC: Record<string, number[][]> = {
+      "application/pdf": [[0x25, 0x50, 0x44, 0x46]],
+      "image/png": [[0x89, 0x50, 0x4E, 0x47]],
+      "image/jpeg": [[0xFF, 0xD8, 0xFF]],
+      "image/gif": [[0x47, 0x49, 0x46, 0x38]],
+      "image/webp": [[0x52, 0x49, 0x46, 0x46]],
+    };
+    const sigs = MAGIC[file.mimetype];
+    if (sigs) {
+      try {
+        const buf = await fs.promises.readFile(file.path);
+        const header = Array.from(buf.slice(0, 8));
+        const valid = sigs.some(sig => sig.every((b, i) => header[i] === b));
+        if (!valid) {
+          await fs.promises.unlink(file.path).catch(() => {});
+          return res.status(400).json({ message: "محتوى الملف لا يتطابق مع نوعه المُعلن." });
+        }
+      } catch {}
+    }
+
     const type = file.mimetype === "application/pdf" ? "pdf" : "image";
     const url = `/attached_assets/uploads/${file.filename}`;
     const row = await storage.addAttachment({ lessonId, type, url, label });

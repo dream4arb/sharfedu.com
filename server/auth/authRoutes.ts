@@ -229,7 +229,6 @@ router.put("/account", requireAuth, (req: Request, res: Response, next: (err?: u
   (async () => {
     try {
       const userId = (req.user as Express.User)?.id;
-      console.log("[auth] PUT /account", userId ? "userId=" + userId : "no user");
       if (!userId) return res.status(401).json({ message: "يجب تسجيل الدخول." });
       const body = (req.body && typeof req.body === "object" ? req.body : {}) as {
         email?: string;

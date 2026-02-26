@@ -444,35 +444,113 @@ export default function Lesson() {
       }
 
       const videoIds = Object.keys(idToUrlMap);
-      const oEmbedPromises = urlsToFetch.map(async ({ url }) => {
+
+      const apiPromise = videoIds.length > 0
+        ? fetch(`/api/content/youtube-video-info?ids=${videoIds.join(",")}`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+        : Promise.resolve({});
+
+      const oembedPromises = urlsToFetch.map(async ({ url }) => {
         const videoId = extractVideoId(url);
         if (!videoId) return;
-        const watchUrl = url.includes("/embed/") ? `https://www.youtube.com/watch?v=${videoId}` : url;
         try {
+          const watchUrl = url.includes("/embed/") ? `https://www.youtube.com/watch?v=${videoId}` : url;
           const resp = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`);
           if (resp.ok) {
             const data = await resp.json();
             const fb = fallbacks[url];
-            metadata[url] = { title: data.title || fb.title, channelName: data.author_name || fb.channel, duration: fb.duration };
+            if (!metadata[url]) {
+              metadata[url] = { title: data.title || fb.title, channelName: data.author_name || fb.channel, duration: fb.duration };
+            } else {
+              if (!metadata[url].title) metadata[url].title = data.title || fb.title;
+              if (!metadata[url].channelName) metadata[url].channelName = data.author_name || fb.channel;
+            }
           }
         } catch {}
-        if (!metadata[url]) {
-          const fb = fallbacks[url];
-          metadata[url] = { title: fb.title, channelName: fb.channel, duration: fb.duration };
-        }
       });
 
-      const durPromise = videoIds.length > 0
-        ? fetch(`/api/youtube/durations?ids=${videoIds.join(",")}`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
-        : Promise.resolve({});
-
-      const [, durations] = await Promise.all([Promise.allSettled(oEmbedPromises), durPromise]) as [PromiseSettledResult<void>[], Record<string, string>];
-      for (const [vid, dur] of Object.entries(durations)) {
+      const [apiData] = await Promise.all([apiPromise, Promise.allSettled(oembedPromises)]) as [Record<string, { title: string; channelName: string; durationCompact: string }>, unknown];
+      for (const [vid, info] of Object.entries(apiData)) {
         const origUrl = idToUrlMap[vid];
-        if (origUrl && metadata[origUrl]) metadata[origUrl].duration = dur;
+        if (origUrl) {
+          const fb = fallbacks[origUrl];
+          const existing = metadata[origUrl];
+          metadata[origUrl] = {
+            title: info.title || existing?.title || fb.title,
+            channelName: info.channelName || existing?.channelName || fb.channel,
+            duration: info.durationCompact || existing?.duration || fb.duration,
+          };
+        }
+      }
+
+      for (const { url } of urlsToFetch) {
+        if (!metadata[url]) {
+          const fb = fallbacks[url];
+          if (fb) metadata[url] = { title: fb.title, channelName: fb.channel, duration: fb.duration };
+        }
       }
 
       setVideoMetadata(metadata);
+
+      const missingDuration = videoIds.filter(vid => {
+        const origUrl = idToUrlMap[vid];
+        return origUrl && metadata[origUrl] && (!metadata[origUrl].duration || metadata[origUrl].duration === "—" || metadata[origUrl].duration === "غير محدد");
+      });
+
+      if (missingDuration.length > 0) {
+        const loadYTApi = () => new Promise<void>((resolve) => {
+          if ((window as any).YT?.Player) { resolve(); return; }
+          const existing = document.getElementById("yt-iframe-api");
+          if (existing) { const check = setInterval(() => { if ((window as any).YT?.Player) { clearInterval(check); resolve(); } }, 100); return; }
+          const tag = document.createElement("script");
+          tag.id = "yt-iframe-api";
+          tag.src = "https://www.youtube.com/iframe_api";
+          document.head.appendChild(tag);
+          (window as any).onYouTubeIframeAPIReady = () => resolve();
+        });
+
+        await loadYTApi();
+
+        const container = document.createElement("div");
+        container.style.cssText = "position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden";
+        document.body.appendChild(container);
+
+        await Promise.allSettled(missingDuration.map((vid) => new Promise<void>((resolve) => {
+          const el = document.createElement("div");
+          container.appendChild(el);
+          const timeout = setTimeout(() => { resolve(); }, 8000);
+          try {
+            new (window as any).YT.Player(el, {
+              videoId: vid,
+              width: 1, height: 1,
+              playerVars: { autoplay: 0, controls: 0 },
+              events: {
+                onReady: (event: any) => {
+                  try {
+                    const totalSec = Math.round(event.target.getDuration());
+                    if (totalSec > 0) {
+                      const h = Math.floor(totalSec / 3600);
+                      const m = Math.floor((totalSec % 3600) / 60);
+                      const s = totalSec % 60;
+                      const dur = h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+                      const origUrl = idToUrlMap[vid];
+                      if (origUrl && metadata[origUrl]) {
+                        metadata[origUrl].duration = dur;
+                      }
+                    }
+                  } catch {}
+                  clearTimeout(timeout);
+                  try { event.target.destroy(); } catch {}
+                  resolve();
+                },
+                onError: () => { clearTimeout(timeout); resolve(); },
+              },
+            });
+          } catch { clearTimeout(timeout); resolve(); }
+        })));
+
+        try { document.body.removeChild(container); } catch {}
+        setVideoMetadata({ ...metadata });
+      }
     };
 
     fetchMetadata();

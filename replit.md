@@ -36,7 +36,7 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 │   └── lib/                 # Utilities (queryClient, seo, theme)
 ├── server/                  # Backend source
 │   ├── index.ts             # Express entry (CORS, security headers, trust proxy)
-│   ├── routes.ts            # API routes (auth, chat, progress, SEO, attached_assets)
+│   ├── routes.ts            # API routes (AI summarize, YouTube info, progress, SEO, attached_assets)
 │   ├── static.ts            # Static file serving with 1y cache + SPA fallback
 │   ├── db.ts                # Database connection
 │   ├── storage.ts           # Data access layer
@@ -46,13 +46,13 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 │   ├── admin/               # Admin CMS (adminRoutes, cmsRoutes, cmsStorage, contentRoutes, hierarchyStore)
 │   ├── routes/              # AI routes (pdf-extractor, extract-questions)
 │   ├── data/                # cms-hierarchy (curriculum structure)
-│   └── middleware/           # Auth middleware (adminAuth)
+│   └── middleware/          # Auth middleware (adminAuth)
 ├── shared/                  # Shared types and schemas
 │   ├── schema.ts            # Drizzle database schema
 │   └── routes.ts            # API route definitions
 ├── dist/index.cjs           # Production server bundle (esbuild output)
 ├── server/public/           # Production frontend (Vite output) + PDF worker
-├── attached_assets/         # User-uploaded files (uploads/, html/, json/)
+├── attached_assets/         # User-uploaded files (uploads/, lessons/, images)
 └── sqlite.db                # SQLite database
 ```
 
@@ -60,13 +60,21 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 **Secrets**: SESSION_SECRET, GEMINI_API_KEY, YOUTUBE_API_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL, SMTP_PASS, SSH_PASS, GITHUB_TOKEN
 **Config**: NODE_ENV=production, PORT=5000, DATABASE_URL=file:sqlite.db
 
+### YouTube Video Metadata
+- **Strategy**: Three-tier approach for fetching video title, channel, duration
+  1. **YouTube Data API** (server-side) — full metadata when quota available
+  2. **YouTube oEmbed API** (server-side fallback) — title + channel, no API key needed
+  3. **YouTube IFrame Player API** (browser-side) — duration extraction from browser
+- **Cache**: Server-side with TTL (1h) and max size (500 entries)
+- **Endpoint**: `GET /api/content/youtube-video-info?ids=id1,id2` — max 20 IDs per request
+
 ### Security Features
 - CORS: Strict origin whitelist (sharfedu.com + Replit domain; localhost only in dev)
 - Security headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, HSTS (production)
 - Path traversal protection on file serving routes (SAFE_NAME regex + path.basename)
 - Session: httpOnly, sameSite=lax, secure in production
 - Passwords: bcrypt hashed
-- File uploads: Size limited (20MB), random filenames, MIME type whitelist (PDF, PNG, JPEG, WebP, GIF, SVG) on both admin and CMS upload routes
+- File uploads: Size limited (20MB), random filenames, MIME type whitelist + magic number validation (PDF, PNG, JPEG, WebP, GIF, SVG)
 - Error messages: Generic in production (no stack trace leaks)
 - All file I/O uses async fs/promises (non-blocking)
 

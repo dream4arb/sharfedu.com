@@ -120,85 +120,147 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     }
   });
 
-  const durationCache = new Map<string, string>();
+  interface VideoInfo {
+    title: string;
+    channelName: string;
+    duration: string;
+    durationCompact: string;
+    likeCount: string;
+    viewCount: string;
+    publishedAt: string;
+    commentCount: string;
+  }
+  const videoInfoCache = new Map<string, { data: VideoInfo; ts: number }>();
+  const CACHE_TTL = 3600000;
+  const CACHE_MAX = 500;
 
-  async function scrapeDuration(videoId: string): Promise<string | null> {
+  function getCachedInfo(id: string): VideoInfo | undefined {
+    const entry = videoInfoCache.get(id);
+    if (!entry) return undefined;
+    if (Date.now() - entry.ts > CACHE_TTL) { videoInfoCache.delete(id); return undefined; }
+    return entry.data;
+  }
+  function setCachedInfo(id: string, info: VideoInfo) {
+    if (videoInfoCache.size >= CACHE_MAX) {
+      const oldest = videoInfoCache.keys().next().value;
+      if (oldest) videoInfoCache.delete(oldest);
+    }
+    videoInfoCache.set(id, { data: info, ts: Date.now() });
+  }
+
+  function formatSeconds(total: number): { duration: string; durationCompact: string } {
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    const durationCompact = h > 0
+      ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
+      : `${m}:${String(s).padStart(2, "0")}`;
+
+    let duration = "";
+    if (h > 0) duration += `${h} ساعة `;
+    if (m > 0) duration += `${m} دقيقة `;
+    if (s > 0 && h === 0) duration += `${s} ثانية`;
+    duration = duration.trim() || "0 ثانية";
+
+    return { duration, durationCompact };
+  }
+
+  function formatRelativeDate(isoDate: string): string {
     try {
-      const resp = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
-        headers: { "Accept-Language": "en", "User-Agent": "Mozilla/5.0" },
-      });
+      const d = new Date(isoDate);
+      const now = new Date();
+      const diffMs = now.getTime() - d.getTime();
+      const days = Math.floor(diffMs / 86400000);
+      if (days < 1) return "اليوم";
+      if (days < 30) return `منذ ${days} يوم`;
+      const months = Math.floor(days / 30);
+      if (months < 12) return `منذ ${months} شهر`;
+      const years = Math.floor(months / 12);
+      return `منذ ${years} سنة`;
+    } catch { return ""; }
+  }
+
+  async function getVideoInfoViaOembed(videoId: string): Promise<VideoInfo | null> {
+    try {
+      const url = `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}&format=json`;
+      const resp = await fetch(url);
       if (!resp.ok) return null;
-      const html = await resp.text();
-      const match = html.match(/"lengthSeconds":"(\d+)"/);
-      if (!match) return null;
-      const total = parseInt(match[1]);
-      if (total <= 0) return null;
-      const h = Math.floor(total / 3600);
-      const m = Math.floor((total % 3600) / 60);
-      const s = total % 60;
-      return h > 0
-        ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
-        : `${m}:${String(s).padStart(2, "0")}`;
+      const data = await resp.json() as { title?: string; author_name?: string };
+      return {
+        title: data.title || "",
+        channelName: data.author_name || "",
+        duration: "",
+        durationCompact: "",
+        likeCount: "0",
+        viewCount: "0",
+        publishedAt: "",
+        commentCount: "0",
+      };
     } catch {
       return null;
     }
   }
 
-  app.get("/api/youtube/durations", async (req, res) => {
+  app.get("/api/content/youtube-video-info", async (req, res) => {
     try {
       const ids = (req.query.ids as string || "").split(",").filter(Boolean).slice(0, 20);
       if (ids.length === 0) return res.json({});
 
-      const result: Record<string, string> = {};
+      const result: Record<string, VideoInfo> = {};
       const uncached: string[] = [];
       for (const id of ids) {
-        const cached = durationCache.get(id);
+        const cached = getCachedInfo(id);
         if (cached) result[id] = cached;
         else uncached.push(id);
       }
 
       if (uncached.length > 0) {
         const apiKey = process.env.YOUTUBE_API_KEY?.trim();
-        let apiSuccess = false;
         if (apiKey) {
           try {
-            const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${uncached.join(",")}&key=${apiKey}`;
-            const resp = await fetch(url);
-            if (resp.ok) {
-              const data = await resp.json() as { items?: { id: string; contentDetails?: { duration?: string } }[] };
+            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${uncached.join(",")}&key=${apiKey}`;
+            const apiResp = await fetch(url);
+            if (apiResp.ok) {
+              const data = await apiResp.json() as { items?: any[] };
               for (const item of data.items || []) {
                 const iso = item.contentDetails?.duration || "";
                 const m2 = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-                if (m2) {
-                  const h = parseInt(m2[1] || "0");
-                  const m = parseInt(m2[2] || "0");
-                  const s = parseInt(m2[3] || "0");
-                  const dur = h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
-                  result[item.id] = dur;
-                  durationCache.set(item.id, dur);
-                }
+                const totalSec = m2 ? (parseInt(m2[1]||"0")*3600 + parseInt(m2[2]||"0")*60 + parseInt(m2[3]||"0")) : 0;
+                const { duration, durationCompact } = totalSec > 0 ? formatSeconds(totalSec) : { duration: "", durationCompact: "" };
+                const info: VideoInfo = {
+                  title: item.snippet?.title || "",
+                  channelName: item.snippet?.channelTitle || "",
+                  duration,
+                  durationCompact,
+                  likeCount: item.statistics?.likeCount || "0",
+                  viewCount: item.statistics?.viewCount || "0",
+                  publishedAt: item.snippet?.publishedAt ? formatRelativeDate(item.snippet.publishedAt) : "",
+                  commentCount: item.statistics?.commentCount || "0",
+                };
+                result[item.id] = info;
+                setCachedInfo(item.id, info);
               }
-              apiSuccess = true;
             }
           } catch {}
         }
 
         const stillMissing = uncached.filter(id => !result[id]);
         if (stillMissing.length > 0) {
-          const scrapeResults = await Promise.allSettled(
+          await Promise.allSettled(
             stillMissing.map(async (id) => {
-              const dur = await scrapeDuration(id);
-              if (dur) {
-                result[id] = dur;
-                durationCache.set(id, dur);
+              const info = await getVideoInfoViaOembed(id);
+              if (info) {
+                result[id] = info;
+                setCachedInfo(id, info);
               }
             })
           );
         }
       }
+
       res.json(result);
     } catch {
-      res.status(500).json({ error: "Failed to fetch durations" });
+      res.status(500).json({ error: "Failed to fetch video info" });
     }
   });
 
@@ -208,69 +270,6 @@ export async function registerRoutes(httpServer: Server, app: Express) {
   app.use("/api/admin", requireAdmin, adminRoutes);
   const cmsRoutes = (await import("./admin/cmsRoutes")).default;
   app.use("/api/admin/cms", requireAdmin, cmsRoutes);
-
-  app.post("/api/chat", async (req, res) => {
-    try {
-      const { message, lessonTitle, subjectName, conversationHistory } = req.body;
-
-      if (!message) {
-        return res.status(400).json({ error: "Message is required" });
-      }
-
-      const genAI = getGeminiClient();
-      if (!genAI) {
-        return res.status(503).json({ 
-          error: "المعلم الذكي غير متاح حالياً.",
-        });
-      }
-
-      const systemPrompt = `أنت المعلم الذكي في منصة شارف التعليمية. أنت مساعد تعليمي ذكي وودود متخصص في مساعدة الطلاب السعوديين في فهم دروسهم وتحسين أدائهم الأكاديمي.
-
-السياق الحالي:
-- المادة: ${subjectName || "غير محدد"}
-- الدرس: ${lessonTitle || "غير محدد"}
-
-قواعد مهمة:
-1. أجب دائماً باللغة العربية الفصحى أو العامية السعودية حسب سياق السؤال
-2. استخدم لغة بسيطة ومفهومة مناسبة لمستوى الطالب
-3. قدم أمثلة توضيحية عملية عند الحاجة
-4. شجع الطالب وحفزه على التعلم المستمر
-5. إذا سُئلت عن شيء خارج نطاق التعليم، وجه الطالب بلطف للتركيز على الأسئلة التعليمية
-6. كن ودوداً ومشجعاً ومهذباً في جميع ردودك
-7. قدم شرحاً واضحاً ومفصلاً للمفاهيم الصعبة
-8. استخدم أمثلة من الحياة اليومية لتسهيل الفهم`;
-
-      let fullPrompt = systemPrompt + "\n\n";
-      
-      if (conversationHistory && Array.isArray(conversationHistory)) {
-        const historyText = conversationHistory
-          .filter((m: { role: "user" | "assistant"; content: string }) => m.content)
-          .map((m: { role: "user" | "assistant"; content: string }) => {
-            const roleLabel = m.role === "user" ? "الطالب" : "شارف";
-            return `${roleLabel}: ${m.content}`;
-          })
-          .join("\n\n");
-        
-        if (historyText) {
-          fullPrompt += "سجل المحادثة السابق:\n" + historyText + "\n\n";
-        }
-      }
-      
-      fullPrompt += `الطالب: ${message}\n\nشارف:`;
-
-      const model = getGeminiModel(genAI);
-      const result = await model.generateContent(fullPrompt);
-      const response = await result.response;
-      const text = response.text();
-
-      return res.json({ response: text });
-    } catch (error: any) {
-      console.error("[Chat] Error:", error?.message);
-      return res.status(500).json({ 
-        error: "حدث خطأ أثناء التواصل مع المعلم الذكي. يرجى المحاولة مرة أخرى.",
-      });
-    }
-  });
 
   app.post("/api/ai/summarize", async (req, res) => {
     try {

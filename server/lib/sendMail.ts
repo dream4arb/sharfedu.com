@@ -15,9 +15,7 @@ const transporter = nodemailer.createTransport({
 
 const FROM = process.env.MAIL_FROM || process.env.SMTP_USER || "noreply@sharfedu.com";
 
-if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-  console.log("[Mail] SMTP مُعد — الإرسال من", process.env.SMTP_USER, "عبر", process.env.SMTP_HOST || "smtp.gmail.com");
-} else {
+if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
   console.warn("[Mail] SMTP غير مُعد (SMTP_USER أو SMTP_PASS فارغ في .env)");
 }
 
@@ -27,7 +25,6 @@ export async function sendPasswordResetCode(email: string, code: string): Promis
     return { sent: false };
   }
   try {
-    console.log("[Mail] إرسال رمز استعادة إلى", email, "عبر", process.env.SMTP_HOST);
     await transporter.sendMail({
       from: FROM,
       to: email,
