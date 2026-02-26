@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  --primary: 195 100% 42%;
+  --primary: 195 100% 36%;
   --primary-foreground: 0 0% 100%;
   
   --secondary: 195 30% 96%;
@@ -19,7 +19,7 @@
   --card-border: 220 15% 92%;
 
   --muted: 220 15% 96%;
-  --muted-foreground: 220 10% 50%;
+  --muted-foreground: 220 10% 42%;
 
   --accent: 195 50% 96%;
   --accent-foreground: 195 100% 35%;
@@ -42,11 +42,11 @@
 
   --border: 220 15% 92%;
   --input: 220 15% 92%;
-  --ring: 195 100% 42%;
+  --ring: 195 100% 36%;
 
   --radius: 1rem;
 
-  --chart-1: 195 100% 42%;
+  --chart-1: 195 100% 36%;
   --chart-2: 160 70% 45%;
   --chart-3: 35 95% 55%;
   --chart-4: 280 70% 55%;

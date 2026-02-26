@@ -71,7 +71,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-lg mb-6">روابط سريعة</h4>
+            <h3 className="font-bold text-lg mb-6">روابط سريعة</h3>
             <ul className="space-y-4">
               <li>
                 <Link href="/" className="text-white/60 transition-colors flex items-center gap-2 hover-elevate" data-testid="footer-link-home">
@@ -97,7 +97,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-lg mb-6">تواصل معنا</h4>
+            <h3 className="font-bold text-lg mb-6">تواصل معنا</h3>
             <ul className="space-y-4">
               <li className="flex items-center gap-3 text-white/60">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
@@ -121,7 +121,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-bold text-lg mb-6">القائمة البريدية</h4>
+            <h3 className="font-bold text-lg mb-6">القائمة البريدية</h3>
             <p className="text-white/60 mb-4 text-sm">
               احصل على آخر التحديثات والنصائح التعليمية مباشرة في بريدك.
             </p>
@@ -134,7 +134,7 @@ export function Footer() {
                 className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/10 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-white placeholder:text-white/40"
                 data-testid="input-newsletter-email"
               />
-              <Button type="submit" size="icon" className="rounded-xl shrink-0" data-testid="button-newsletter-subscribe">
+              <Button type="submit" size="icon" className="rounded-xl shrink-0" aria-label="اشتراك في القائمة البريدية" data-testid="button-newsletter-subscribe">
                 <Send className="w-4 h-4" />
               </Button>
             </form>
