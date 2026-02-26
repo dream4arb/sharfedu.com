@@ -1813,10 +1813,10 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
+                          <div className="w-full max-w-[1200px] mx-auto sm:overflow-hidden pdf-iframe-container">
                             <iframe
                               src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block w-full sm:pdf-iframe-desktop"
+                              className="border-0 block w-full"
                               scrolling="no"
                               loading="lazy"
                               style={{ height: '5000px', overflow: 'hidden' }}
@@ -1853,14 +1853,14 @@ export default function Lesson() {
                         </div>
                       </div>
                     ) : educationRawHtml ? (
-                      <div className="w-full rounded-2xl overflow-hidden border border-border/50 bg-white dark:bg-card shadow-sm">
+                      <div className="w-full rounded-2xl overflow-x-auto sm:overflow-hidden border border-border/50 bg-white dark:bg-card shadow-sm" style={{ WebkitOverflowScrolling: 'touch' }}>
                         <iframe
                           srcDoc={educationRawHtml}
                           sandbox="allow-scripts allow-same-origin"
                           title="المحتوى التعليمي"
                           className="w-full border-0 block"
                           scrolling="no"
-                          style={{ minHeight: "700px", width: "100%", overflow: "hidden" }}
+                          style={{ minHeight: "700px", minWidth: "700px", overflow: "hidden" }}
                           onLoad={(e) => {
                             try {
                               const iframe = e.currentTarget;
@@ -1914,11 +1914,11 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
+                          <div className="w-full max-w-[1200px] mx-auto sm:overflow-hidden pdf-iframe-container">
                             <iframe
                               ref={pdfIframeRef}
                               src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block w-full sm:pdf-iframe-desktop"
+                              className="border-0 block w-full"
                               scrolling="no"
                               loading="lazy"
                               style={{ height: '5000px', overflow: 'hidden' }}
