@@ -81,7 +81,19 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 5. **Admin (/admin)**: CMS dashboard (admin only)
 6. **Auth**: /login, /register, /forgot-password, /reset-password
 
+### Deployment Rule (STRICT)
+**Every change must be deployed in this exact order:**
+1. First: Push to GitHub (`git push` using GITHUB_TOKEN)
+2. Second: Upload to production server via SSH
+Never skip either step. Never deploy to server without pushing to GitHub first.
+
 ### Production Server (Cloudways)
 - Host: 165.227.236.121, User: SSH_USER env var
-- App path: /home/master/applications/cmkdrtgqcv/
-- Sync: SSH + tar to pull database, static files, server binary
+- App path: /home/master/applications/cmkdrtgqcv/public_html/
+- Node app: /home/master/applications/cmkdrtgqcv/public_html/node_app/
+- Frontend: tar + scp to ~/  then extract in public_html/
+- Backend: tar + scp index.cjs + server-original.cjs to node_app/
+
+### GitHub
+- Repo: https://github.com/dream4arb/sharfedu.com
+- Push: `git push "https://${GITHUB_TOKEN}@github.com/dream4arb/sharfedu.com.git" HEAD:main`
