@@ -148,7 +148,7 @@ function VideoTabContent({
         </div>
       </div>
       <div className="mb-8">
-        <h3 className="text-lg font-bold mb-4 text-foreground">فيديوهات أخرى لنفس الدرس</h3>
+        <h3 className="text-lg font-bold mb-4 text-foreground" id="video-list-heading">فيديوهات أخرى لنفس الدرس</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {videos.map((v, i) => {
             const emb = toEmbed(v.url);
@@ -490,104 +490,6 @@ export default function Lesson() {
 
     return () => { cancelled = true; };
   }, [currentLessonId, currentVideoUrl, additionalVideosKey, cmsVideoDataValue]);
-
-  const durationFetchedRef = useRef("");
-  useEffect(() => {
-    if (Object.keys(videoMetadata).length === 0) return;
-
-    const missingEntries = Object.entries(videoMetadata).filter(
-      ([, m]) => !m.duration || m.duration === "—" || m.duration === "غير محدد"
-    );
-    if (missingEntries.length === 0) return;
-
-    const missingIds = missingEntries
-      .map(([url]) => extractVideoId(url))
-      .filter(Boolean) as string[];
-    if (missingIds.length === 0) return;
-
-    const durationKey = missingIds.join(",");
-    if (durationFetchedRef.current === durationKey) return;
-    durationFetchedRef.current = durationKey;
-
-    let cancelled = false;
-
-    const fetchDurations = async () => {
-      const loadYTApi = () => new Promise<void>((resolve) => {
-        if ((window as any).YT?.Player) { resolve(); return; }
-        const existing = document.getElementById("yt-iframe-api");
-        if (existing) {
-          const check = setInterval(() => { if ((window as any).YT?.Player) { clearInterval(check); resolve(); } }, 200);
-          setTimeout(() => { clearInterval(check); resolve(); }, 10000);
-          return;
-        }
-        const tag = document.createElement("script");
-        tag.id = "yt-iframe-api";
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-        const timeout = setTimeout(() => resolve(), 10000);
-        (window as any).onYouTubeIframeAPIReady = () => { clearTimeout(timeout); resolve(); };
-      });
-
-      await loadYTApi();
-      if (cancelled || !(window as any).YT?.Player) return;
-
-      const idToUrl: Record<string, string> = {};
-      for (const [url] of missingEntries) {
-        const vid = extractVideoId(url);
-        if (vid) idToUrl[vid] = url;
-      }
-
-      const container = document.createElement("div");
-      container.style.cssText = "position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden";
-      document.body.appendChild(container);
-
-      const results: Record<string, string> = {};
-      await Promise.allSettled(missingIds.map((vid) => new Promise<void>((resolve) => {
-        const el = document.createElement("div");
-        container.appendChild(el);
-        const tmout = setTimeout(() => resolve(), 8000);
-        try {
-          new (window as any).YT.Player(el, {
-            videoId: vid, width: 1, height: 1,
-            playerVars: { autoplay: 0, controls: 0 },
-            events: {
-              onReady: (e: any) => {
-                try {
-                  const sec = Math.round(e.target.getDuration());
-                  if (sec > 0) {
-                    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
-                    results[vid] = h > 0 ? `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}` : `${m}:${String(s).padStart(2,"0")}`;
-                  }
-                } catch {}
-                clearTimeout(tmout);
-                try { e.target.destroy(); } catch {}
-                resolve();
-              },
-              onError: () => { clearTimeout(tmout); resolve(); },
-            },
-          });
-        } catch { clearTimeout(tmout); resolve(); }
-      })));
-
-      try { document.body.removeChild(container); } catch {}
-
-      if (!cancelled && Object.keys(results).length > 0) {
-        setVideoMetadata(prev => {
-          const updated = { ...prev };
-          for (const [vid, dur] of Object.entries(results)) {
-            const url = idToUrl[vid];
-            if (url && updated[url]) {
-              updated[url] = { ...updated[url], duration: dur };
-            }
-          }
-          return updated;
-        });
-      }
-    };
-
-    fetchDurations();
-    return () => { cancelled = true; };
-  }, [videoMetadata]);
 
   // SEO: تحديث عنوان الصفحة ووصفها عند تغيير الدرس
   useEffect(() => {
@@ -1151,7 +1053,7 @@ export default function Lesson() {
           <Sidebar side="right" className="border-l border-border/50 bg-background/95">
             <SidebarHeader className="p-5 border-b border-border/50 bg-card/50">
               <div className="flex items-center gap-3">
-                <Link href={homeLink} className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/80 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
+                <Link href={homeLink} aria-label="الرجوع للصفحة الرئيسية" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/80 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
                   <Home className="w-5 h-5" />
                 </Link>
                 <div className="flex-1 min-w-0">
@@ -2041,7 +1943,7 @@ export default function Lesson() {
                       <div className="mt-6 p-4 rounded-xl border border-border/50 bg-accent/30">
                         <div className="flex items-center justify-between">
                           <div>
-                            <h4 className="font-bold mb-1">تتبع القراءة التلقائي</h4>
+                            <h3 className="font-bold mb-1">تتبع القراءة التلقائي</h3>
                             <p className="text-sm text-muted-foreground">
                               {isTabCompleted(subjectId, lessonId, "lesson") 
                                 ? "تم تسجيل قراءتك للدرس ✓" 

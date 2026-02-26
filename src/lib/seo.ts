@@ -52,6 +52,15 @@ export function setPageMeta(
   }
   metaKw.setAttribute("content", kw ?? DEFAULT_SEO.keywords);
 
+  // Canonical URL
+  let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.setAttribute("rel", "canonical");
+    document.head.appendChild(canonical);
+  }
+  canonical.href = `https://sharfedu.com${window.location.pathname}`;
+
   // Open Graph
   const setOg = (property: string, content: string) => {
     let el = document.querySelector(`meta[property="${property}"]`);
@@ -62,6 +71,7 @@ export function setPageMeta(
     }
     el.setAttribute("content", content);
   };
+  setOg("og:url", `https://sharfedu.com${window.location.pathname}`);
   if (ogTitle) setOg("og:title", ogTitle);
   if (ogDescription) setOg("og:description", ogDescription);
   if (ogImage) setOg("og:image", ogImage);
