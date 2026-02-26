@@ -5,8 +5,8 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import heroStudentImg from "@/assets/images/hero-student-new.jpg";
 
-// صورة الهيرو: ضع ملف hero-main.png في public لاستبدال الصورة الافتراضية
-const heroImageUrl = "/hero-main.png";
+const heroImageUrl = "/hero-main.webp";
+const heroImageFallback = "/hero-main.png";
 
 export function Hero() {
   const { toast } = useToast();
@@ -106,19 +106,23 @@ export function Hero() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-cyan-200/30 rounded-[2.5rem] blur-2xl scale-95" />
               <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-primary/20 border-4 border-white">
-                <img 
-                  src={heroImageUrl}
-                  alt="طلاب وطالبات سعوديون يتعلمون - منصة شارف التعليمية"
-                  className="w-full aspect-[4/3] object-cover"
-                  loading="eager"
-                  decoding="async"
-                  fetchPriority="high"
-                  data-testid="img-hero"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = heroStudentImg;
-                    (e.target as HTMLImageElement).onerror = null;
-                  }}
-                />
+                <picture>
+                  <source srcSet={heroImageUrl} type="image/webp" />
+                  <source srcSet={heroImageFallback} type="image/png" />
+                  <img 
+                    src={heroImageFallback}
+                    alt="طلاب وطالبات سعوديون يتعلمون - منصة شارف التعليمية"
+                    className="w-full aspect-[4/3] object-cover"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                    data-testid="img-hero"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = heroStudentImg;
+                      (e.target as HTMLImageElement).onerror = null;
+                    }}
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent" />
               </div>
             </div>

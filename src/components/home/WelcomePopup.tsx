@@ -48,6 +48,7 @@ export function WelcomePopup() {
               variant="ghost"
               className="absolute top-3 right-3 z-10"
               onClick={handleClose}
+              aria-label="إغلاق"
               data-testid="button-close-welcome"
             >
               <X className="w-5 h-5" />

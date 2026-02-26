@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --primary: 195 100% 36%;
+  --primary: 195 100% 32%;
   --primary-foreground: 0 0% 100%;
   
   --secondary: 195 30% 96%;
@@ -42,11 +40,11 @@
 
   --border: 220 15% 92%;
   --input: 220 15% 92%;
-  --ring: 195 100% 36%;
+  --ring: 195 100% 32%;
 
   --radius: 1rem;
 
-  --chart-1: 195 100% 36%;
+  --chart-1: 195 100% 32%;
   --chart-2: 160 70% 45%;
   --chart-3: 35 95% 55%;
   --chart-4: 280 70% 55%;

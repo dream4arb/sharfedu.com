@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowLeft, Rocket } from "lucide-react";
 import { Link } from "wouter";
-import ctaBgImg from "@/assets/images/cta-bg.jpg";
+import ctaBgImgWebp from "@/assets/images/cta-bg.webp";
+import ctaBgImgJpg from "@/assets/images/cta-bg.jpg";
 
 export function CTA() {
   return (
@@ -14,14 +15,17 @@ export function CTA() {
           viewport={{ once: true }}
           className="relative rounded-[2.5rem] overflow-hidden"
         >
-          <img 
-            src={ctaBgImg}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <picture>
+            <source srcSet={ctaBgImgWebp} type="image/webp" />
+            <img 
+              src={ctaBgImgJpg}
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-cyan-600/85 to-primary/90" />
           
           <div className="relative p-12 lg:p-20 text-center text-white">
