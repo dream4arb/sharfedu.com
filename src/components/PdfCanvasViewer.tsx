@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
+import * as pdfjsLib from "pdfjs-dist";
+import { Loader2 } from "lucide-react";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 interface PdfCanvasViewerProps {
   url: string;
@@ -9,7 +12,7 @@ interface PdfCanvasViewerProps {
 export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [fallback, setFallback] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
   const renderPdf = useCallback(() => {
     const container = containerRef.current;
@@ -17,24 +20,13 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
 
     container.querySelectorAll("canvas").forEach((c) => c.remove());
     setStatus("loading");
-    setFallback(false);
+    setErrMsg("");
 
     let cancelled = false;
 
     (async () => {
       try {
-        const pdfjsLib = await import("pdfjs-dist");
-
-        if (typeof Worker !== "undefined") {
-          pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-        }
-
-        const pdf = await pdfjsLib.getDocument({
-          url,
-          cMapUrl: undefined,
-          cMapPacked: false,
-        }).promise;
-
+        const pdf = await pdfjsLib.getDocument(url).promise;
         if (cancelled) return;
 
         const containerWidth = container.offsetWidth || 700;
@@ -66,10 +58,10 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
         }
 
         if (pdf.numPages === 0) setStatus("ready");
-      } catch {
+      } catch (err: any) {
         if (!cancelled) {
-          setFallback(true);
-          setStatus("ready");
+          setErrMsg(err?.message || "unknown");
+          setStatus("error");
         }
       }
     })();
@@ -82,25 +74,26 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
     return cleanup;
   }, [renderPdf]);
 
-  if (fallback) {
-    return (
-      <div className="w-full" data-testid="pdf-fallback-viewer">
-        <iframe
-          src={`${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-          className="border-0 block w-full rounded-lg"
-          style={{ height: "85vh", minHeight: "500px" }}
-          title={title || "عارض PDF"}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="w-full" data-testid="pdf-canvas-viewer">
       {status === "loading" && (
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
           <p className="text-sm text-muted-foreground">جاري تحميل الملف...</p>
+        </div>
+      )}
+      {status === "error" && (
+        <div className="text-center py-8">
+          <p className="text-destructive font-semibold mb-2">تعذّر تحميل ملف PDF</p>
+          <p className="text-xs text-muted-foreground mb-4 dir-ltr">{errMsg}</p>
+          <button
+            onClick={() => renderPdf()}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
+            data-testid="button-retry-pdf"
+          >
+            <Loader2 className="w-4 h-4" />
+            إعادة المحاولة
+          </button>
         </div>
       )}
       <div
