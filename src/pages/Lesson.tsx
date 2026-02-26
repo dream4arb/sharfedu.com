@@ -1267,12 +1267,11 @@ export default function Lesson() {
                                         const lessonProgRounded = Math.round(lessonProg);
                                         const lessonCompleted = lessonProgRounded >= 100;
                                         return (
-                                          <SidebarMenuItem key={`${chapter.id}-${lesson.id}`}>
-                                            <div className="flex items-center gap-1">
+                                          <SidebarMenuItem key={`${chapter.id}-${lesson.id}`} className={isAdmin ? "flex items-center gap-1" : ""}>
                                               <SidebarMenuButton
                                                 asChild
                                                 isActive={isActive}
-                                                className="gap-3 h-auto py-2.5 px-3 rounded-lg data-[active]:ring-[0.5px] data-[active]:ring-violet-400/40 flex-1"
+                                                className={`gap-3 h-auto py-2.5 px-3 rounded-lg data-[active]:ring-[0.5px] data-[active]:ring-violet-400/40${isAdmin ? " flex-1 min-w-0" : ""}`}
                                                 data-testid={`sidebar-lesson-${chapter.id}-${lesson.id}`}
                                               >
                                                 <Link href={`/lesson/${urlStage}/${subjectId}/${lesson.id}`}>
@@ -1317,7 +1316,6 @@ export default function Lesson() {
                                                   </button>
                                                 </div>
                                               )}
-                                            </div>
                                           </SidebarMenuItem>
                                         );
                                       })}
