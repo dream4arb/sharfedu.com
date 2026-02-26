@@ -239,27 +239,3 @@
     margin: 0 -25px;
   }
 }
-
-.yt-hide-branding::before,
-.yt-hide-branding::after {
-  content: "";
-  position: absolute;
-  z-index: 3;
-  pointer-events: auto;
-}
-
-.yt-hide-branding::before {
-  top: 0;
-  right: 0;
-  width: 120px;
-  height: 42px;
-  background: #000;
-}
-
-.yt-hide-branding::after {
-  bottom: 0;
-  right: 60px;
-  width: 42px;
-  height: 38px;
-  background: #000;
-}
