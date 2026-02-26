@@ -234,8 +234,10 @@
 }
 
 @media (min-width: 640px) {
+  .pdf-iframe-container {
+    overflow: visible;
+  }
   .pdf-iframe-container iframe {
-    width: calc(100% + 50px);
-    margin: 0 -25px;
+    width: 100%;
   }
 }
