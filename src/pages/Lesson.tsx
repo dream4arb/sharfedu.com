@@ -1070,7 +1070,7 @@ export default function Lesson() {
                       className="rounded-2xl border border-violet-200/50 bg-violet-50/20 dark:border-violet-500/25 dark:bg-violet-500/5 p-3 space-y-2 mb-4 pt-2"
                     >
                       <div className="flex justify-center mb-1">
-                        <div className="px-5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-violet-100/80 text-indigo-500 dark:bg-violet-500/20 dark:text-violet-300">
+                        <div className="w-full text-center px-5 py-2.5 rounded-lg text-xs font-bold bg-violet-100/80 text-indigo-500 dark:bg-violet-500/20 dark:text-violet-300">
                           {semesterIndex === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني"}
                         </div>
                       </div>
