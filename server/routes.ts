@@ -62,6 +62,30 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.json({ ok: true, service: "sharfedu-api" });
   });
 
+  app.get("/attached_assets/:folder/:filename", async (req, res) => {
+    const { folder, filename } = req.params;
+    const localPath = path.join(process.cwd(), "server", "public", "attached_assets", folder, filename);
+    const fs = await import("fs");
+    if (fs.existsSync(localPath)) {
+      return res.sendFile(localPath);
+    }
+    try {
+      const upstream = `https://sharfedu.com/attached_assets/${encodeURIComponent(folder)}/${encodeURIComponent(filename)}`;
+      const response = await fetch(upstream);
+      if (!response.ok) return res.status(response.status).end();
+      const ct = response.headers.get("content-type");
+      if (ct) res.setHeader("Content-Type", ct);
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const dir = path.dirname(localPath);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(localPath, buffer);
+      res.send(buffer);
+    } catch {
+      res.status(502).json({ error: "Failed to fetch file from origin" });
+    }
+  });
+
   // الجلسة والمصادقة (قبل أي route يحتاجها)
   const sessionStore = createSessionStore();
   const isSecure = process.env.NODE_ENV === "production" && (process.env.BASE_URL?.startsWith("https:") ?? false);
