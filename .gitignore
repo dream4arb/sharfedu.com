@@ -1,42 +1,21 @@
 node_modules
 .DS_Store
-vite.config.ts.*
 *.tar.gz
 
-# لا ترفع ملف البيئة — ضع المتغيرات في Cloudways أو على السيرفر
 .env
+.env.*
 .env.backup
 .env.local
-.env.*.local
 .env.server
-env_server_public_html.txt
-server-files-list.txt
 
-# سجلات التطبيق على السيرفر (تُنشأ داخل git_repo/logs)
 logs/
-
-# ويب هوك النشر (يُنشأ على السيرفر فقط)
 .deploy-token
-deploy-requested.flag
-
-# مفاتيح النشر (لا ترفعها أبداً)
 deploy_key
 deploy_key.pub
 
-# مجلد public_html المحلي (إن وُجد)
-public_html
-# مخرجات البناء للرفع (يُنشأ بـ npm run build)
-for_server
-.build_preserve_deploy
-public_html_upload.zip
-node_app_upload.zip
-
-# قاعدة البيانات المحلية (لا ترفعها — واستخدم نسخة منفصلة للاستبدال)
 sqlite.db
 *.db
 
-# --- ملفات الإنتاج (مرفوعة عمداً لسحبها جاهزة على السيرفر عبر Git، بدون npm run build هناك) ---
-# dist/         → يُرفع (تطبيق Node المُبنى)
-# server/public → يُرفع (واجهة SPA + .htaccess)
-# deploy_public_html → يُرفع (نسخة جاهزة لنسخها إلى public_html على السيرفر)
-# لا نضع dist ولا server/public ولا deploy_public_html في .gitignore
+server/public/attached_assets/uploads/
+attached_assets/
+.local/
