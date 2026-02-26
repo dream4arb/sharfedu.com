@@ -14,17 +14,36 @@ Sharaf (شارف) is a comprehensive Arabic educational platform designed for al
 
 ## System Architecture
 
-### Build & Development
-This project has full source code and can be built from source. Edit source files, then rebuild.
+### Build & Deployment Strategy
 
-- **Build command**: `npx tsx script/build.ts` (builds both frontend and server)
-- **Frontend only**: `npx vite build` (outputs to `server/public/`)
-- **Dev mode**: `npm run dev` (runs tsx with hot reload)
+This project runs a **hybrid approach**:
+- **Backend (dist/index.cjs)**: Built from source code in `server/` using `npx tsx script/build.ts`
+- **Frontend (server/public/)**: Uses pre-built static files from the production server (sharfedu.com) — NOT built from source on Replit
+- **Wrapper (dist/index.cjs)**: A wrapper script loads the server's original `dist/server-original.cjs` and adds static file serving + proxy routes for Replit compatibility
+
+**Why this approach?** The production server (Cloudways) has a more recent compiled build that includes features not yet in the source code (e.g., YouTube video info API, tab-types API). The source code in `git_repo` on the server is behind the compiled build.
+
+### Build Commands
+- **Full rebuild (backend only)**: `npx tsx script/build.ts` then restore server/public from production
+- **Database**: Synced from production server SQLite
+- **Static assets proxy**: Files in `/attached_assets/` are fetched from sharfedu.com on-demand and cached locally
 
 ### Startup (Production)
-- **Entry point**: `bash start.sh` which sets DATABASE_URL and runs `node dist/index.cjs`
+- **Entry point**: `bash start.sh` → sets DATABASE_URL, NODE_ENV=production → runs `node dist/index.cjs`
 - **Port**: 5000
-- **Static files**: Served from `server/public/`
+- **Static files**: Served from `server/public/` via wrapper
+- **dist/index.cjs**: Wrapper that loads `dist/server-original.cjs` + adds express.static + proxy
+- **dist/server-original.cjs**: The actual server from Cloudways production build
+
+### SSH Access to Production Server
+- **Host**: 165.227.236.121 (Cloudways/DigitalOcean)
+- **User**: Stored in env var SSH_USER
+- **Password**: Stored in secret SSH_PASS
+- **Port**: 22
+- **App path**: /home/master/applications/cmkdrtgqcv/
+  - Source: `git_repo/src/`, `git_repo/server/`, `git_repo/shared/`
+  - Production build: `public_html/` (static) + `public_html/node_app/index.cjs` (server)
+  - Database: `public_html/node_app/sqlite.db`
 
 ### Frontend
 - **Framework**: React 18 with TypeScript
@@ -38,82 +57,63 @@ This project has full source code and can be built from source. Edit source file
 - **Framework**: Express.js
 - **Database**: SQLite via LibSQL (`file:sqlite.db`)
 - **Authentication**: Google OAuth + local auth (bcrypt) via Passport.js
-- **Session Storage**: In-memory via memorystore
+- **Session Storage**: Custom SQLite session store (`server/auth/sessionStore.ts`)
 - **AI**: Google Gemini API for chat/tutoring
 - **Email**: Nodemailer with SMTP
+- **Trust Proxy**: Enabled (`app.set("trust proxy", 1)`) for Replit reverse proxy
 
 ### Project Structure
 ```
 ├── start.sh              # Startup script (sets env, runs server)
-├── index.html            # Vite entry point
+├── index.html            # Vite entry point (dev mode)
 ├── vite.config.ts        # Vite configuration
 ├── tailwind.config.ts    # Tailwind CSS configuration
 ├── tsconfig.json         # TypeScript configuration
-├── postcss.config.js     # PostCSS configuration
-├── package.json          # Dependencies and scripts
 ├── src/                  # Frontend source code
 │   ├── App.tsx           # Main app with routing
-│   ├── main.tsx          # Entry point
-│   ├── index.css         # Global styles and CSS variables
+│   ├── pages/            # Page components (Lesson.tsx, Home.tsx, etc.)
 │   ├── components/       # UI components
-│   │   ├── home/         # Landing page sections
-│   │   ├── layout/       # Navbar, Footer
-│   │   ├── ui/           # shadcn/ui components
-│   │   └── ...           # Feature components
-│   ├── pages/            # Page components
-│   │   ├── Home.tsx      # Landing page
-│   │   ├── Dashboard.tsx # Student dashboard
-│   │   ├── Stage.tsx     # Stage view
-│   │   ├── Subject.tsx   # Subject view
-│   │   ├── Lesson.tsx    # Lesson view
-│   │   ├── Profile.tsx   # User profile
-│   │   ├── AdminDashboard.tsx # Admin panel
-│   │   ├── auth/         # Auth pages (Login, Register, etc.)
-│   │   └── ...
 │   ├── hooks/            # Custom React hooks
-│   ├── lib/              # Utilities (queryClient, api-base, utils)
-│   ├── data/             # Static data files
-│   └── assets/           # Images
+│   ├── lib/              # Utilities
+│   └── data/             # Static data files
 ├── server/               # Backend source code
-│   ├── index.ts          # Express server entry
-│   ├── routes.ts         # Main API routes
-│   ├── db.ts             # Database connection (LibSQL/SQLite)
+│   ├── index.ts          # Express server entry (trust proxy enabled)
+│   ├── routes.ts         # Main API routes (includes attached_assets proxy)
+│   ├── db.ts             # Database connection
 │   ├── storage.ts        # Data access layer
 │   ├── static.ts         # Static file serving
-│   ├── vite.ts           # Vite dev server integration
-│   ├── auth/             # Authentication (authRoutes, sessionStore)
+│   ├── auth/             # Authentication
 │   ├── admin/            # Admin CMS routes
-│   ├── routes/           # Additional API route modules
-│   ├── middleware/        # Auth middleware
-│   ├── lib/              # Server utilities (sendMail)
-│   └── data/             # Server data files
+│   └── ...
 ├── shared/               # Shared between client & server
-│   ├── schema.ts         # Drizzle ORM database schema
-│   ├── routes.ts         # API contracts with Zod
-│   └── models/           # Shared model definitions
 ├── script/               # Build scripts
-│   └── build.ts          # Build script (esbuild + vite)
 ├── dist/                 # Build output
-│   ├── index.cjs         # Compiled server
-│   └── public/           # Compiled frontend
-└── sqlite.db             # SQLite database
+│   ├── index.cjs         # Wrapper (loads server-original + static serving)
+│   └── server-original.cjs  # Production server from Cloudways
+├── server/public/        # Production frontend build from Cloudways
+│   ├── index.html        # Built HTML
+│   ├── assets/           # Built JS/CSS (146 files, code-split)
+│   ├── attached_assets/  # Cached PDF files
+│   └── pdf.worker.min.mjs
+└── sqlite.db             # SQLite database (synced from production)
 ```
 
-### Environment Variables (Secrets - need to be set)
-- `SESSION_SECRET` - Session encryption key (SET)
-- `GEMINI_API_KEY` - Google Gemini AI API key (NOT SET)
-- `YOUTUBE_API_KEY` - YouTube Data API v3 key (NOT SET)
-- `GOOGLE_CLIENT_ID` - Google OAuth client ID (NOT SET)
-- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret (NOT SET)
-- `GOOGLE_CALLBACK_URL` - Google OAuth callback URL (NOT SET)
-- `SMTP_PASS` - SMTP email password (NOT SET)
+### Environment Variables (Secrets - all configured)
+- `SESSION_SECRET` - Session encryption key
+- `GEMINI_API_KEY` - Google Gemini AI API key
+- `YOUTUBE_API_KEY` - YouTube Data API v3 key
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+- `GOOGLE_CALLBACK_URL` - Google OAuth callback URL
+- `SMTP_PASS` - SMTP email password
+- `SSH_PASS` - SSH password for production server access
 
-### Environment Variables (Config - set via env vars)
+### Environment Variables (Config)
 - `NODE_ENV` - production
 - `PORT` - 5000
-- `BASE_URL` - https://sharfedu.com
-- `ADMIN_EMAIL` - Admin email address
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `MAIL_FROM` - Email config
+- `SSH_HOST` - 165.227.236.121
+- `SSH_USER` - master_nyrmduupwf
+- `SSH_PORT` - 22
 
 ## Key Pages
 
@@ -121,25 +121,19 @@ This project has full source code and can be built from source. Edit source file
 2. **Stage (/stage/:stageId)**: Stage-specific page with grades and subjects
 3. **Subject (/subject/:stageSlug/:gradeSlug/:subjectSlug)**: Subject lessons list
 4. **Dashboard (/dashboard)**: Student dashboard with progress tracking (protected)
-5. **Lesson (/lesson/:subjectId/:lessonId)**: Video lessons with attachments
+5. **Lesson (/lesson/:stage/:subject/:lessonId)**: Lesson with tabs (الدرس, الفيديو, شارف AI, الملخص)
 6. **Profile (/profile)**: User profile (protected)
 7. **Admin (/admin)**: Admin CMS dashboard (protected, admin only)
 8. **Auth**: /login, /register, /forgot-password, /reset-password
 
-## Design System
+## Lesson Page Tabs
+- **الدرس**: PDF lesson content (from CMS or static data)
+- **الفيديو**: YouTube videos with metadata
+- **شارف AI**: AI-powered tutoring
+- **الملخص**: PDF summary
 
-### Color Palette by Stage
-- Elementary: Sky blue (`from-sky-400 to-blue-500`)
-- Middle School: Emerald (`from-emerald-400 to-teal-500`)
-- High School: Violet (`from-violet-400 to-purple-500`)
-- Paths: Amber (`from-amber-400 to-orange-500`)
-- Qudurat: Rose (`from-rose-400 to-pink-500`)
-
-### Typography
-- Font: Tajawal (Google Fonts)
-- RTL layout with Arabic as primary language
-
-### API Base
-- On Replit: API calls go directly to `/api/...`
-- On Cloudways: Uses `VITE_API_BASE=/api-proxy.php` for PHP proxy
-- Controlled by `src/lib/api-base.ts`
+## Syncing with Production
+To re-sync from production server:
+1. SSH to get latest database: `sshpass -p "$SSH_PASS" ssh ... "cat sqlite.db" > sqlite.db`
+2. Get latest static build: `tar` from `public_html/` → `server/public/`
+3. Get latest server build: `cat index.cjs` from `public_html/node_app/` → `dist/server-original.cjs`
