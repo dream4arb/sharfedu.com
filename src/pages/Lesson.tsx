@@ -143,7 +143,10 @@ function VideoTabContent({
           <div className="yt-overlay-top" />
           {selectedUrl && (
             <button
-              onClick={() => {
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const el = videoContainerRef.current;
                 if (!el) return;
                 if (document.fullscreenElement) {
@@ -152,7 +155,7 @@ function VideoTabContent({
                   el.requestFullscreen().catch(() => {});
                 }
               }}
-              className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-black/70 text-white text-xs font-bold hover:bg-black/90 transition-all backdrop-blur-sm sm:opacity-0 sm:group-hover:opacity-100"
+              className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-black/70 text-white text-xs font-bold hover:bg-black/90 transition-all backdrop-blur-sm sm:opacity-0 sm:group-hover:opacity-100"
               data-testid="button-fullscreen-video"
             >
               <Maximize2 className="w-4 h-4" />
