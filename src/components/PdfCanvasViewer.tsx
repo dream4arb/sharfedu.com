@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import { Loader2 } from "lucide-react";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs?v=${pdfjsLib.version}`;
 
 interface PdfCanvasViewerProps {
   url: string;
@@ -13,8 +13,14 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [errMsg, setErrMsg] = useState("");
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   const renderPdf = useCallback(() => {
+    if (cleanupRef.current) {
+      cleanupRef.current();
+      cleanupRef.current = null;
+    }
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -23,6 +29,7 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
     setErrMsg("");
 
     let cancelled = false;
+    cleanupRef.current = () => { cancelled = true; };
 
     (async () => {
       try {
@@ -65,13 +72,16 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
         }
       }
     })();
-
-    return () => { cancelled = true; };
   }, [url]);
 
   useEffect(() => {
-    const cleanup = renderPdf();
-    return cleanup;
+    renderPdf();
+    return () => {
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = null;
+      }
+    };
   }, [renderPdf]);
 
   return (
@@ -87,7 +97,7 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
           <p className="text-destructive font-semibold mb-2">تعذّر تحميل ملف PDF</p>
           <p className="text-xs text-muted-foreground mb-4 dir-ltr">{errMsg}</p>
           <button
-            onClick={() => renderPdf()}
+            onClick={renderPdf}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
             data-testid="button-retry-pdf"
           >
