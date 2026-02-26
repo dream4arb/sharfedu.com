@@ -7,6 +7,7 @@ import { lessonsData, getSubjectName, subjectsData, getSemestersForSidebar, ensu
 import { setPageMeta } from "@/lib/seo";
 import { PdfCanvasViewer } from "@/components/PdfCanvasViewer";
 import { SsaIframe } from "@/components/SsaIframe";
+import { InlineAdminToolbar } from "@/components/admin/InlineAdminToolbar";
 import { type MathTestData } from "@/data/math-tests-final";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,8 +15,28 @@ import { Link, useParams, useLocation } from "wouter";
 import { 
   Loader2, Play, FileText, Download, CheckCircle,
   Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
-  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
+  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles,
+  Pencil, Trash2, Plus
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Sidebar,
@@ -194,7 +215,7 @@ function VideoTabContent({
 
 export default function Lesson() {
   const { user } = useAuth();
-  const { displayStructure, lessonTitles: lessonTitlesFromApi } = usePublicStructure();
+  const { displayStructure, lessonTitles: lessonTitlesFromApi, refetch: refetchStructure } = usePublicStructure();
   const { isCompleted, markComplete, markIncomplete, getProgress, markTabComplete, isTabCompleted, getLessonProgress, completedTabs } = useLessonProgress();
   const params = useParams<{ stage: string; subject: string; lessonId?: string }>();
   const [, setLocation] = useLocation();
@@ -218,6 +239,135 @@ export default function Lesson() {
   const educationContainerRef = useRef<HTMLDivElement>(null);
   const [videoMetadata, setVideoMetadata] = useState<Record<string, { title: string; channelName: string; duration: string }>>({});
   const [attachmentView, setAttachmentView] = useState<{ url: string; label: string } | null>(null);
+
+  const isAdmin = user?.role === "admin";
+  const [adminDialogOpen, setAdminDialogOpen] = useState(false);
+  const [adminDialogMode, setAdminDialogMode] = useState<"addLesson" | "editLesson" | "addChapter">("addLesson");
+  const [adminDialogName, setAdminDialogName] = useState("");
+  const [adminDialogContext, setAdminDialogContext] = useState<{ semesterId?: string; chapterId?: string; lessonId?: string }>({});
+  const [adminDeleteOpen, setAdminDeleteOpen] = useState(false);
+  const [adminDeleteContext, setAdminDeleteContext] = useState<{ semesterId?: string; chapterId?: string; lessonId?: string; name?: string }>({});
+  const [adminSaving, setAdminSaving] = useState(false);
+
+  const openAdminDialog = (mode: "addLesson" | "editLesson" | "addChapter", ctx: typeof adminDialogContext, defaultName = "") => {
+    setAdminDialogMode(mode);
+    setAdminDialogContext(ctx);
+    setAdminDialogName(defaultName);
+    setAdminDialogOpen(true);
+  };
+
+  const openAdminDelete = (ctx: typeof adminDeleteContext) => {
+    setAdminDeleteContext(ctx);
+    setAdminDeleteOpen(true);
+  };
+
+  const adminSaveStructure = async (mutator: (hierarchy: any[]) => any[]) => {
+    setAdminSaving(true);
+    try {
+      const res = await fetch("/api/admin/cms/structure", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch structure");
+      const hierarchy = await res.json();
+      if (!Array.isArray(hierarchy)) throw new Error("Invalid hierarchy");
+      const updated = mutator(JSON.parse(JSON.stringify(hierarchy)));
+      const putRes = await fetch("/api/admin/cms/structure", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(updated),
+      });
+      if (!putRes.ok) throw new Error("Failed to save structure");
+      refetchStructure();
+    } catch (e) {
+      console.error("Admin structure save error:", e);
+    } finally {
+      setAdminSaving(false);
+      setAdminDialogOpen(false);
+      setAdminDeleteOpen(false);
+    }
+  };
+
+  const findSubjectInHierarchy = (hierarchy: any[]) => {
+    const stage = hierarchy.find((s: any) => s.slug === internalStage);
+    if (!stage) return null;
+    const gradeId = typeof window !== "undefined" ? sessionStorage.getItem("lesson_grade") : null;
+    for (const grade of stage.grades || []) {
+      const subject = grade.subjects?.find((s: any) => s.slug === subjectId);
+      if (subject) {
+        if (gradeId && grade.id !== gradeId) continue;
+        return subject;
+      }
+    }
+    for (const grade of stage.grades || []) {
+      const subject = grade.subjects?.find((s: any) => s.slug === subjectId);
+      if (subject) return subject;
+    }
+    return null;
+  };
+
+  const handleAdminDialogSave = () => {
+    const name = adminDialogName.trim();
+    if (!name) return;
+
+    if (adminDialogMode === "addLesson" && adminDialogContext.chapterId && adminDialogContext.semesterId) {
+      adminSaveStructure((hierarchy) => {
+        const subject = findSubjectInHierarchy(hierarchy);
+        if (!subject) return hierarchy;
+        const semester = subject.semesters?.find((s: any) => s.id === adminDialogContext.semesterId);
+        const chapter = semester?.chapters?.find((c: any) => c.id === adminDialogContext.chapterId);
+        if (!chapter) return hierarchy;
+        const newId = `lesson-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        chapter.lessons = chapter.lessons || [];
+        chapter.lessons.push({ id: newId, title: name });
+        return hierarchy;
+      });
+    } else if (adminDialogMode === "editLesson" && adminDialogContext.lessonId) {
+      adminSaveStructure((hierarchy) => {
+        const subject = findSubjectInHierarchy(hierarchy);
+        if (!subject) return hierarchy;
+        for (const sem of subject.semesters || []) {
+          for (const ch of sem.chapters || []) {
+            const lesson = ch.lessons?.find((l: any) => l.id === adminDialogContext.lessonId);
+            if (lesson) {
+              lesson.title = name;
+              return hierarchy;
+            }
+          }
+        }
+        return hierarchy;
+      });
+    } else if (adminDialogMode === "addChapter" && adminDialogContext.semesterId) {
+      adminSaveStructure((hierarchy) => {
+        const subject = findSubjectInHierarchy(hierarchy);
+        if (!subject) return hierarchy;
+        const semester = subject.semesters?.find((s: any) => s.id === adminDialogContext.semesterId);
+        if (!semester) return hierarchy;
+        const newId = `ch-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        semester.chapters = semester.chapters || [];
+        const num = semester.chapters.length + 1;
+        semester.chapters.push({ id: newId, name, number: num, lessons: [] });
+        return hierarchy;
+      });
+    }
+  };
+
+  const handleAdminDelete = () => {
+    if (adminDeleteContext.lessonId) {
+      adminSaveStructure((hierarchy) => {
+        const subject = findSubjectInHierarchy(hierarchy);
+        if (!subject) return hierarchy;
+        for (const sem of subject.semesters || []) {
+          for (const ch of sem.chapters || []) {
+            const idx = ch.lessons?.findIndex((l: any) => l.id === adminDeleteContext.lessonId);
+            if (idx !== undefined && idx >= 0) {
+              ch.lessons.splice(idx, 1);
+              return hierarchy;
+            }
+          }
+        }
+        return hierarchy;
+      });
+    }
+  };
 
   // محتوى CMS من جدول cms_content حسب lesson_id و tab_type (استخدام lessonId من params)
   const lessonIdFromParams = params.lessonId;
@@ -1118,35 +1268,87 @@ export default function Lesson() {
                                         const lessonCompleted = lessonProgRounded >= 100;
                                         return (
                                           <SidebarMenuItem key={`${chapter.id}-${lesson.id}`}>
-                                            <SidebarMenuButton
-                                              asChild
-                                              isActive={isActive}
-                                              className="gap-3 h-auto py-2.5 px-3 rounded-lg data-[active]:ring-[0.5px] data-[active]:ring-violet-400/40"
-                                              data-testid={`sidebar-lesson-${chapter.id}-${lesson.id}`}
-                                            >
-                                              <Link href={`/lesson/${urlStage}/${subjectId}/${lesson.id}`}>
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
-                                                  lessonCompleted ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" :
-                                                  isActive ? "bg-violet-500 text-white" :
-                                                  "bg-muted text-muted-foreground"
-                                                }`}>
-                                                  {lessonCompleted ? <Check className="w-4 h-4" /> : lessonIndex + 1}
+                                            <div className="flex items-center gap-1">
+                                              <SidebarMenuButton
+                                                asChild
+                                                isActive={isActive}
+                                                className="gap-3 h-auto py-2.5 px-3 rounded-lg data-[active]:ring-[0.5px] data-[active]:ring-violet-400/40 flex-1"
+                                                data-testid={`sidebar-lesson-${chapter.id}-${lesson.id}`}
+                                              >
+                                                <Link href={`/lesson/${urlStage}/${subjectId}/${lesson.id}`}>
+                                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
+                                                    lessonCompleted ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" :
+                                                    isActive ? "bg-violet-500 text-white" :
+                                                    "bg-muted text-muted-foreground"
+                                                  }`}>
+                                                    {lessonCompleted ? <Check className="w-4 h-4" /> : lessonIndex + 1}
+                                                  </div>
+                                                  <div className="flex-1 text-right min-w-0">
+                                                    <div className="font-medium text-xs break-words">{getLessonDisplayTitle(lesson, lessonTitlesFromApi)}</div>
+                                                  </div>
+                                                  <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${lessonProgRounded > 95 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"}`}>
+                                                    {lessonProgRounded}%
+                                                  </span>
+                                                </Link>
+                                              </SidebarMenuButton>
+                                              {isAdmin && (
+                                                <div className="flex items-center gap-0.5 shrink-0">
+                                                  <button
+                                                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                                                    data-testid={`button-edit-lesson-${lesson.id}`}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      e.preventDefault();
+                                                      openAdminDialog("editLesson", { lessonId: lesson.id, semesterId: semester.id, chapterId: chapter.id }, getLessonDisplayTitle(lesson, lessonTitlesFromApi));
+                                                    }}
+                                                  >
+                                                    <Pencil className="w-3 h-3" />
+                                                  </button>
+                                                  <button
+                                                    className="p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                                    data-testid={`button-delete-lesson-${lesson.id}`}
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      e.preventDefault();
+                                                      openAdminDelete({ lessonId: lesson.id, semesterId: semester.id, chapterId: chapter.id, name: getLessonDisplayTitle(lesson, lessonTitlesFromApi) });
+                                                    }}
+                                                  >
+                                                    <Trash2 className="w-3 h-3" />
+                                                  </button>
                                                 </div>
-                                                <div className="flex-1 text-right min-w-0">
-                                                  <div className="font-medium text-xs break-words">{getLessonDisplayTitle(lesson, lessonTitlesFromApi)}</div>
-                                                </div>
-                                                <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${lessonProgRounded > 95 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"}`}>
-                                                  {lessonProgRounded}%
-                                                </span>
-                                              </Link>
-                                            </SidebarMenuButton>
+                                              )}
+                                            </div>
                                           </SidebarMenuItem>
                                         );
                                       })}
+                                      {isAdmin && (
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="w-full mt-1 gap-1.5 text-xs text-muted-foreground justify-center"
+                                          data-testid={`button-add-lesson-${chapter.id}`}
+                                          onClick={() => openAdminDialog("addLesson", { semesterId: semester.id, chapterId: chapter.id })}
+                                        >
+                                          <Plus className="w-3 h-3" />
+                                          إضافة درس
+                                        </Button>
+                                      )}
                                     </div>
                                   </div>
                                 );
                               })}
+                              {isAdmin && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="w-full mt-2 gap-1.5 text-xs text-muted-foreground justify-center border border-dashed border-border"
+                                  data-testid={`button-add-chapter-${semester.id}`}
+                                  onClick={() => openAdminDialog("addChapter", { semesterId: semester.id })}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  إضافة وحدة
+                                </Button>
+                              )}
                             </SidebarGroupContent>
                           </CollapsibleContent>
                         </SidebarGroup>
@@ -1383,6 +1585,15 @@ export default function Lesson() {
                 )}
               </div>
               
+              {/* Admin Inline Toolbar */}
+              {currentLesson && (
+                <InlineAdminToolbar
+                  lessonId={currentLesson.id}
+                  lessonTitle={currentLesson.title}
+                  subjectName={getSubjectName(subjectId)}
+                />
+              )}
+
               {/* Sticky Tab Navigation - Only show when lesson is selected */}
               {currentLesson && (
                 <div className="flex items-center justify-center gap-2 px-4 pb-3 bg-white/95 dark:bg-card/95 backdrop-blur-lg">
@@ -2072,6 +2283,64 @@ export default function Lesson() {
           </main>
         </div>
       </SidebarProvider>
+
+      {isAdmin && (
+        <>
+          <Dialog open={adminDialogOpen} onOpenChange={setAdminDialogOpen}>
+            <DialogContent dir="rtl" className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>
+                  {adminDialogMode === "addLesson" ? "إضافة درس جديد" : adminDialogMode === "editLesson" ? "تعديل اسم الدرس" : "إضافة وحدة جديدة"}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <Input
+                  data-testid="input-admin-dialog-name"
+                  placeholder={adminDialogMode === "addChapter" ? "اسم الوحدة" : "اسم الدرس"}
+                  value={adminDialogName}
+                  onChange={(e) => setAdminDialogName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleAdminDialogSave(); }}
+                  autoFocus
+                />
+              </div>
+              <DialogFooter className="gap-2 flex-wrap">
+                <DialogClose asChild>
+                  <Button variant="outline" data-testid="button-admin-dialog-cancel">إلغاء</Button>
+                </DialogClose>
+                <Button
+                  onClick={handleAdminDialogSave}
+                  disabled={!adminDialogName.trim() || adminSaving}
+                  data-testid="button-admin-dialog-save"
+                >
+                  {adminSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "حفظ"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <AlertDialog open={adminDeleteOpen} onOpenChange={setAdminDeleteOpen}>
+            <AlertDialogContent dir="rtl">
+              <AlertDialogHeader>
+                <AlertDialogTitle>حذف الدرس</AlertDialogTitle>
+                <AlertDialogDescription>
+                  هل أنت متأكد من حذف الدرس "{adminDeleteContext.name}"؟ لا يمكن التراجع عن هذا الإجراء.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="gap-2 flex-wrap">
+                <AlertDialogCancel data-testid="button-admin-delete-cancel">إلغاء</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleAdminDelete}
+                  className="bg-destructive text-destructive-foreground"
+                  disabled={adminSaving}
+                  data-testid="button-admin-delete-confirm"
+                >
+                  {adminSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "حذف"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
     </div>
   );
 }

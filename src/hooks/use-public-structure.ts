@@ -18,11 +18,12 @@ export interface PublicStructureData {
 }
 
 /** جلب الهيكل المحدث من لوحة التحكم (فصول، وحدات، دروس) */
-export function usePublicStructure(): PublicStructureData {
+export function usePublicStructure(): PublicStructureData & { refetch: () => void } {
   const [data, setData] = useState<PublicStructureData>({
     displayStructure: {},
     lessonTitles: {},
   });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     fetch("/api/public/structure")
@@ -34,9 +35,11 @@ export function usePublicStructure(): PublicStructureData {
         });
       })
       .catch(() => {});
-  }, []);
+  }, [refreshKey]);
 
-  return data;
+  const refetch = () => setRefreshKey((k) => k + 1);
+
+  return { ...data, refetch };
 }
 
 /** للتوافق مع الكود القديم */

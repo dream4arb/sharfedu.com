@@ -79,11 +79,17 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 
 ### Key Pages
 1. **Home (/)**: Landing with Hero, SearchBar, StageSelector, Features
-2. **Stage (/stage/:stageId)**: Grades and subjects per stage
-3. **Lesson (/lesson/:stage/:subject/:lessonId)**: Tabs: الدرس، الفيديو، شارف AI، الملخص
+2. **Stage (/stage/:stageId)**: Grades and subjects per stage; admin sees inline add/edit/delete for grades & subjects
+3. **Lesson (/lesson/:stage/:subject/:lessonId)**: Tabs: الدرس، الفيديو، شارف AI، الملخص; admin sees InlineAdminToolbar (PDF/YouTube/HTML management) + sidebar lesson/chapter CRUD
 4. **Dashboard (/dashboard)**: Student progress (protected)
 5. **Admin (/admin)**: CMS dashboard (admin only)
 6. **Auth**: /login, /register, /forgot-password, /reset-password
+
+### Inline Admin Editing
+- **InlineAdminToolbar** (`src/components/admin/InlineAdminToolbar.tsx`): Expandable toolbar on Lesson page for managing PDF uploads, YouTube links, HTML content (شارف AI + الملخص). Only visible to admin users.
+- **Lesson sidebar controls**: Admin sees pencil/trash icons next to lessons, "إضافة درس"/"إضافة وحدة" buttons. Changes go through `PUT /api/admin/cms/structure`.
+- **Stage page controls** (`src/pages/Stage.tsx`): Admin sees add/edit/delete buttons for grades and subjects. Changes through same hierarchy API.
+- All inline edits use the same API/DB as the admin dashboard — no separate storage.
 
 ### Deployment Rule (STRICT)
 **Every change must be deployed in this exact order:**
