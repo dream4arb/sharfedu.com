@@ -234,18 +234,8 @@
 }
 
 @media (max-width: 639px) {
-  .pdf-iframe-container {
-    overflow: hidden;
-  }
   .education-sandbox {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-  }
-}
-
-@media (min-width: 640px) {
-  .pdf-iframe-container iframe {
-    width: calc(100% + 50px);
-    margin: 0 -25px;
   }
 }

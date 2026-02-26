@@ -5,6 +5,7 @@ import { useCmsTabContent } from "@/hooks/use-cms-tab-content";
 import { usePublicStructure } from "@/hooks/use-public-structure";
 import { lessonsData, getSubjectName, subjectsData, getSemestersForSidebar, ensureTwoSemestersWithAttachments, type SemesterData, type LessonData } from "@/data/lessons";
 import { setPageMeta } from "@/lib/seo";
+import { PdfCanvasViewer } from "@/components/PdfCanvasViewer";
 import { type MathTestData } from "@/data/math-tests-final";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -210,7 +211,6 @@ export default function Lesson() {
   const [canCompleteVideo, setCanCompleteVideo] = useState(false);
   const [pdfScrollProgress, setPdfScrollProgress] = useState(0);
   const pdfIframeRef = useRef<HTMLIFrameElement>(null);
-  const [pdfZoom, setPdfZoom] = useState(1);
   const [educationContent, setEducationContent] = useState<string>("");
   const [educationRawHtml, setEducationRawHtml] = useState<string | null>(null); // للعرض في iframe عند وجود scripts
   const [loadingEducation, setLoadingEducation] = useState(false);
@@ -648,22 +648,6 @@ export default function Lesson() {
   useEffect(() => {
     if (lessonId) setAttachmentView(null);
   }, [lessonId]);
-
-  useEffect(() => {
-    const measure = () => {
-      const vw = window.innerWidth;
-      if (vw < 640) {
-        const containerW = vw - 36;
-        const PDF_WIDTH = 700;
-        setPdfZoom(Math.min(containerW / PDF_WIDTH, 1));
-      } else {
-        setPdfZoom(1);
-      }
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
 
   // Load Education HTML content when tab is active (من API المحتوى — ينعكس فوراً مع لوحة التحكم)
   useEffect(() => {
@@ -1830,27 +1814,10 @@ export default function Lesson() {
                           ? cmsSummaryContent.dataValue
                           : currentLesson?.summaryPdfUrl;
                         return summaryPdfUrl ? (
-                          pdfZoom < 1 ? (
-                          <div className="w-full mx-auto rounded-xl overflow-hidden" style={{ height: '80vh' }}>
-                            <iframe
-                              src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(summaryPdfUrl.startsWith('http') ? summaryPdfUrl : `https://sharfedu.com${summaryPdfUrl}`)}`}
-                              className="border-0 block w-full h-full"
-                              loading="lazy"
-                              title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
-                            />
-                          </div>
-                          ) : (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
-                            <iframe
-                              src={`${summaryPdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block w-full"
-                              scrolling="no"
-                              loading="lazy"
-                              style={{ height: '5000px' }}
-                              title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
-                            />
-                          </div>
-                          )
+                          <PdfCanvasViewer
+                            url={summaryPdfUrl}
+                            title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
+                          />
                         ) : (
                           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                             <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
@@ -1942,29 +1909,10 @@ export default function Lesson() {
                           ? cmsLessonContent.dataValue
                           : currentLesson?.pdfUrl;
                         return pdfUrl ? (
-                          pdfZoom < 1 ? (
-                          <div className="w-full mx-auto rounded-xl overflow-hidden" style={{ height: '80vh' }}>
-                            <iframe
-                              ref={pdfIframeRef}
-                              src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl.startsWith('http') ? pdfUrl : `https://sharfedu.com${pdfUrl}`)}`}
-                              className="border-0 block w-full h-full"
-                              loading="lazy"
-                              title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
-                            />
-                          </div>
-                          ) : (
-                          <div className="w-full max-w-[1200px] mx-auto overflow-hidden pdf-iframe-container">
-                            <iframe
-                              ref={pdfIframeRef}
-                              src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                              className="border-0 block w-full"
-                              scrolling="no"
-                              loading="lazy"
-                              style={{ height: '5000px' }}
-                              title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
-                            />
-                          </div>
-                          )
+                          <PdfCanvasViewer
+                            url={pdfUrl}
+                            title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
+                          />
                         ) : (
                           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                             <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
