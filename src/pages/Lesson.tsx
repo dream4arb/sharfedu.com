@@ -1333,7 +1333,7 @@ export default function Lesson() {
           </Sidebar>
 
           {/* Main Content */}
-          <main className="flex-1">
+          <main className="flex-1 min-w-0 overflow-x-hidden">
             {/* Header - بنفس تنسيق الموقع */}
             <header className="sticky top-0 z-20 bg-white/95 dark:bg-card/95 backdrop-blur-lg shadow-sm border-b border-border/50">
               <div className="flex items-center justify-between gap-2 p-4 min-w-0">
