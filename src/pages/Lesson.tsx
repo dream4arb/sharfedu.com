@@ -7,7 +7,6 @@ import { lessonsData, getSubjectName, subjectsData, getSemestersForSidebar, ensu
 import { setPageMeta } from "@/lib/seo";
 import { PdfCanvasViewer } from "@/components/PdfCanvasViewer";
 import { SsaIframe } from "@/components/SsaIframe";
-import { InlineAdminToolbar } from "@/components/admin/InlineAdminToolbar";
 import { type MathTestData } from "@/data/math-tests-final";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,7 +14,7 @@ import { Link, useParams, useLocation } from "wouter";
 import { 
   Loader2, Play, FileText, Download, CheckCircle,
   Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
-  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles,
+  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -1136,7 +1135,7 @@ export default function Lesson() {
                                                 <div className="flex-1 text-right min-w-0">
                                                   <div className="font-medium text-xs break-words">{getLessonDisplayTitle(lesson, lessonTitlesFromApi)}</div>
                                                 </div>
-                                                <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${lessonProgRounded > 95 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-300"}`}>
+                                                <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${lessonProgRounded > 95 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"}`}>
                                                   {lessonProgRounded}%
                                                 </span>
                                               </Link>
@@ -1384,15 +1383,6 @@ export default function Lesson() {
                 )}
               </div>
               
-              {/* Admin Inline Toolbar */}
-              {currentLesson && (
-                <InlineAdminToolbar
-                  lessonId={currentLesson.id}
-                  lessonTitle={currentLesson.title}
-                  subjectName={getSubjectName(subjectId)}
-                />
-              )}
-
               {/* Sticky Tab Navigation - Only show when lesson is selected */}
               {currentLesson && (
                 <div className="flex items-center justify-center gap-2 px-4 pb-3 bg-white/95 dark:bg-card/95 backdrop-blur-lg">
@@ -2082,7 +2072,6 @@ export default function Lesson() {
           </main>
         </div>
       </SidebarProvider>
-
     </div>
   );
 }
