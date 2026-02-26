@@ -17,6 +17,8 @@ import {
   ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
@@ -31,6 +33,8 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import PolygonAnglesQuizSSA from "@/components/lessons/PolygonAnglesQuizSSA";
+import { InlineAdminToolbar } from "@/components/admin/InlineAdminToolbar";
+import { AdminSidebarControls, AdminLessonActions, AdminAddLessonButton, AdminChapterActions, AdminAddChapterButton } from "@/components/admin/AdminSidebarControls";
 
 type TabType = "lesson" | "video" | "summary" | "education" | "ssa";
 
@@ -194,7 +198,8 @@ function VideoTabContent({
 
 export default function Lesson() {
   const { user } = useAuth();
-  const { displayStructure, lessonTitles: lessonTitlesFromApi } = usePublicStructure();
+  const [structureVersion, setStructureVersion] = useState(0);
+  const { displayStructure, lessonTitles: lessonTitlesFromApi } = usePublicStructure(structureVersion);
   const { isCompleted, markComplete, markIncomplete, getProgress, markTabComplete, isTabCompleted, getLessonProgress, completedTabs } = useLessonProgress();
   const params = useParams<{ stage: string; subject: string; lessonId?: string }>();
   const [, setLocation] = useLocation();
@@ -1028,8 +1033,167 @@ export default function Lesson() {
     "--sidebar-width-icon": "4rem",
   } as React.CSSProperties;
 
+  const [adminModal, setAdminModal] = useState<{
+    type: "none" | "add-lesson" | "edit-lesson" | "delete-lesson" | "add-chapter" | "edit-chapter" | "delete-chapter";
+    semesterId?: string;
+    chapterId?: string;
+    lessonId?: string;
+    name?: string;
+  }>({ type: "none" });
+  const [adminInput, setAdminInput] = useState("");
+  const [adminSaving, setAdminSaving] = useState(false);
+  const [adminError, setAdminError] = useState("");
+
+  const adminHandlers = {
+    addLesson: (semesterId: string, chapterId: string) => {
+      setAdminInput(""); setAdminError("");
+      setAdminModal({ type: "add-lesson", semesterId, chapterId });
+    },
+    editLesson: (semesterId: string, chapterId: string, lessonId: string, title: string) => {
+      setAdminInput(title); setAdminError("");
+      setAdminModal({ type: "edit-lesson", semesterId, chapterId, lessonId, name: title });
+    },
+    deleteLesson: (semesterId: string, chapterId: string, lessonId: string, title: string) => {
+      setAdminError("");
+      setAdminModal({ type: "delete-lesson", semesterId, chapterId, lessonId, name: title });
+    },
+    addChapter: (semesterId: string) => {
+      setAdminInput(""); setAdminError("");
+      setAdminModal({ type: "add-chapter", semesterId });
+    },
+    editChapter: (semesterId: string, chapterId: string, name: string) => {
+      setAdminInput(name); setAdminError("");
+      setAdminModal({ type: "edit-chapter", semesterId, chapterId, name });
+    },
+    deleteChapter: (semesterId: string, chapterId: string, name: string) => {
+      setAdminError("");
+      setAdminModal({ type: "delete-chapter", semesterId, chapterId, name });
+    },
+  };
+
+  const adminCloseModal = () => { setAdminModal({ type: "none" }); setAdminInput(""); setAdminError(""); };
+
+  const adminSaveStructure = async () => {
+    setAdminSaving(true); setAdminError("");
+    try {
+      const res = await fetch("/api/admin/cms/structure", { credentials: "include" });
+      if (!res.ok) throw new Error("فشل تحميل الهيكل");
+      const hierarchy = await res.json();
+      const stage = hierarchy.find((s: any) => s.slug === internalStage);
+      if (!stage) throw new Error("المرحلة غير موجودة");
+      const gId = savedGradeId || "1";
+      const grade = stage.grades.find((g: any) => g.id === gId);
+      if (!grade) throw new Error("الصف غير موجود");
+      const subject = grade.subjects.find((s: any) => s.slug === subjectId);
+      if (!subject) throw new Error("المادة غير موجودة");
+
+      const m = adminModal;
+      if (m.type === "add-lesson") {
+        const val = adminInput.trim();
+        if (!val) { setAdminError("أدخل اسم الدرس"); setAdminSaving(false); return; }
+        const sem = subject.semesters.find((s: any) => s.id === m.semesterId);
+        const ch = sem?.chapters.find((c: any) => c.id === m.chapterId);
+        if (!ch) throw new Error("الوحدة غير موجودة");
+        ch.lessons.push({ id: `${m.chapterId}-${Date.now()}`, title: val });
+      } else if (m.type === "edit-lesson") {
+        const val = adminInput.trim();
+        if (!val) { setAdminError("أدخل اسم الدرس"); setAdminSaving(false); return; }
+        const sem = subject.semesters.find((s: any) => s.id === m.semesterId);
+        const ch = sem?.chapters.find((c: any) => c.id === m.chapterId);
+        const lesson = ch?.lessons.find((l: any) => l.id === m.lessonId);
+        if (!lesson) throw new Error("الدرس غير موجود");
+        lesson.title = val;
+      } else if (m.type === "delete-lesson") {
+        const sem = subject.semesters.find((s: any) => s.id === m.semesterId);
+        const ch = sem?.chapters.find((c: any) => c.id === m.chapterId);
+        if (!ch) throw new Error("الوحدة غير موجودة");
+        ch.lessons = ch.lessons.filter((l: any) => l.id !== m.lessonId);
+      } else if (m.type === "add-chapter") {
+        const val = adminInput.trim();
+        if (!val) { setAdminError("أدخل اسم الوحدة"); setAdminSaving(false); return; }
+        const sem = subject.semesters.find((s: any) => s.id === m.semesterId);
+        if (!sem) throw new Error("الفصل غير موجود");
+        sem.chapters.push({ id: `ch-${Date.now()}`, name: val, number: sem.chapters.length + 1, lessons: [] });
+      } else if (m.type === "edit-chapter") {
+        const val = adminInput.trim();
+        if (!val) { setAdminError("أدخل اسم الوحدة"); setAdminSaving(false); return; }
+        const sem = subject.semesters.find((s: any) => s.id === m.semesterId);
+        const ch = sem?.chapters.find((c: any) => c.id === m.chapterId);
+        if (!ch) throw new Error("الوحدة غير موجودة");
+        ch.name = val;
+      } else if (m.type === "delete-chapter") {
+        const sem = subject.semesters.find((s: any) => s.id === m.semesterId);
+        if (!sem) throw new Error("الفصل غير موجود");
+        sem.chapters = sem.chapters.filter((c: any) => c.id !== m.chapterId);
+      }
+
+      const saveRes = await fetch("/api/admin/cms/structure", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(hierarchy),
+      });
+      if (!saveRes.ok) throw new Error("فشل حفظ الهيكل");
+      setStructureVersion((v) => v + 1);
+      adminCloseModal();
+    } catch (e: any) {
+      setAdminError(e.message || "حدث خطأ");
+    } finally {
+      setAdminSaving(false);
+    }
+  };
+
+  const adminIsDelete = adminModal.type === "delete-lesson" || adminModal.type === "delete-chapter";
+  const adminDialogTitle = adminModal.type === "add-lesson" ? "إضافة درس جديد"
+    : adminModal.type === "edit-lesson" ? "تعديل اسم الدرس"
+    : adminModal.type === "delete-lesson" ? "حذف الدرس"
+    : adminModal.type === "add-chapter" ? "إضافة وحدة جديدة"
+    : adminModal.type === "edit-chapter" ? "تعديل اسم الوحدة"
+    : adminModal.type === "delete-chapter" ? "حذف الوحدة" : "";
+
   return (
     <div className="min-h-screen bg-accent/30" dir="rtl">
+      {user?.role === "admin" && adminModal.type !== "none" && (
+        <Dialog open onOpenChange={(open) => { if (!open) adminCloseModal(); }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{adminDialogTitle}</DialogTitle>
+              {adminIsDelete && (
+                <DialogDescription>
+                  هل أنت متأكد من حذف &quot;{adminModal.name}&quot;؟ لا يمكن التراجع عن هذا الإجراء.
+                </DialogDescription>
+              )}
+            </DialogHeader>
+            {!adminIsDelete && (
+              <div className="py-4">
+                <Input
+                  value={adminInput}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAdminInput(e.target.value)}
+                  placeholder={adminModal.type?.includes("lesson") ? "اسم الدرس" : "اسم الوحدة"}
+                  dir="rtl"
+                  data-testid="input-admin-structure-name"
+                  onKeyDown={(e: React.KeyboardEvent) => { if (e.key === "Enter") adminSaveStructure(); }}
+                />
+              </div>
+            )}
+            {adminError && <p className="text-sm text-destructive">{adminError}</p>}
+            <DialogFooter>
+              <Button variant="ghost" onClick={adminCloseModal} disabled={adminSaving} data-testid="button-admin-structure-cancel">
+                إلغاء
+              </Button>
+              <Button
+                variant={adminIsDelete ? "destructive" : "default"}
+                onClick={adminSaveStructure}
+                disabled={adminSaving}
+                data-testid="button-admin-structure-save"
+              >
+                {adminSaving && <Loader2 className="w-4 h-4 animate-spin ml-2" />}
+                {adminIsDelete ? "حذف" : "حفظ"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
       <SidebarProvider style={sidebarStyle}>
         <div className="flex min-h-screen w-full">
           {/* Lessons Sidebar - إعادة تصميم */}
@@ -1096,8 +1260,7 @@ export default function Lesson() {
                           </SidebarGroupLabel>
                           <CollapsibleContent>
                             <SidebarGroupContent className="pt-3 px-1 pb-4 space-y-5">
-                              {semester.chapters?.map((chapter, chapterIndex) => {
-                                return (
+                              {semester.chapters?.map((chapter, chapterIndex) => (
                                   <div key={chapter.id} className="space-y-2">
                                     {/* عنوان الوحدة — شكل تاب/وسم في المنتصف */}
                                     <div className="relative flex items-center justify-center gap-2 pr-1">
@@ -1106,6 +1269,13 @@ export default function Lesson() {
                                         <span className="opacity-80">{chapter.number ?? chapterIndex + 1}</span>
                                         <span className="w-px h-3 bg-current opacity-30" />
                                         <span className="truncate max-w-[140px]">{chapter.name}</span>
+                                        <AdminChapterActions
+                                          semesterId={semester.id}
+                                          chapterId={chapter.id}
+                                          chapterName={chapter.name}
+                                          onEdit={adminHandlers.editChapter}
+                                          onDelete={adminHandlers.deleteChapter}
+                                        />
                                       </div>
                                       <div className="flex-1 h-px bg-border" aria-hidden />
                                     </div>
@@ -1135,6 +1305,14 @@ export default function Lesson() {
                                                 <div className="flex-1 text-right min-w-0">
                                                   <div className="font-medium text-xs break-words">{getLessonDisplayTitle(lesson, lessonTitlesFromApi)}</div>
                                                 </div>
+                                                <AdminLessonActions
+                                                  semesterId={semester.id}
+                                                  chapterId={chapter.id}
+                                                  lessonId={lesson.id}
+                                                  lessonTitle={getLessonDisplayTitle(lesson, lessonTitlesFromApi)}
+                                                  onEdit={adminHandlers.editLesson}
+                                                  onDelete={adminHandlers.deleteLesson}
+                                                />
                                                 <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${lessonProgRounded > 95 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"}`}>
                                                   {lessonProgRounded}%
                                                 </span>
@@ -1143,10 +1321,18 @@ export default function Lesson() {
                                           </SidebarMenuItem>
                                         );
                                       })}
+                                      <AdminAddLessonButton
+                                        semesterId={semester.id}
+                                        chapterId={chapter.id}
+                                        onAdd={adminHandlers.addLesson}
+                                      />
                                     </div>
                                   </div>
-                                );
-                              })}
+                              ))}
+                              <AdminAddChapterButton
+                                semesterId={semester.id}
+                                onAdd={adminHandlers.addChapter}
+                              />
                             </SidebarGroupContent>
                           </CollapsibleContent>
                         </SidebarGroup>
@@ -1416,6 +1602,13 @@ export default function Lesson() {
             </header>
 
             <div className="p-3 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+              {currentLesson && lessonId && (
+                <InlineAdminToolbar
+                  lessonId={lessonId}
+                  lessonTitle={getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}
+                  subjectName={subjectName}
+                />
+              )}
               {attachmentView !== null ? (
                 // عرض PDF المرفق في نفس الصفحة مكان رسالة الترحيب
                 <motion.div

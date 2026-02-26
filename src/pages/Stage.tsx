@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { useParams, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -10,6 +10,13 @@ import {
   ArrowRight, ArrowLeft, BookOpen, Baby, GraduationCap, Route, Target,
   Calculator, FlaskConical, Globe, Pen, Book, Atom, Languages, History, Palette, Heart, Monitor, Briefcase, DollarSign
 } from "lucide-react";
+import {
+  useAdminStageControls,
+  AdminGradeActions,
+  AdminAddGradeButton,
+  AdminSubjectActions,
+  AdminAddSubjectButton,
+} from "@/components/admin/AdminStageControls";
 
 const stageData: Record<string, {
   title: string;
@@ -272,9 +279,12 @@ const stageData: Record<string, {
 export default function Stage() {
   const { stageId } = useParams<{ stageId: string }>();
   const { user } = useAuth();
+  const [, setVersion] = useState(0);
   const stage = stageData[stageId || ""] || stageData.middle;
   const StageIcon = stage.icon;
   const profileComplete = !!user;
+
+  const { isAdmin, handlers: adminHandlers, ModalComponent: AdminModal } = useAdminStageControls(() => setVersion((v) => v + 1));
 
   const stageUrlMap: Record<string, string> = {
     elementary: "primary",
@@ -285,6 +295,7 @@ export default function Stage() {
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
+      <AdminModal />
       <Navbar />
       <main className="pt-24 pb-20 bg-white dark:bg-background">
         {/* Hero - تصميم عصري مع تأثير زجاجي */}
@@ -338,6 +349,15 @@ export default function Stage() {
                         </div>
                       )}
                       <h2 className={`text-lg font-bold ${gradeLocked ? "text-muted-foreground" : stageId === "elementary" ? "text-white" : "text-foreground"}`}>{grade.name}</h2>
+                      {isAdmin && (
+                        <AdminGradeActions
+                          stageSlug={stageId || "middle"}
+                          gradeId={grade.id}
+                          gradeName={grade.name}
+                          onEdit={adminHandlers.editGrade}
+                          onDelete={adminHandlers.deleteGrade}
+                        />
+                      )}
                     </div>
                     {gradeLocked && (
                       <span className="text-xs font-medium text-muted-foreground flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5">
@@ -386,6 +406,16 @@ export default function Stage() {
                               whileTap={{ scale: 0.98 }}
                               className="group relative flex items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-2xl bg-white/60 dark:bg-white/5 border border-black/5 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 hover:border-transparent hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/20 transition-all duration-300 cursor-pointer overflow-hidden min-w-0"
                             >
+                              {isAdmin && (
+                                <AdminSubjectActions
+                                  stageSlug={stageId || "middle"}
+                                  gradeId={grade.id}
+                                  subjectSlug={subject.id}
+                                  subjectName={subject.name}
+                                  onEdit={adminHandlers.editSubject}
+                                  onDelete={adminHandlers.deleteSubject}
+                                />
+                              )}
                               <div className={`absolute inset-0 bg-gradient-to-br ${stage.gradient} opacity-0 group-hover:opacity-[0.08] transition-opacity duration-300`} />
                               <div className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center bg-gradient-to-br ${stage.gradient} text-white shrink-0 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300`}>
                                 <SubjectIcon className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -401,11 +431,24 @@ export default function Stage() {
                           </Link>
                         );
                       })}
+                      {isAdmin && (
+                        <AdminAddSubjectButton
+                          stageSlug={stageId || "middle"}
+                          gradeId={grade.id}
+                          onAdd={adminHandlers.addSubject}
+                        />
+                      )}
                     </div>
                   </div>
                 </motion.section>
               );
             })}
+            {isAdmin && (
+              <AdminAddGradeButton
+                stageSlug={stageId || "middle"}
+                onAdd={adminHandlers.addGrade}
+              />
+            )}
           </div>
         </div>
       </main>

@@ -6,10 +6,8 @@ export type DisplaySemester = {
   chapters: { id: string; name: string; number?: number; lessons: { id: string; title: string }[] }[];
 };
 
-/** هيكل العرض: مرحلة_مادة → فصول ووحدات ودروس */
 export type DisplayStructure = Record<string, { semesters: DisplaySemester[] }>;
 
-/** خريطة معرف الدرس → عنوانه */
 export type LessonTitlesMap = Record<string, string>;
 
 export interface PublicStructureData {
@@ -17,8 +15,7 @@ export interface PublicStructureData {
   lessonTitles: LessonTitlesMap;
 }
 
-/** جلب الهيكل المحدث من لوحة التحكم (فصول، وحدات، دروس) */
-export function usePublicStructure(): PublicStructureData {
+export function usePublicStructure(version?: number): PublicStructureData {
   const [data, setData] = useState<PublicStructureData>({
     displayStructure: {},
     lessonTitles: {},
@@ -34,12 +31,11 @@ export function usePublicStructure(): PublicStructureData {
         });
       })
       .catch(() => {});
-  }, []);
+  }, [version]);
 
   return data;
 }
 
-/** للتوافق مع الكود القديم */
 export function useLessonTitlesFromApi(): Record<string, string> {
   const { lessonTitles } = usePublicStructure();
   return lessonTitles;
