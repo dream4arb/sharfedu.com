@@ -1067,10 +1067,12 @@ export default function Lesson() {
                   {semesters.map((semester, semesterIndex) => (
                     <div
                       key={semester.id}
-                      className="rounded-2xl border border-violet-200/50 bg-violet-50/20 dark:border-violet-500/25 dark:bg-violet-500/5 p-3 space-y-2 mb-4 relative pt-6"
+                      className="rounded-2xl border border-violet-200/50 bg-violet-50/20 dark:border-violet-500/25 dark:bg-violet-500/5 p-3 space-y-2 mb-4 pt-2"
                     >
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-violet-100/80 text-indigo-500 dark:bg-violet-500/20 dark:text-violet-300">
-                        {semesterIndex === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني"}
+                      <div className="flex justify-center mb-1">
+                        <div className="px-5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-violet-100/80 text-indigo-500 dark:bg-violet-500/20 dark:text-violet-300">
+                          {semesterIndex === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني"}
+                        </div>
                       </div>
                       <Collapsible open={openSemesters[semester.id]}>
                         <SidebarGroup className="space-y-0">
