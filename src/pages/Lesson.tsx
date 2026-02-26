@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams, useLocation } from "wouter";
 import { 
-  Loader2, Play, FileText, Download, CheckCircle, Maximize2,
+  Loader2, Play, FileText, Download, CheckCircle,
   Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
   ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
 } from "lucide-react";
@@ -109,7 +109,6 @@ function VideoTabContent({
     return id ? `https://www.youtube-nocookie.com/embed/${id}` : url;
   };
 
-  const videoContainerRef = useRef<HTMLDivElement>(null);
   const firstEmbed = videos[0] ? toEmbed(videos[0].url) : null;
   const [selectedUrl, setSelectedUrl] = useState<string | null>(firstEmbed);
 
@@ -131,7 +130,7 @@ function VideoTabContent({
   return (
     <>
       <div className="mb-8">
-        <div ref={videoContainerRef} className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl group">
+        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl">
           <iframe
             key={selectedUrl}
             src={finalSrc}
@@ -140,28 +139,6 @@ function VideoTabContent({
             allowFullScreen
             title={lessonTitle}
           />
-          <div className="yt-overlay-top" />
-          {selectedUrl && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const el = videoContainerRef.current;
-                if (!el) return;
-                if (document.fullscreenElement) {
-                  document.exitFullscreen();
-                } else {
-                  el.requestFullscreen().catch(() => {});
-                }
-              }}
-              className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-black/70 text-white text-xs font-bold hover:bg-black/90 transition-all backdrop-blur-sm sm:opacity-0 sm:group-hover:opacity-100"
-              data-testid="button-fullscreen-video"
-            >
-              <Maximize2 className="w-4 h-4" />
-              <span>ملء الشاشة</span>
-            </button>
-          )}
         </div>
       </div>
       <div className="mb-8">
