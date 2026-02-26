@@ -86,16 +86,22 @@ router.get("/lesson/:lessonId/education-html", async (req, res) => {
  * يُرجع HTML SSA: من ملف {id}-ssa.html إن وُجد، وإلا يُرجع نفس محتوى education-html
  */
 router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
+  const iframeFix = `<style>html,body{max-width:100%!important;overflow-x:hidden!important;width:100%!important}*{box-sizing:border-box!important}img,video,canvas,svg,table,iframe{max-width:100%!important}pre,code{overflow-x:auto!important;white-space:pre-wrap!important;word-break:break-word!important}</style><script>window.addEventListener("load",function(){var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);window.parent.postMessage({type:"sharef-iframe-height",height:h},"*");new ResizeObserver(function(){var nh=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);window.parent.postMessage({type:"sharef-iframe-height",height:nh},"*")}).observe(document.body)});</script>`;
+  const injectFix = (html: string) => {
+    if (html.includes("</head>")) return html.replace("</head>", iframeFix + "</head>");
+    if (html.includes("<body")) return html.replace("<body", iframeFix + "<body");
+    return iframeFix + html;
+  };
   try {
     const { lessonId } = req.params;
 
     try {
       const cms = await cmsStorage.getCmsContent(lessonId, "education");
       if (cms && cms.trim().length > 0) {
-        res.type("text/html").send(cms);
+        res.type("text/html").send(injectFix(cms));
         return;
       }
-    } catch (_) { /* جدول cms_content قد يكون غير موجود */ }
+    } catch (_) {}
 
     const pathsToTry = [
       path.resolve(attachedRoot, "html", "lessons", `${lessonId}-ssa.html`),
@@ -104,7 +110,7 @@ router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
     for (const ssaPath of pathsToTry) {
       if (await fileExists(ssaPath)) {
         const raw = await readTextFile(ssaPath);
-        res.type("text/html").send(raw);
+        res.type("text/html").send(injectFix(raw));
         return;
       }
     }
@@ -114,7 +120,7 @@ router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
       html = await storage.getLessonHtml(lessonId);
     } catch (_) {}
     if (html != null && html.length > 0) {
-      res.type("text/html").send(html);
+      res.type("text/html").send(injectFix(html));
       return;
     }
     const eduPaths = [
@@ -124,7 +130,7 @@ router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
     for (const educationPath of eduPaths) {
       if (await fileExists(educationPath)) {
         const raw = await readTextFile(educationPath);
-        res.type("text/html").send(raw);
+        res.type("text/html").send(injectFix(raw));
         return;
       }
     }

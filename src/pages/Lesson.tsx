@@ -6,7 +6,7 @@ import { usePublicStructure } from "@/hooks/use-public-structure";
 import { lessonsData, getSubjectName, subjectsData, getSemestersForSidebar, ensureTwoSemestersWithAttachments, type SemesterData, type LessonData } from "@/data/lessons";
 import { setPageMeta } from "@/lib/seo";
 import { PdfCanvasViewer } from "@/components/PdfCanvasViewer";
-import { ShadowHtmlViewer } from "@/components/ShadowHtmlViewer";
+import { SsaIframe } from "@/components/SsaIframe";
 import { type MathTestData } from "@/data/math-tests-final";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -1995,8 +1995,8 @@ export default function Lesson() {
                         </div>
                       </div>
                     ) : hasSsaContent ? (
-                      <ShadowHtmlViewer
-                        url={`/api/content/lesson/${currentLesson.id}/ssa-html`}
+                      <SsaIframe
+                        src={`/api/content/lesson/${currentLesson.id}/ssa-html`}
                         lessonId={currentLesson.id}
                       />
                     ) : (
