@@ -182,7 +182,9 @@ function VideoTabContent({
                   <p className="font-semibold text-sm mb-1 line-clamp-2">{meta.title}</p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span className="truncate">{meta.channelName}</span>
-                    <span className="shrink-0 mr-2 flex items-center gap-1"><Clock className="w-3 h-3" />{meta.duration}</span>
+                    {meta.duration && meta.duration !== "—" && meta.duration !== "غير محدد" && (
+                      <span className="shrink-0 mr-2 flex items-center gap-1"><Clock className="w-3 h-3" />{meta.duration}</span>
+                    )}
                   </div>
                 </div>
               </div>

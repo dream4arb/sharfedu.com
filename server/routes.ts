@@ -120,30 +120,40 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     }
   });
 
+  const durationCache = new Map<string, string>();
+
   app.get("/api/youtube/durations", async (req, res) => {
     try {
       const apiKey = process.env.YOUTUBE_API_KEY?.trim();
       if (!apiKey) return res.status(503).json({ error: "YouTube API not configured" });
       const ids = (req.query.ids as string || "").split(",").filter(Boolean).slice(0, 20);
       if (ids.length === 0) return res.json({});
-      const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ids.join(",")}&key=${apiKey}`;
-      const resp = await fetch(url);
-      if (!resp.ok) {
-        const errText = await resp.text().catch(() => "");
-        console.error("[YouTube API]", resp.status, errText.slice(0, 300));
-        return res.status(502).json({ error: "YouTube API error" });
-      }
-      const data = await resp.json() as { items?: { id: string; contentDetails?: { duration?: string } }[] };
+
       const result: Record<string, string> = {};
-      for (const item of data.items || []) {
-        const iso = item.contentDetails?.duration || "";
-        const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-        if (match) {
-          const h = parseInt(match[1] || "0");
-          const m = parseInt(match[2] || "0");
-          const s = parseInt(match[3] || "0");
-          if (h > 0) result[item.id] = `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-          else result[item.id] = `${m}:${String(s).padStart(2, "0")}`;
+      const uncached: string[] = [];
+      for (const id of ids) {
+        const cached = durationCache.get(id);
+        if (cached) result[id] = cached;
+        else uncached.push(id);
+      }
+
+      if (uncached.length > 0) {
+        const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${uncached.join(",")}&key=${apiKey}`;
+        const resp = await fetch(url);
+        if (resp.ok) {
+          const data = await resp.json() as { items?: { id: string; contentDetails?: { duration?: string } }[] };
+          for (const item of data.items || []) {
+            const iso = item.contentDetails?.duration || "";
+            const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+            if (match) {
+              const h = parseInt(match[1] || "0");
+              const m = parseInt(match[2] || "0");
+              const s = parseInt(match[3] || "0");
+              const dur = h > 0 ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+              result[item.id] = dur;
+              durationCache.set(item.id, dur);
+            }
+          }
         }
       }
       res.json(result);
