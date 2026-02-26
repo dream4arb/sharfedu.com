@@ -1,0 +1,129 @@
+{
+  "testId": "math-period-1446",
+  "title": "اختبار الفترة - الفصل الدراسي الثاني 1446هـ",
+  "subject": "الرياضيات",
+  "grade": "أول ثانوي",
+  "questions": [
+    {
+      "id": 1,
+      "questionText": "قياس كل زاوية في مثلث متطابق الاضلاع تساوي",
+      "hasGeometricShape": false,
+      "shapeDescription": null,
+      "shapeAngles": [],
+      "options": {
+        "a": "90°",
+        "b": "60°",
+        "c": "180°",
+        "d": "50°"
+      }
+    },
+    {
+      "id": 2,
+      "questionText": "تصنيف المثلث التالي",
+      "hasGeometricShape": true,
+      "shapeDescription": "مثلث يحتوي على الزوايا ∠ = 97°, ∠ = 49°, ∠ = 34°.",
+      "shapeAngles": [
+        "∠ = 97°",
+        "∠ = 49°",
+        "∠ = 34°"
+      ],
+      "options": {
+        "a": "حد الزوايا",
+        "b": "قائم الزاوية",
+        "c": "منفرج الزاوية",
+        "d": "متطابق الزوايا"
+      }
+    },
+    {
+      "id": 3,
+      "questionText": "من الشكل التالي ∠L1 يساوي",
+      "hasGeometricShape": true,
+      "shapeDescription": "مثلث يحتوي على الزوايا ∠ = 52°, ∠ = 27°. الزاوية الثالثة مجهولة.",
+      "shapeAngles": [
+        "∠ = 52°",
+        "∠ = 27°"
+      ],
+      "options": {
+        "a": "90°",
+        "b": "50°",
+        "c": "102°",
+        "d": "79°"
+      }
+    },
+    {
+      "id": 4,
+      "questionText": "من الشكل المجاور ∠Y يساوي",
+      "hasGeometricShape": true,
+      "shapeDescription": "مثلث يحتوي على الزوايا ∠X = 20°, ∠ = 50°، ∠Y مجهولة.",
+      "shapeAngles": [
+        "∠X = 20°",
+        "∠ = 50°"
+      ],
+      "options": {
+        "a": "30°",
+        "b": "60°",
+        "c": "50°",
+        "d": "20°"
+      }
+    },
+    {
+      "id": 5,
+      "questionText": "يصنف المثلث في الشكل المجاور بالنسبة لزواياه بأنه",
+      "hasGeometricShape": true,
+      "shapeDescription": "مثلث يحتوي على الزوايا ∠ = 70°, ∠ = 50°, ∠ = 60°.",
+      "shapeAngles": [
+        "∠ = 70°",
+        "∠ = 50°",
+        "∠ = 60°"
+      ],
+      "options": {
+        "a": "حد الزوايا",
+        "b": "قائم الزاوية",
+        "c": "منفرج الزاوية",
+        "d": "متطابق الزوايا"
+      }
+    },
+    {
+      "id": 6,
+      "questionText": "قياس الزاوية ١ في الشكل المقابل يساوي",
+      "hasGeometricShape": true,
+      "shapeDescription": "مثلث يحتوي على الزوايا ∠ = 50°, ∠ = 50°، ∠ مجهولة.",
+      "shapeAngles": [
+        "∠ = 50°",
+        "∠ = 50°"
+      ],
+      "options": {
+        "a": "30°",
+        "b": "60°",
+        "c": "80°",
+        "d": "73°"
+      }
+    },
+    {
+      "id": 7,
+      "questionText": "الزاويتان الداخليتان في مثلث قائم الزاوية هما",
+      "hasGeometricShape": false,
+      "shapeDescription": null,
+      "shapeAngles": [],
+      "options": {
+        "a": "متكاملتان",
+        "b": "متساويتان",
+        "c": "متتامتان",
+        "d": "متقابله بالرأس"
+      }
+    },
+    {
+      "id": 8,
+      "questionText": "اوجد احداثي النقطة H",
+      "hasGeometricShape": true,
+      "shapeDescription": "مثلث يحتوي على النقاط والقياسات التالية: N(0, 0), O(4b, 0), وM(2b,c).",
+      "shapeAngles": [],
+      "options": {
+        "a": "(0,0)",
+        "b": "(2b,c)",
+        "c": "(0, 4b)",
+        "d": "(0,c)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: 195 100% 42%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 195 30% 96%;
+  --secondary-foreground: 195 80% 25%;
+
+  --background: 0 0% 100%;
+  --foreground: 220 25% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 220 25% 12%;
+  --card-border: 220 15% 92%;
+
+  --muted: 220 15% 96%;
+  --muted-foreground: 220 10% 50%;
+
+  --accent: 195 50% 96%;
+  --accent-foreground: 195 100% 35%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 25% 12%;
+  --popover-border: 220 15% 92%;
+
+  --sidebar: 195 25% 98%;
+  --sidebar-foreground: 220 25% 12%;
+  --sidebar-border: 220 15% 92%;
+  --sidebar-primary: 195 100% 42%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 195 50% 96%;
+  --sidebar-accent-foreground: 195 100% 35%;
+  --sidebar-ring: 195 100% 42%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 15% 92%;
+  --input: 220 15% 92%;
+  --ring: 195 100% 42%;
+
+  --radius: 1rem;
+
+  --chart-1: 195 100% 42%;
+  --chart-2: 160 70% 45%;
+  --chart-3: 35 95% 55%;
+  --chart-4: 280 70% 55%;
+  --chart-5: 340 75% 55%;
+
+  --button-outline: rgba(0,0,0, .08);
+  --badge-outline: rgba(0,0,0, .05);
+  --opaque-button-border-intensity: -6;
+  --elevate-1: rgba(0,0,0, .03);
+  --elevate-2: rgba(0,0,0, .06);
+
+  --primary-border: hsl(var(--primary));
+  --secondary-border: hsl(var(--secondary));
+  --muted-border: hsl(var(--muted));
+  --accent-border: hsl(var(--accent));
+  --destructive-border: hsl(var(--destructive));
+
+  --font-sans: 'Tajawal', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+
+  --grade-1: 195 100% 45%;
+  --grade-2: 160 70% 42%;
+  --grade-3: 35 90% 52%;
+}
+
+.dark {
+  --primary: 195 90% 55%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 220 30% 16%;
+  --secondary-foreground: 220 20% 92%;
+
+  --background: 220 30% 6%;
+  --foreground: 220 15% 96%;
+
+  --card: 220 30% 9%;
+  --card-foreground: 220 15% 96%;
+  --card-border: 220 25% 16%;
+
+  --muted: 220 25% 14%;
+  --muted-foreground: 220 12% 58%;
+
+  --accent: 220 30% 14%;
+  --accent-foreground: 195 90% 60%;
+
+  --popover: 220 30% 9%;
+  --popover-foreground: 220 15% 96%;
+  --popover-border: 220 25% 16%;
+
+  --sidebar: 220 30% 8%;
+  --sidebar-foreground: 220 15% 96%;
+  --sidebar-border: 220 25% 16%;
+  --sidebar-primary: 195 90% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 30% 14%;
+  --sidebar-accent-foreground: 195 90% 60%;
+  --sidebar-ring: 195 90% 55%;
+
+  --destructive: 0 75% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 25% 16%;
+  --input: 220 25% 16%;
+  --ring: 195 90% 55%;
+
+  --button-outline: rgba(255,255,255, .10);
+  --badge-outline: rgba(255,255,255, .05);
+  --opaque-button-border-intensity: 8;
+  --elevate-1: rgba(255,255,255, .04);
+  --elevate-2: rgba(255,255,255, .08);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    direction: rtl;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Tajawal', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+    font-family: 'Tajawal', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-cyan-400;
+  }
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-primary via-cyan-500 to-primary;
+  }
+  .bg-grade-1 {
+    background-color: hsl(var(--grade-1));
+  }
+  .bg-grade-2 {
+    background-color: hsl(var(--grade-2));
+  }
+  .bg-grade-3 {
+    background-color: hsl(var(--grade-3));
+  }
+  .text-grade-1 {
+    color: hsl(var(--grade-1));
+  }
+  .text-grade-2 {
+    color: hsl(var(--grade-2));
+  }
+  .text-grade-3 {
+    color: hsl(var(--grade-3));
+  }
+  .hover-elevate:not(.no-default-hover-elevate),
+  .active-elevate:not(.no-default-active-elevate),
+  .hover-elevate-2:not(.no-default-hover-elevate),
+  .active-elevate-2:not(.no-default-active-elevate) {
+    position: relative;
+    z-index: 0;
+  }
+  .hover-elevate:not(.no-default-hover-elevate)::after,
+  .active-elevate:not(.no-default-active-elevate)::after,
+  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:not(.no-default-active-elevate)::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+  }
+  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-1);
+  }
+  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-2);
+  }
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-xl border border-white/50;
+  }
+  .shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  .shine:hover::before {
+    left: 100%;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
