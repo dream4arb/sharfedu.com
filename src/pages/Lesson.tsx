@@ -1067,22 +1067,22 @@ export default function Lesson() {
                   {semesters.map((semester, semesterIndex) => (
                     <div
                       key={semester.id}
-                      className="rounded-xl border-2 border-violet-200 bg-violet-50/30 dark:border-violet-500/30 dark:bg-violet-500/5 p-2 space-y-2 mb-4 relative"
+                      className="rounded-2xl border border-violet-200/70 bg-violet-50/20 dark:border-violet-500/25 dark:bg-violet-500/5 p-3 space-y-2.5 mb-5 relative pt-5"
                     >
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full text-[13px] font-bold whitespace-nowrap bg-gradient-to-r from-violet-100 to-blue-100 text-indigo-600 dark:from-violet-500/25 dark:to-blue-500/25 dark:text-violet-300 border border-violet-200/80 dark:border-violet-500/30">
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-md text-xs font-bold whitespace-nowrap bg-violet-50 text-indigo-500 dark:bg-violet-500/20 dark:text-violet-300 border border-violet-200/60 dark:border-violet-500/30">
                         {semesterIndex === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني"}
                       </div>
                       <Collapsible open={openSemesters[semester.id]}>
                         <SidebarGroup className="space-y-0">
                           <SidebarGroupLabel
-                            className="flex items-center justify-between w-full gap-3 px-3 py-2.5 mt-3 min-h-[3rem] rounded-xl border border-gray-200 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200"
+                            className="flex items-center justify-between w-full gap-3 px-4 py-3 min-h-[3rem] rounded-xl border border-gray-200/80 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50/50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200 shadow-sm"
                             onClick={() => toggleSemester(semester.id)}
                           >
                             <div className="flex items-center gap-3 min-w-0 flex-1">
                               <div className="w-8 h-8 rounded-lg bg-violet-500 text-white flex items-center justify-center shrink-0">
                                 <BookOpen className="w-4 h-4" />
                               </div>
-                              <span className="font-bold text-sm text-foreground">الدروس</span>
+                              <span className="font-bold text-[13px] text-foreground">الدروس</span>
                             </div>
                             {openSemesters[semester.id] ? (
                               <ChevronUp className="w-4 h-4 shrink-0 text-gray-400" />
@@ -1152,14 +1152,14 @@ export default function Lesson() {
                         <Collapsible open={openAttachmentsFirstSemester}>
                           <SidebarGroup>
                             <SidebarGroupLabel
-                              className="flex items-center justify-between w-full gap-3 px-3 py-2.5 min-h-[3rem] rounded-xl border border-gray-200 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200"
+                              className="flex items-center justify-between w-full gap-3 px-4 py-3 min-h-[3rem] rounded-xl border border-gray-200/80 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50/50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200 shadow-sm"
                               onClick={toggleAttachmentsFirstSemester}
                             >
                               <div className="flex items-center gap-3 min-w-0 flex-1">
                                 <div className="w-8 h-8 rounded-lg bg-violet-500 text-white flex items-center justify-center shrink-0">
                                   <Paperclip className="w-4 h-4" />
                                 </div>
-                                <span className="font-bold text-sm text-foreground">المرفقات</span>
+                                <span className="font-bold text-[13px] text-foreground">المرفقات</span>
                               </div>
                               {openAttachmentsFirstSemester ? <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
                             </SidebarGroupLabel>
@@ -1213,14 +1213,14 @@ export default function Lesson() {
                         <Collapsible open={openAttachmentsSection}>
                           <SidebarGroup>
                             <SidebarGroupLabel
-                              className="flex items-center justify-between w-full gap-3 px-3 py-2.5 min-h-[3rem] rounded-xl border border-gray-200 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200"
+                              className="flex items-center justify-between w-full gap-3 px-4 py-3 min-h-[3rem] rounded-xl border border-gray-200/80 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50/50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200 shadow-sm"
                               onClick={toggleAttachmentsSection}
                             >
                               <div className="flex items-center gap-3 min-w-0 flex-1">
                                 <div className="w-8 h-8 rounded-lg bg-violet-500 text-white flex items-center justify-center shrink-0">
                                   <Paperclip className="w-4 h-4" />
                                 </div>
-                                <span className="font-bold text-sm text-foreground">المرفقات</span>
+                                <span className="font-bold text-[13px] text-foreground">المرفقات</span>
                               </div>
                               {openAttachmentsSection ? <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
                             </SidebarGroupLabel>
