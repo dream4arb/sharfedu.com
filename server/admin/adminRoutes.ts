@@ -15,6 +15,15 @@ const __dirname = getDirname();
 const uploadsDir = path.join(__dirname, "..", "..", "attached_assets", "uploads");
 fs.promises.mkdir(uploadsDir, { recursive: true }).catch(() => {});
 
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+]);
+
 const upload = multer({
   storage: multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, uploadsDir),
@@ -23,7 +32,13 @@ const upload = multer({
       cb(null, `${Date.now()}_${Math.random().toString(36).slice(2, 10)}${ext}`);
     },
   }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return cb(new Error("نوع الملف غير مسموح به."));
+    }
+    cb(null, true);
+  },
 });
 
 const router = Router();

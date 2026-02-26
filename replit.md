@@ -71,7 +71,8 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 - Path traversal protection on file serving routes
 - Session: httpOnly, sameSite=lax, secure in production
 - Passwords: bcrypt hashed
-- File uploads: Size limited (20MB), random filenames
+- File uploads: Size limited (20MB), random filenames, MIME type whitelist (PDF, PNG, JPEG, WebP, GIF, SVG)
+- Error messages: Generic in production (no stack trace leaks)
 
 ### Key Pages
 1. **Home (/)**: Landing with Hero, SearchBar, StageSelector, Features

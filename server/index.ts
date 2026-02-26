@@ -90,13 +90,16 @@ app.use((req, res, next) => {
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
 
     console.error("Server Error:", err.message);
 
     if (res.headersSent) {
       return next(err);
     }
+
+    const message = process.env.NODE_ENV === "production" && status >= 500
+      ? "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى."
+      : (err.message || "Internal Server Error");
 
     return res.status(status).json({ message });
   });

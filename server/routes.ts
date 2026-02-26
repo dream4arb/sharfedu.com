@@ -187,11 +187,6 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     }
   });
 
-  app.post("/api/ai/lesson-chat", (req, res) => {
-    req.url = "/api/chat";
-    app.handle(req, res);
-  });
-
   app.post("/api/ai/summarize", async (req, res) => {
     try {
       const { lessonTitle, subjectName } = req.body;

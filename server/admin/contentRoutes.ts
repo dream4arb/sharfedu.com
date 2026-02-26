@@ -83,7 +83,7 @@ router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
     const { lessonId } = req.params;
 
     try {
-      const cms = await cmsStorage.getCmsContent(lessonId, "questions");
+      const cms = await cmsStorage.getCmsContent(lessonId, "education");
       if (cms && cms.trim().length > 0) {
         res.type("text/html").send(cms);
         return;

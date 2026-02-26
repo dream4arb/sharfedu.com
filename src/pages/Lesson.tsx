@@ -233,7 +233,7 @@ export default function Lesson() {
   const { content: cmsLessonContent } = useCmsTabContent(lessonIdFromParams, "lesson");
   const { content: cmsVideoContent } = useCmsTabContent(lessonIdFromParams, "video");
   const { content: cmsSummaryContent } = useCmsTabContent(lessonIdFromParams, "summary");
-  const { content: cmsQuestionsContent } = useCmsTabContent(lessonIdFromParams, "questions");
+  const { content: cmsEducationContent } = useCmsTabContent(lessonIdFromParams, "education");
 
   const [hasSsaContent, setHasSsaContent] = useState<boolean | null>(null);
   const [loadingSsa, setLoadingSsa] = useState(false);
@@ -242,7 +242,7 @@ export default function Lesson() {
       setHasSsaContent(null);
       return;
     }
-    if (cmsQuestionsContent?.dataValue?.trim()) {
+    if (cmsEducationContent?.dataValue?.trim()) {
       setHasSsaContent(true);
       setLoadingSsa(false);
       return;
@@ -257,7 +257,7 @@ export default function Lesson() {
         setHasSsaContent(false);
         setLoadingSsa(false);
       });
-  }, [lessonIdFromParams, activeTab, cmsQuestionsContent]);
+  }, [lessonIdFromParams, activeTab, cmsEducationContent]);
 
   const openAttachmentPdfInPage = (url: string | undefined, label: string) => {
     setAttachmentView({ url: url ?? "", label });
