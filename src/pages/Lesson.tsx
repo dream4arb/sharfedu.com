@@ -135,12 +135,6 @@ function VideoTabContent({
 
   return (
     <>
-      {selectedMeta && (
-        <div className="mb-4 p-4 rounded-xl bg-muted/50 border border-border/50">
-          <p className="font-bold text-foreground">{selectedMeta.title}</p>
-          <p className="text-sm text-muted-foreground mt-1">{selectedMeta.channelName} · {selectedMeta.duration}</p>
-        </div>
-      )}
       <div className="mb-8">
         <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl">
           <iframe
