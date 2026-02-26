@@ -1069,7 +1069,7 @@ export default function Lesson() {
                       key={semester.id}
                       className={`rounded-xl border-2 p-2 space-y-2 mb-4 relative ${semesterIndex === 0 ? "border-primary/40 bg-primary/5" : "border-violet-500/40 bg-violet-500/5 dark:border-violet-500/30 dark:bg-violet-500/10"}`}
                     >
-                      <div className={`absolute -top-3 right-4 px-3 py-0.5 rounded-md text-xs font-bold ${semesterIndex === 0 ? "bg-primary text-white" : "bg-violet-500 text-white"}`}>
+                      <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-md text-xs font-bold whitespace-nowrap ${semesterIndex === 0 ? "bg-primary text-white" : "bg-violet-500 text-white"}`}>
                         {semesterIndex === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني"}
                       </div>
                       <Collapsible open={openSemesters[semester.id]}>
