@@ -243,6 +243,7 @@ export function Navbar() {
           <button 
             className="lg:hidden p-2.5 rounded-xl bg-accent/50 transition-colors"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "إغلاق القائمة" : "فتح القائمة"}
             data-testid="button-mobile-menu"
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
