@@ -1067,19 +1067,22 @@ export default function Lesson() {
                   {semesters.map((semester, semesterIndex) => (
                     <div
                       key={semester.id}
-                      className={`rounded-xl border-2 p-2 space-y-2 mb-4 ${semesterIndex === 0 ? "border-primary/40 bg-primary/5" : "border-violet-500/40 bg-violet-500/5 dark:border-violet-500/30 dark:bg-violet-500/10"}`}
+                      className={`rounded-xl border-2 p-2 space-y-2 mb-4 relative ${semesterIndex === 0 ? "border-primary/40 bg-primary/5" : "border-violet-500/40 bg-violet-500/5 dark:border-violet-500/30 dark:bg-violet-500/10"}`}
                     >
+                      <div className={`absolute -top-3 right-4 px-3 py-0.5 rounded-md text-xs font-bold ${semesterIndex === 0 ? "bg-primary text-white" : "bg-violet-500 text-white"}`}>
+                        {semesterIndex === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني"}
+                      </div>
                       <Collapsible open={openSemesters[semester.id]}>
                         <SidebarGroup className="space-y-0">
                           <SidebarGroupLabel
-                            className={`flex items-center justify-between w-full gap-4 px-4 py-3 min-h-[3.5rem] rounded-lg border cursor-pointer transition-all duration-200 ${semesterIndex === 0 ? "border-primary/20 bg-primary/10 hover:bg-primary/15" : "border-violet-500/20 bg-violet-500/10 hover:bg-violet-500/15 dark:border-violet-500/20 dark:bg-violet-500/10 dark:hover:bg-violet-500/15"}`}
+                            className={`flex items-center justify-between w-full gap-4 px-4 py-3 mt-2 min-h-[3.5rem] rounded-lg border cursor-pointer transition-all duration-200 ${semesterIndex === 0 ? "border-primary/20 bg-primary/10 hover:bg-primary/15" : "border-violet-500/20 bg-violet-500/10 hover:bg-violet-500/15 dark:border-violet-500/20 dark:bg-violet-500/10 dark:hover:bg-violet-500/15"}`}
                             onClick={() => toggleSemester(semester.id)}
                           >
                             <div className="flex items-center gap-4 min-w-0 flex-1">
                               <div className={`w-9 h-9 rounded-lg text-white flex items-center justify-center text-sm font-bold shrink-0 shadow-sm ${semesterIndex === 0 ? "bg-primary" : "bg-violet-500"}`}>
                                 {semesterIndex + 1}
                               </div>
-                              <span className="font-bold text-xs truncate text-black">{semester.name}</span>
+                              <span className="font-bold text-xs truncate text-black">الدروس</span>
                             </div>
                             {openSemesters[semester.id] ? (
                               <ChevronUp className={`w-5 h-5 shrink-0 ${semesterIndex === 0 ? "text-primary/70" : "text-violet-600/90 dark:text-violet-400/90"}`} />
@@ -1156,7 +1159,7 @@ export default function Lesson() {
                                 <div className="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0 shadow-sm">
                                   <Paperclip className="w-5 h-5" />
                                 </div>
-                                <span className="font-bold text-xs text-black">مرفقات الفصل الدراسي الأول</span>
+                                <span className="font-bold text-xs text-black">المرفقات</span>
                               </div>
                               {openAttachmentsFirstSemester ? <ChevronUp className="w-5 h-5 text-primary/70 shrink-0" /> : <ChevronDown className="w-5 h-5 text-primary/70 shrink-0" />}
                             </SidebarGroupLabel>
@@ -1217,7 +1220,7 @@ export default function Lesson() {
                                 <div className="w-9 h-9 rounded-lg bg-violet-500 text-white flex items-center justify-center shrink-0 shadow-sm">
                                   <Paperclip className="w-5 h-5" />
                                 </div>
-                                <span className="font-bold text-xs text-black">مرفقات الفصل الدراسي الثاني</span>
+                                <span className="font-bold text-xs text-black">المرفقات</span>
                               </div>
                               {openAttachmentsSection ? <ChevronUp className="w-5 h-5 text-violet-600/90 dark:text-violet-400/90 shrink-0" /> : <ChevronDown className="w-5 h-5 text-violet-600/90 dark:text-violet-400/90 shrink-0" />}
                             </SidebarGroupLabel>
