@@ -297,7 +297,7 @@ export default function Stage() {
     <div className="min-h-screen bg-background" dir="rtl">
       <AdminModal />
       <Navbar />
-      <main className="pt-24 pb-20 bg-white dark:bg-background">
+      <main className="pt-32 pb-20 bg-white dark:bg-background">
         {/* Hero - تصميم عصري مع تأثير زجاجي */}
         <div className={`relative overflow-hidden bg-gradient-to-br ${stage.bgGradient} pb-24`}>
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,120,255,0.15),transparent)]" />
