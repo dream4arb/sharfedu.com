@@ -708,7 +708,7 @@ export function InlineAdminToolbar({
                 >
                   <span className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4" />
-                    الملخص
+                    ملف PDF الملخص
                   </span>
                   {summarySection ? (
                     <ChevronUp className="w-4 h-4" />
@@ -720,21 +720,12 @@ export function InlineAdminToolbar({
               <CollapsibleContent className="pt-2 space-y-2">
                 {existingSummary && (
                   <div className="flex items-center justify-between gap-2 p-2 rounded-md bg-muted/50 text-sm flex-wrap">
-                    <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                    <span className="flex items-center gap-1 text-muted-foreground">
                       <Check className="w-3 h-3 text-green-600" />
-                      {existingSummary.dataValue.endsWith(".pdf") || existingSummary.contentType === "pdf" ? (
-                        <>
-                          ملف PDF مرفوع:{" "}
-                          <span className="font-medium text-foreground truncate max-w-[200px]">
-                            {existingSummary.dataValue.split("/").pop()}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          ملخص HTML موجود (
-                          {existingSummary.dataValue.length.toLocaleString()} حرف)
-                        </>
-                      )}
+                      ملف مرفوع:{" "}
+                      <span className="font-medium text-foreground truncate max-w-[200px]">
+                        {existingSummary.dataValue.split("/").pop()}
+                      </span>
                     </span>
                     <Button
                       variant="ghost"
@@ -752,78 +743,38 @@ export function InlineAdminToolbar({
                     </Button>
                   </div>
                 )}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      ref={summaryFileInputRef}
-                      type="file"
-                      accept=".pdf"
-                      className="hidden"
-                      data-testid="input-admin-summary-pdf-file"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSummaryPdfUpload(file);
-                      }}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={summaryPdfUploading}
-                      data-testid="button-admin-summary-pdf-upload"
-                      onClick={() => summaryFileInputRef.current?.click()}
-                    >
-                      {summaryPdfUploading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Upload className="w-4 h-4" />
-                      )}
-                      {existingSummary && (existingSummary.dataValue.endsWith(".pdf") || existingSummary.contentType === "pdf")
-                        ? "استبدال PDF الملخص"
-                        : "رفع PDF الملخص"}
-                    </Button>
-                    {summaryPdfSuccess && (
-                      <span className="text-xs text-green-600 flex items-center gap-1">
-                        <Check className="w-3 h-3" />
-                        تم رفع PDF بنجاح
-                      </span>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <div className="absolute inset-x-0 top-0 flex items-center justify-center -mt-1">
-                      <span className="bg-background px-2 text-[10px] text-muted-foreground">أو أدخل HTML</span>
-                    </div>
-                    <hr className="border-border" />
-                  </div>
-                  <textarea
-                    className="w-full min-h-[200px] p-3 text-sm rounded-md border bg-background text-foreground resize-y font-mono"
-                    dir="ltr"
-                    placeholder="أدخل كود HTML للملخص..."
-                    value={summaryHtml}
-                    data-testid="input-admin-summary-html"
-                    onChange={(e) => setSummaryHtml(e.target.value)}
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={summaryFileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    data-testid="input-admin-summary-pdf-file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleSummaryPdfUpload(file);
+                    }}
                   />
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={summarySaving || !summaryHtml.trim()}
-                      data-testid="button-admin-summary-save"
-                      onClick={handleSummarySave}
-                    >
-                      {summarySaving ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Save className="w-4 h-4" />
-                      )}
-                      حفظ الملخص
-                    </Button>
-                    {summarySuccess && (
-                      <span className="text-xs text-green-600 flex items-center gap-1">
-                        <Check className="w-3 h-3" />
-                        تم الحفظ
-                      </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={summaryPdfUploading}
+                    data-testid="button-admin-summary-pdf-upload"
+                    onClick={() => summaryFileInputRef.current?.click()}
+                  >
+                    {summaryPdfUploading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
                     )}
-                  </div>
+                    {existingSummary ? "استبدال PDF" : "رفع PDF"}
+                  </Button>
+                  {summaryPdfSuccess && (
+                    <span className="text-xs text-green-600 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      تم الرفع بنجاح
+                    </span>
+                  )}
                 </div>
               </CollapsibleContent>
             </Collapsible>
