@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getApiUrl } from "@/lib/api-base";
+import { useAuth } from "@/hooks/use-auth";
 import { Loader2, Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
+  const { refetch } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -30,6 +32,7 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
+      await refetch();
       setLocation("/dashboard");
     } catch {
       setError("خطأ في الاتصال.");

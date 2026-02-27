@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { getApiUrl } from "@/lib/api-base";
 
 export interface AuthUser {
@@ -12,7 +12,20 @@ export interface AuthUser {
   gradeId?: string | null;
 }
 
-export function useAuth() {
+interface AuthContextValue {
+  user: AuthUser | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  logout: () => Promise<void>;
+  isLoggingOut: boolean;
+  refetch: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export { AuthContext };
+
+export function useAuthProvider() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -21,7 +34,11 @@ export function useAuth() {
     try {
       const res = await fetch(getApiUrl("/api/auth/user"), { credentials: "include" });
       const data = await res.json().catch(() => null);
-      setUser(Array.isArray(data) ? null : data);
+      if (data && typeof data === "object" && !Array.isArray(data) && data.id && data.role) {
+        setUser(data as AuthUser);
+      } else {
+        setUser(null);
+      }
     } catch {
       setUser(null);
     } finally {
@@ -51,4 +68,12 @@ export function useAuth() {
     isLoggingOut,
     refetch: fetchUser,
   };
+}
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return ctx;
 }

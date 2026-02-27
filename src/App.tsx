@@ -8,7 +8,7 @@ import { LessonProgressProvider } from "@/hooks/use-lesson-progress";
 import Home from "@/pages/Home";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SeoHead } from "@/components/SeoHead";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, useAuthProvider, AuthContext } from "@/hooks/use-auth";
 
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Profile = lazy(() => import("@/pages/Profile"));
@@ -108,14 +108,21 @@ function Router() {
   );
 }
 
+function AuthProvider({ children }: { children: React.ReactNode }) {
+  const auth = useAuthProvider();
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <LessonProgressProvider>
-          <Toaster />
-          <Router />
-        </LessonProgressProvider>
+        <AuthProvider>
+          <LessonProgressProvider>
+            <Toaster />
+            <Router />
+          </LessonProgressProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
