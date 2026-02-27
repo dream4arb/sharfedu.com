@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { useToast } from "@/hooks/use-toast";
+import { usePageSeo } from "@/hooks/use-page-seo";
 import { subjectsData as sharedSubjectsData, lessonsData } from "@/data/lessons";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,6 +52,11 @@ const achievementsData = [
 
 
 export default function Dashboard() {
+  usePageSeo({
+    title: "لوحة التحكم",
+    description: "لوحة تحكم الطالب على منصة شارف التعليمية. تتبع تقدمك الدراسي واستكمل دروسك واختباراتك.",
+    keywords: "لوحة التحكم, تقدم الطالب, دروسي, شارف, تعليم",
+  });
   const { user } = useAuth();
   const { getProgress, isCompleted } = useLessonProgress();
   const { toast } = useToast();

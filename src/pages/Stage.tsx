@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { canAccessStageGrade } from "@/lib/profile";
+import { setPageMeta } from "@/lib/seo";
 import { 
   ArrowRight, ArrowLeft, BookOpen, Baby, GraduationCap, Route, Target,
   Calculator, FlaskConical, Globe, Pen, Book, Atom, Languages, History, Palette, Heart, Monitor, Briefcase, DollarSign
@@ -292,6 +293,18 @@ export default function Stage() {
     high: "secondary",
   };
   const urlStage = stageUrlMap[stageId || ""] || stageId || "primary";
+
+  useEffect(() => {
+    if (stage) {
+      const subjectList = stage.grades.flatMap(g => g.subjects.map(s => s.name));
+      const uniqueSubjects = [...new Set(subjectList)].slice(0, 6).join("، ");
+      setPageMeta({
+        title: `${stage.title} - ${stage.subtitle}`,
+        description: `${stage.title} على منصة شارف التعليمية. دروس وشروحات تفاعلية في ${uniqueSubjects} وغيرها. ${stage.description}.`,
+        keywords: `${stage.title}, ${uniqueSubjects}, منصة شارف, تعليم, السعودية, دروس`,
+      });
+    }
+  }, [stageId]);
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">

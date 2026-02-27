@@ -4,9 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getApiUrl } from "@/lib/api-base";
+import { usePageSeo } from "@/hooks/use-page-seo";
 import { Loader2, Mail, Lock, Hash } from "lucide-react";
 
 export default function ResetPasswordPage() {
+  usePageSeo({
+    title: "إعادة تعيين كلمة المرور",
+    description: "أدخل رمز التحقق وكلمة المرور الجديدة لإعادة تعيين حسابك على منصة شارف التعليمية.",
+    keywords: "إعادة تعيين كلمة المرور, شارف",
+  });
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
+import { usePageSeo } from "@/hooks/use-page-seo";
 import { motion } from "framer-motion";
 import { Beaker, Calculator, Globe, ArrowRight, Loader2 } from "lucide-react";
 import type { Course } from "@shared/schema";
@@ -36,6 +37,12 @@ const gradeNames: Record<string, string> = {
 
 export default function Courses() {
   const { gradeLevel } = useParams<{ gradeLevel: string }>();
+  const gradeName = gradeNames[gradeLevel || ""] || "المواد الدراسية";
+  usePageSeo({
+    title: `${gradeName} - المواد الدراسية`,
+    description: `جميع المواد الدراسية المتاحة لـ${gradeName} على منصة شارف التعليمية. اختر مادتك وابدأ التعلم مع دروس تفاعلية وشروحات مبسّطة.`,
+    keywords: `${gradeName}, مواد دراسية, شارف, دروس, تعليم, السعودية`,
+  });
 
   const { data: courses, isLoading } = useQuery<Course[]>({
     queryKey: ["/api/courses", gradeLevel],
