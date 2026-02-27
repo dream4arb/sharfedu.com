@@ -123,7 +123,7 @@ Never skip either step. Never deploy to server without pushing to GitHub first.
 - SSH: `sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no master_nyrmduupwf@165.227.236.121`
 - PM2 path: `/home/master/.nvm/versions/node/v20.20.0/lib/node_modules/pm2/bin/pm2`
 - Server script: `/home/894422.cloudwaysapps.com/cmkdrtgqcv/public_html/node_app/index.cjs`
-- Frontend: `~/applications/zrsxxbfsdx/public_html/`
+- Frontend: `/home/894422.cloudwaysapps.com/cmkdrtgqcv/public_html/` (same as backend app)
 - Varnish purge: `varnishadm -S /etc/varnish/secret -T localhost:6082 'ban req.http.host ~ sharfedu'`
 
 ### Cleanup Status
