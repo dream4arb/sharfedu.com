@@ -114,6 +114,14 @@ router.put("/structure", async (req, res) => {
     await saveHierarchyToDb(hierarchy);
     setCurrentHierarchy(hierarchy);
     res.json({ ok: true });
+
+    try {
+      const { generateSitemapFiles } = await import("../lib/sitemapGenerator");
+      const result = await generateSitemapFiles();
+      console.log(`[sitemap] Auto-generated: ${result.totalUrls} URLs`);
+    } catch (e) {
+      console.error("[sitemap] Auto-generate failed:", e);
+    }
   } catch (e) {
     console.error("Structure save:", e);
     res.status(500).json({ message: "خطأ في حفظ الهيكلية" });

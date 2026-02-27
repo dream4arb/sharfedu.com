@@ -1892,7 +1892,7 @@ export default function AdminDashboard() {
 
                           <TabsContent value="sitemap" className="space-y-6 mt-0">
                             <div className="flex items-center justify-between flex-wrap gap-3">
-                              <p className="text-sm text-muted-foreground flex-1">خريطة الموقع (sitemap.xml) تشمل جميع الصفحات والدروس. اضغط "توليد ونشر" لتحديث الملفات على الخادم.</p>
+                              <p className="text-sm text-muted-foreground flex-1">خريطة الموقع (sitemap.xml) تُحدّث تلقائياً عند تعديل الهيكلية الدراسية. يمكنك أيضاً التحديث يدوياً.</p>
                               <div className="flex gap-2">
                                 <Button variant="outline" size="sm" onClick={loadSitemapInfo} disabled={sitemapLoading} data-testid="button-refresh-sitemap">
                                   <RefreshCw className={`w-4 h-4 ml-2 ${sitemapLoading ? "animate-spin" : ""}`} />
@@ -2045,7 +2045,7 @@ export default function AdminDashboard() {
                                 <div className="flex items-center gap-2 p-4 rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30 text-green-800 dark:text-green-200">
                                   <CheckCircle2 className="h-5 w-5 shrink-0" />
                                   <div className="text-sm">
-                                    <strong>خريطة الموقع تُحدّث تلقائياً</strong> — عند إضافة أي درس أو مادة جديدة في الهيكلية الدراسية، ستظهر تلقائياً في خريطة الموقع عند الزحف القادم من Google.
+                                    <strong>تحديث تلقائي</strong> — عند إضافة أو تعديل أي درس أو مادة في الهيكلية الدراسية، تُحدّث خريطة الموقع و robots.txt تلقائياً على الخادم بدون تدخل منك.
                                   </div>
                                 </div>
                               </div>
