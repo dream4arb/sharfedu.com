@@ -324,7 +324,7 @@ export default function Stage() {
     <div className="min-h-screen bg-background" dir="rtl">
       <AdminModal />
       <Navbar />
-      <main className="pt-28 pb-20 bg-white dark:bg-background">
+      <main className="pb-20 bg-white dark:bg-background" style={{ paddingTop: "120px" }}>
         {/* Hero - تصميم عصري مع تأثير زجاجي */}
         <div className={`relative overflow-hidden bg-gradient-to-br ${stage.bgGradient} pb-24`}>
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,120,255,0.15),transparent)]" />
@@ -353,8 +353,17 @@ export default function Stage() {
           </div>
         </div>
 
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-20 -mt-10 mb-4">
+          <InlineSeoEditor
+            pagePath={`/stage/${stageId}`}
+            autoTitle={`${stage.title} - ${stage.subtitle}`}
+            autoDescription={`${stage.title} في منصة شارف التعليمية. ${stage.description}. شرح تفاعلي وملخصات واختبارات لجميع المواد الدراسية.`}
+            autoKeywords={`${stage.title}, دروس ${stage.title}, مواد ${stage.title}, منصة شارف`}
+          />
+        </div>
+
         {/* المواد - تصميم بطاقات زجاجية عصري */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-14 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-4 relative z-10">
           <div className="space-y-8">
             {stage.grades.map((grade, gradeIndex) => {
               const gradeLocked = profileComplete && !canAccessStageGrade(stageId || "", grade.id, user);
@@ -479,14 +488,6 @@ export default function Stage() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-4">
-          <InlineSeoEditor
-            pagePath={`/stage/${stageId}`}
-            autoTitle={`${stage.title} - ${stage.subtitle}`}
-            autoDescription={`${stage.title} في منصة شارف التعليمية. ${stage.description}. شرح تفاعلي وملخصات واختبارات لجميع المواد الدراسية.`}
-            autoKeywords={`${stage.title}, دروس ${stage.title}, مواد ${stage.title}, منصة شارف`}
-          />
-        </div>
       </main>
       <Footer />
     </div>
