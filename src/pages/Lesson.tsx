@@ -14,7 +14,7 @@ import { Link, useParams, useLocation } from "wouter";
 import { 
   Loader2, Play, FileText, Download, CheckCircle,
   Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
-  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles
+  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles, LayoutDashboard
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -1246,16 +1246,14 @@ export default function Lesson() {
           <Sidebar side="right" className="border-l border-border/50 bg-background/95">
             <SidebarHeader className="p-5 border-b border-border/50 bg-card/50">
               <div className="flex items-center gap-3">
-                <Link href={homeLink} aria-label="الرجوع للصفحة الرئيسية" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/80 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/" aria-label="الصفحة الرئيسية" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/80 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors" data-testid="link-home">
                   <Home className="w-5 h-5" />
                 </Link>
+                <Link href={homeLink} aria-label="الرجوع للمرحلة" className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-colors" data-testid="link-stage">
+                  <LayoutDashboard className="w-5 h-5" />
+                </Link>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      <BookOpen className="w-5 h-5 text-primary" />
-                    </div>
-                    <span className="font-bold text-base truncate">{subjectName}</span>
-                  </div>
+                  <span className="font-bold text-base truncate">{subjectName}</span>
                 </div>
               </div>
               {/* شريط التقدم */}
