@@ -109,6 +109,7 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
       <div
         ref={containerRef}
         className="w-full"
+        role="document"
         aria-label={title || "عارض PDF"}
       />
     </div>
