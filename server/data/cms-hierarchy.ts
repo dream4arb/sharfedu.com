@@ -391,11 +391,23 @@ export function getAllSeoPaths(): SeoPathItem[] {
     { value: "/stage/elementary", label: "المرحلة الابتدائية", searchText: "المرحلة الابتدائية ابتدائي", type: "stage", group: "المراحل" },
     { value: "/stage/middle", label: "المرحلة المتوسطة", searchText: "المرحلة المتوسطة متوسط أول متوسط ثاني متوسط", type: "stage", group: "المراحل" },
     { value: "/stage/high", label: "المرحلة الثانوية", searchText: "المرحلة الثانوية ثانوي أول ثانوي ثاني ثانوي", type: "stage", group: "المراحل" },
-    { value: "/lesson/elementary/math", label: "رياضيات - ابتدائي", searchText: "رياضيات ابتدائي المرحلة الابتدائية", type: "lesson", group: "الرياضيات" },
-    { value: "/lesson/middle/math", label: "رياضيات - متوسط", searchText: "رياضيات متوسط المرحلة المتوسطة أول متوسط", type: "lesson", group: "الرياضيات" },
-    { value: "/lesson/high/math", label: "رياضيات - ثانوي", searchText: "رياضيات ثانوي المرحلة الثانوية أول ثانوي", type: "lesson", group: "الرياضيات" },
   ];
+  const subjectPathsSet = new Set<string>();
+  const subjectPaths: SeoPathItem[] = [];
   const lessons = getAllLessons();
+  for (const l of lessons) {
+    const subjectKey = `${l.stageSlug}/${l.subjectSlug}`;
+    if (!subjectPathsSet.has(subjectKey)) {
+      subjectPathsSet.add(subjectKey);
+      subjectPaths.push({
+        value: `/lesson/${l.stageSlug}/${l.subjectSlug}`,
+        label: `${l.subject} — ${l.stage}`,
+        searchText: `${l.subject} ${l.stage} ${l.gradeName} مادة`,
+        type: "lesson" as const,
+        group: `المواد - ${l.stage}`,
+      });
+    }
+  }
   const lessonPaths: SeoPathItem[] = lessons.map((l) => {
     const shortLabel = `${l.title} — ${l.subject} (${l.gradeName} ${l.stage})`;
     const searchText = [l.title, l.subject, l.stage, l.gradeName, l.semesterName, l.chapterName].filter(Boolean).join(" ");
@@ -407,7 +419,7 @@ export function getAllSeoPaths(): SeoPathItem[] {
       group: l.subject,
     };
   });
-  return [...staticPaths, ...lessonPaths];
+  return [...staticPaths, ...subjectPaths, ...lessonPaths];
 }
 
 /** هيكل العرض للموقع: مرحلة_مادة → فصول ووحدات ودروس (باستخدام أول صف) */

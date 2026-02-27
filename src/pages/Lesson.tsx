@@ -479,15 +479,30 @@ export default function Lesson() {
     return () => { cancelled = true; };
   }, [currentLessonId, currentVideoUrl, additionalVideosKey, cmsVideoDataValue]);
 
-  // SEO: تحديث عنوان الصفحة ووصفها عند تغيير الدرس
   useEffect(() => {
-    if (currentLesson && subjectName) {
-      const title = getLessonDisplayTitle(currentLesson, lessonTitlesFromApi);
-      setPageMeta(
-        `${title} - ${subjectName}`,
-        `درس ${title} في ${subjectName} - منصة شارف التعليمية. شاهد الشرح والملخص والاختبارات.`
-      );
-    }
+    if (!currentLesson || !subjectName) return;
+    const title = getLessonDisplayTitle(currentLesson, lessonTitlesFromApi);
+    const autoTitle = `${title} - ${subjectName}`;
+    const autoDesc = `درس ${title} في مادة ${subjectName} - شرح الدرس والملخص والاختبارات على منصة شارف التعليمية.`;
+    const autoKw = `${title}, ${subjectName}, شرح ${title}, ملخص ${title}, اختبار ${title}, منصة شارف`;
+    const lessonPath = window.location.pathname;
+    fetch(`/api/seo?path=${encodeURIComponent(lessonPath)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && (data.title || data.description)) {
+          setPageMeta({
+            title: data.title || autoTitle,
+            description: data.description || autoDesc,
+            keywords: data.keywords || autoKw,
+            ogTitle: data.ogTitle,
+            ogDescription: data.ogDescription,
+            ogImage: data.ogImage,
+          });
+        } else {
+          setPageMeta(autoTitle, autoDesc, autoKw);
+        }
+      })
+      .catch(() => setPageMeta(autoTitle, autoDesc, autoKw));
   }, [currentLesson, subjectName, lessonTitlesFromApi]);
 
   const toggleSemester = (semesterId: string) => {

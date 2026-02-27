@@ -486,12 +486,24 @@ function getAllSeoPaths() {
     { value: "/admin", label: "\u0644\u0648\u062D\u0629 \u062A\u062D\u0643\u0645 \u0627\u0644\u0625\u062F\u0627\u0631\u0629", searchText: "\u0644\u0648\u062D\u0629 \u062A\u062D\u0643\u0645 \u0627\u0644\u0625\u062F\u0627\u0631\u0629 \u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0645\u062F\u064A\u0631", type: "general", group: "\u0635\u0641\u062D\u0627\u062A \u0639\u0627\u0645\u0629" },
     { value: "/stage/elementary", label: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u0627\u0628\u062A\u062F\u0627\u0626\u064A\u0629", searchText: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u0627\u0628\u062A\u062F\u0627\u0626\u064A\u0629 \u0627\u0628\u062A\u062F\u0627\u0626\u064A", type: "stage", group: "\u0627\u0644\u0645\u0631\u0627\u062D\u0644" },
     { value: "/stage/middle", label: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u0645\u062A\u0648\u0633\u0637\u0629", searchText: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u0645\u062A\u0648\u0633\u0637\u0629 \u0645\u062A\u0648\u0633\u0637 \u0623\u0648\u0644 \u0645\u062A\u0648\u0633\u0637 \u062B\u0627\u0646\u064A \u0645\u062A\u0648\u0633\u0637", type: "stage", group: "\u0627\u0644\u0645\u0631\u0627\u062D\u0644" },
-    { value: "/stage/high", label: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u062B\u0627\u0646\u0648\u064A\u0629", searchText: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u062B\u0627\u0646\u0648\u064A\u0629 \u062B\u0627\u0646\u0648\u064A \u0623\u0648\u0644 \u062B\u0627\u0646\u0648\u064A \u062B\u0627\u0646\u064A \u062B\u0627\u0646\u0648\u064A", type: "stage", group: "\u0627\u0644\u0645\u0631\u0627\u062D\u0644" },
-    { value: "/lesson/elementary/math", label: "\u0631\u064A\u0627\u0636\u064A\u0627\u062A - \u0627\u0628\u062A\u062F\u0627\u0626\u064A", searchText: "\u0631\u064A\u0627\u0636\u064A\u0627\u062A \u0627\u0628\u062A\u062F\u0627\u0626\u064A \u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u0627\u0628\u062A\u062F\u0627\u0626\u064A\u0629", type: "lesson", group: "\u0627\u0644\u0631\u064A\u0627\u0636\u064A\u0627\u062A" },
-    { value: "/lesson/middle/math", label: "\u0631\u064A\u0627\u0636\u064A\u0627\u062A - \u0645\u062A\u0648\u0633\u0637", searchText: "\u0631\u064A\u0627\u0636\u064A\u0627\u062A \u0645\u062A\u0648\u0633\u0637 \u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u0645\u062A\u0648\u0633\u0637\u0629 \u0623\u0648\u0644 \u0645\u062A\u0648\u0633\u0637", type: "lesson", group: "\u0627\u0644\u0631\u064A\u0627\u0636\u064A\u0627\u062A" },
-    { value: "/lesson/high/math", label: "\u0631\u064A\u0627\u0636\u064A\u0627\u062A - \u062B\u0627\u0646\u0648\u064A", searchText: "\u0631\u064A\u0627\u0636\u064A\u0627\u062A \u062B\u0627\u0646\u0648\u064A \u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u062B\u0627\u0646\u0648\u064A\u0629 \u0623\u0648\u0644 \u062B\u0627\u0646\u0648\u064A", type: "lesson", group: "\u0627\u0644\u0631\u064A\u0627\u0636\u064A\u0627\u062A" }
+    { value: "/stage/high", label: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u062B\u0627\u0646\u0648\u064A\u0629", searchText: "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u062B\u0627\u0646\u0648\u064A\u0629 \u062B\u0627\u0646\u0648\u064A \u0623\u0648\u0644 \u062B\u0627\u0646\u0648\u064A \u062B\u0627\u0646\u064A \u062B\u0627\u0646\u0648\u064A", type: "stage", group: "\u0627\u0644\u0645\u0631\u0627\u062D\u0644" }
   ];
+  const subjectPathsSet = /* @__PURE__ */ new Set();
+  const subjectPaths = [];
   const lessons = getAllLessons();
+  for (const l of lessons) {
+    const subjectKey = `${l.stageSlug}/${l.subjectSlug}`;
+    if (!subjectPathsSet.has(subjectKey)) {
+      subjectPathsSet.add(subjectKey);
+      subjectPaths.push({
+        value: `/lesson/${l.stageSlug}/${l.subjectSlug}`,
+        label: `${l.subject} \u2014 ${l.stage}`,
+        searchText: `${l.subject} ${l.stage} ${l.gradeName} \u0645\u0627\u062F\u0629`,
+        type: "lesson",
+        group: `\u0627\u0644\u0645\u0648\u0627\u062F - ${l.stage}`
+      });
+    }
+  }
   const lessonPaths = lessons.map((l) => {
     const shortLabel = `${l.title} \u2014 ${l.subject} (${l.gradeName} ${l.stage})`;
     const searchText = [l.title, l.subject, l.stage, l.gradeName, l.semesterName, l.chapterName].filter(Boolean).join(" ");
@@ -503,7 +515,7 @@ function getAllSeoPaths() {
       group: l.subject
     };
   });
-  return [...staticPaths, ...lessonPaths];
+  return [...staticPaths, ...subjectPaths, ...lessonPaths];
 }
 function getDisplayStructure() {
   const out = {};

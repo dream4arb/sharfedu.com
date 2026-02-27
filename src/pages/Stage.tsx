@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "wouter";
+import { setPageMeta } from "@/lib/seo";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
@@ -292,6 +293,31 @@ export default function Stage() {
     high: "secondary",
   };
   const urlStage = stageUrlMap[stageId || ""] || stageId || "primary";
+
+  useEffect(() => {
+    if (!stage) return;
+    const autoTitle = `${stage.title} - ${stage.subtitle}`;
+    const autoDesc = `${stage.title} في منصة شارف التعليمية. ${stage.description}. شرح تفاعلي وملخصات واختبارات لجميع المواد الدراسية.`;
+    const autoKw = `${stage.title}, دروس ${stage.title}, مواد ${stage.title}, شرح ${stage.title}, منصة شارف`;
+    const path = `/stage/${stageId}`;
+    fetch(`/api/seo?path=${encodeURIComponent(path)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && (data.title || data.description)) {
+          setPageMeta({
+            title: data.title || autoTitle,
+            description: data.description || autoDesc,
+            keywords: data.keywords || autoKw,
+            ogTitle: data.ogTitle,
+            ogDescription: data.ogDescription,
+            ogImage: data.ogImage,
+          });
+        } else {
+          setPageMeta(autoTitle, autoDesc, autoKw);
+        }
+      })
+      .catch(() => setPageMeta(autoTitle, autoDesc, autoKw));
+  }, [stageId, stage]);
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">

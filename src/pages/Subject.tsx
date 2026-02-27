@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useParams, Link } from "wouter";
+import { setPageMeta } from "@/lib/seo";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -78,13 +79,36 @@ export default function Subject() {
   const subjectData = subjectsData[stageId || ""]?.find(s => s.slug === subjectId);
   const semesters = getSemestersForSidebar(subjectData?.semesters, lessons);
 
-  // حفظ الصف والمرحلة للاستخدام في صفحة الدرس
   useEffect(() => {
     if (stageId && gradeId) {
       sessionStorage.setItem("lesson_grade", gradeId);
       sessionStorage.setItem("lesson_stage", stageId);
     }
   }, [stageId, gradeId]);
+
+  useEffect(() => {
+    const autoTitle = `${subjectName} - ${gradeName} - ${stageName}`;
+    const autoDesc = `دروس مادة ${subjectName} لطلاب ${gradeName} في ${stageName}. شرح تفاعلي وملخصات واختبارات - منصة شارف التعليمية.`;
+    const autoKw = `${subjectName}, ${gradeName}, ${stageName}, دروس ${subjectName}, شرح ${subjectName}, منصة شارف`;
+    const path = `/lesson/${stageId}/${subjectId}`;
+    fetch(`/api/seo?path=${encodeURIComponent(path)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && (data.title || data.description)) {
+          setPageMeta({
+            title: data.title || autoTitle,
+            description: data.description || autoDesc,
+            keywords: data.keywords || autoKw,
+            ogTitle: data.ogTitle,
+            ogDescription: data.ogDescription,
+            ogImage: data.ogImage,
+          });
+        } else {
+          setPageMeta(autoTitle, autoDesc, autoKw);
+        }
+      })
+      .catch(() => setPageMeta(autoTitle, autoDesc, autoKw));
+  }, [stageId, gradeId, subjectId, subjectName, gradeName, stageName]);
   
   // Get subject icon
   const SubjectIcon = subjectData?.icon || Calculator;
