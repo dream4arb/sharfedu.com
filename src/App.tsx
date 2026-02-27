@@ -23,6 +23,7 @@ const RegisterPage = lazy(() => import("@/pages/auth/RegisterPage"));
 const ForgotPasswordPage = lazy(() => import("@/pages/auth/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
 const Features = lazy(() => import("@/pages/Features"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 function ScrollToTop() {
@@ -103,6 +104,7 @@ function Router() {
           <Route path="/stage/:stageId" component={Stage} />
           <Route path="/lesson/:stage/:subject/:lessonId?" component={Lesson} />
           <Route path="/pdf-viewer" component={PdfViewer} />
+          <Route path="/privacy" component={PrivacyPolicy} />
           <Route component={NotFound} />
         </Switch>
       </Suspense>

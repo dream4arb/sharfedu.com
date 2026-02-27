@@ -89,7 +89,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-white/60 transition-colors flex items-center gap-2 hover-elevate" data-testid="footer-link-privacy">
+                <Link href="/privacy" className="text-white/60 transition-colors flex items-center gap-2 hover-elevate" data-testid="footer-link-privacy">
                   <span className="w-1 h-1 rounded-full bg-primary" />سياسة الخصوصية
                 </Link>
               </li>
