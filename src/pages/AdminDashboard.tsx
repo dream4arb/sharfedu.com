@@ -570,8 +570,6 @@ export default function AdminDashboard() {
     }
   }, [activeSection, seoPaths.length]);
 
-  const [sitemapGenerating, setSitemapGenerating] = useState(false);
-
   const loadSitemapInfo = async () => {
     setSitemapLoading(true);
     try {
@@ -581,21 +579,6 @@ export default function AdminDashboard() {
       setSitemapInfo(null);
     } finally {
       setSitemapLoading(false);
-    }
-  };
-
-  const generateSitemap = async () => {
-    setSitemapGenerating(true);
-    try {
-      const result = await fetchAdmin<{ success: boolean; totalUrls: number }>("/api/admin/generate-sitemap", { method: "POST" });
-      if (result?.success) {
-        toast({ title: "تم توليد خريطة الموقع بنجاح", description: `${result.totalUrls} رابط تم تحديثه` });
-        await loadSitemapInfo();
-      }
-    } catch (e: unknown) {
-      toast({ title: "خطأ", description: (e as Error)?.message || "فشل في توليد خريطة الموقع", variant: "destructive" });
-    } finally {
-      setSitemapGenerating(false);
     }
   };
 
@@ -1897,10 +1880,6 @@ export default function AdminDashboard() {
                                 <Button variant="outline" size="sm" onClick={loadSitemapInfo} disabled={sitemapLoading} data-testid="button-refresh-sitemap">
                                   <RefreshCw className={`w-4 h-4 ml-2 ${sitemapLoading ? "animate-spin" : ""}`} />
                                   معاينة
-                                </Button>
-                                <Button size="sm" onClick={generateSitemap} disabled={sitemapGenerating} data-testid="button-generate-sitemap">
-                                  {sitemapGenerating ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Save className="w-4 h-4 ml-2" />}
-                                  توليد ونشر
                                 </Button>
                               </div>
                             </div>

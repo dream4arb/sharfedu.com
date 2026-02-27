@@ -107,16 +107,6 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.send(content);
   });
 
-  app.post("/api/admin/generate-sitemap", requireAdmin, async (req, res) => {
-    try {
-      const { generateSitemapFiles } = await import("./lib/sitemapGenerator");
-      const result = await generateSitemapFiles();
-      res.json({ success: true, ...result });
-    } catch (e: any) {
-      console.error("Generate sitemap error:", e);
-      res.status(500).json({ error: e.message || "Failed to generate sitemap" });
-    }
-  });
 
   app.get("/api/admin/sitemap-info", requireAdmin, async (req, res) => {
     try {
