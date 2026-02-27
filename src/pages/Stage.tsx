@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "wouter";
 import { setPageMeta } from "@/lib/seo";
+import { InlineSeoEditor } from "@/components/admin/InlineSeoEditor";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
@@ -350,6 +351,15 @@ export default function Stage() {
               </div>
             </motion.div>
           </div>
+        </div>
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-14 relative z-10 mb-4">
+          <InlineSeoEditor
+            pagePath={`/stage/${stageId}`}
+            autoTitle={`${stage.title} - ${stage.subtitle}`}
+            autoDescription={`${stage.title} في منصة شارف التعليمية. ${stage.description}. شرح تفاعلي وملخصات واختبارات لجميع المواد الدراسية.`}
+            autoKeywords={`${stage.title}, دروس ${stage.title}, مواد ${stage.title}, منصة شارف`}
+          />
         </div>
 
         {/* المواد - تصميم بطاقات زجاجية عصري */}

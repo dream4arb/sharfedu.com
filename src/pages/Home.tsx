@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { setPageMeta, DEFAULT_SEO } from "@/lib/seo";
+import { InlineSeoEditor } from "@/components/admin/InlineSeoEditor";
 import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/home/Hero";
 import { SearchBar } from "@/components/home/SearchBar";
@@ -35,6 +36,14 @@ export default function Home() {
     <div className="min-h-screen bg-background" dir="rtl">
       <Navbar />
       <main>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-2">
+          <InlineSeoEditor
+            pagePath="/"
+            autoTitle={DEFAULT_SEO.title}
+            autoDescription={DEFAULT_SEO.description}
+            autoKeywords={DEFAULT_SEO.keywords}
+          />
+        </div>
         <Hero />
         <SearchBar />
         <StageSelector />

@@ -33,11 +33,13 @@ import {
   X,
   BookOpen,
 } from "lucide-react";
+import { InlineSeoEditor } from "./InlineSeoEditor";
 
 interface InlineAdminToolbarProps {
   lessonId: string;
   lessonTitle: string;
   subjectName?: string;
+  pagePath?: string;
 }
 
 interface CmsContentItem {
@@ -52,6 +54,7 @@ export function InlineAdminToolbar({
   lessonId,
   lessonTitle,
   subjectName,
+  pagePath,
 }: InlineAdminToolbarProps) {
   const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -830,6 +833,15 @@ export function InlineAdminToolbar({
           </div>
         )}
       </Card>
+
+      {pagePath && (
+        <InlineSeoEditor
+          pagePath={pagePath}
+          autoTitle={`${lessonTitle} - ${subjectName || ""}`}
+          autoDescription={`درس ${lessonTitle} في مادة ${subjectName || ""} - شرح الدرس والملخص والاختبارات على منصة شارف التعليمية.`}
+          autoKeywords={`${lessonTitle}, ${subjectName || ""}, شرح ${lessonTitle}, ملخص ${lessonTitle}, منصة شارف`}
+        />
+      )}
 
       <Dialog
         open={confirmDialog.open}

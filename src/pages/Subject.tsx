@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useParams, Link } from "wouter";
 import { setPageMeta } from "@/lib/seo";
+import { InlineSeoEditor } from "@/components/admin/InlineSeoEditor";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -146,6 +147,13 @@ export default function Subject() {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-foreground font-medium">{gradeName} - {subjectName}</span>
           </div>
+
+          <InlineSeoEditor
+            pagePath={`/lesson/${stageId}/${subjectId}`}
+            autoTitle={`${subjectName} - ${gradeName} - ${stageName}`}
+            autoDescription={`دروس مادة ${subjectName} لطلاب ${gradeName} في ${stageName}. شرح تفاعلي وملخصات واختبارات - منصة شارف التعليمية.`}
+            autoKeywords={`${subjectName}, ${gradeName}, ${stageName}, دروس ${subjectName}, شرح ${subjectName}, منصة شارف`}
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

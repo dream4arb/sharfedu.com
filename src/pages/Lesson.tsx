@@ -1622,6 +1622,7 @@ export default function Lesson() {
                   lessonId={lessonId}
                   lessonTitle={getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}
                   subjectName={subjectName}
+                  pagePath={window.location.pathname}
                 />
               )}
               {attachmentView !== null ? (
