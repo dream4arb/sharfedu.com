@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>زوايا المضلع - شارف</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Tajawal', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.8; }
+
+.header { background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%); color: white; padding: 40px 24px; text-align: center; position: relative; overflow: hidden; }
+.header::before { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+.header::after { content: ''; position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+.header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; position: relative; z-index: 1; }
+.header .meta { font-size: 0.95rem; opacity: 0.85; position: relative; z-index: 1; }
+.header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+
+.section { background: white; border-radius: 16px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+.section-title { font-size: 1.3rem; font-weight: 700; color: #0d9488; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.section-title .icon { width: 36px; height: 36px; background: linear-gradient(135deg, #0d9488, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; }
+
+.summary-list { list-style: none; }
+.summary-list li { padding: 10px 16px; margin-bottom: 8px; background: #f0fdfa; border-radius: 10px; border-right: 4px solid #0d9488; font-size: 0.95rem; }
+
+.explanation-block { margin-bottom: 16px; padding: 16px; background: #fafafa; border-radius: 12px; border: 1px solid #f1f5f9; }
+.explanation-block h3 { color: #334155; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.explanation-block p { color: #475569; font-size: 0.95rem; }
+
+.formula-card { background: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%); border: 2px solid #99f6e4; border-radius: 14px; padding: 20px; margin-bottom: 14px; text-align: center; }
+.formula-name { font-weight: 700; color: #0d9488; font-size: 1rem; margin-bottom: 8px; }
+.formula-math { font-size: 1.4rem; font-weight: 800; color: #0f172a; background: white; display: inline-block; padding: 8px 24px; border-radius: 10px; margin: 8px 0; direction: ltr; border: 1px solid #e2e8f0; }
+.formula-desc { font-size: 0.85rem; color: #64748b; margin-top: 6px; }
+
+.example-card { background: #fffbeb; border: 1px solid #fde68a; border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+.example-q { font-weight: 700; color: #92400e; margin-bottom: 12px; font-size: 1rem; }
+.example-steps { list-style: none; counter-reset: step; }
+.example-steps li { counter-increment: step; padding: 8px 12px; margin-bottom: 6px; background: white; border-radius: 8px; font-size: 0.9rem; position: relative; padding-right: 40px; }
+.example-steps li::before { content: counter(step); position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: #f59e0b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
+.example-answer { margin-top: 10px; padding: 10px 16px; background: #065f46; color: white; border-radius: 10px; font-weight: 700; font-size: 0.95rem; }
+
+.quiz-card { background: white; border: 2px solid #e2e8f0; border-radius: 14px; padding: 22px; margin-bottom: 16px; transition: border-color 0.3s; }
+.quiz-card.correct { border-color: #10b981; background: #f0fdf4; }
+.quiz-card.wrong { border-color: #ef4444; background: #fef2f2; }
+.quiz-q { font-weight: 700; font-size: 1rem; margin-bottom: 14px; color: #1e293b; }
+.quiz-q .q-num { display: inline-block; background: linear-gradient(135deg, #0d9488, #0891b2); color: white; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-size: 0.85rem; margin-left: 8px; }
+.quiz-options { list-style: none; }
+.quiz-options li { padding: 12px 16px; margin-bottom: 8px; border-radius: 10px; border: 2px solid #e2e8f0; cursor: pointer; font-size: 0.95rem; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+.quiz-options li:hover { border-color: #0d9488; background: #f0fdfa; }
+.quiz-options li.selected { border-color: #0d9488; background: #f0fdfa; font-weight: 600; }
+.quiz-options li.correct-answer { border-color: #10b981; background: #dcfce7; }
+.quiz-options li.wrong-answer { border-color: #ef4444; background: #fee2e2; }
+.quiz-options li .letter { width: 28px; height: 28px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #64748b; flex-shrink: 0; }
+.quiz-explanation { margin-top: 12px; padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; display: none; }
+.quiz-explanation.show { display: block; }
+.quiz-explanation.correct-exp { background: #dcfce7; color: #065f46; border: 1px solid #86efac; }
+.quiz-explanation.wrong-exp { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+.tf-options { display: flex; gap: 12px; margin-bottom: 8px; }
+.tf-btn { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #e2e8f0; cursor: pointer; font-family: 'Tajawal', sans-serif; font-size: 1rem; font-weight: 600; background: white; transition: all 0.2s; }
+.tf-btn:hover { border-color: #0d9488; }
+.tf-btn.selected { border-color: #0d9488; background: #f0fdfa; }
+.tf-btn.correct-answer { border-color: #10b981; background: #dcfce7; }
+.tf-btn.wrong-answer { border-color: #ef4444; background: #fee2e2; }
+
+.score-bar { background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; text-align: center; display: none; }
+.score-bar h2 { font-size: 1.3rem; color: #0d9488; margin-bottom: 12px; }
+.score-bar .score { font-size: 2.5rem; font-weight: 800; color: #0f172a; }
+.score-bar .score span { color: #0d9488; }
+.progress-bar { width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; margin-top: 12px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #0d9488, #0891b2); border-radius: 6px; transition: width 0.5s ease; }
+
+.check-btn { display: block; width: 100%; padding: 14px; background: linear-gradient(135deg, #0d9488, #0891b2); color: white; border: none; border-radius: 12px; font-family: 'Tajawal', sans-serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 20px; transition: opacity 0.2s; }
+.check-btn:hover { opacity: 0.9; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>زوايا المضلع</h1>
+  <div class="meta">الرياضيات — الصف الأول الثانوي</div>
+  <div class="badge">شارف AI ✨</div>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-title"><div class="icon">📌</div> ملخص الدرس</div>
+    <ul class="summary-list">
+      <li>تعريف القطر في المضلع كقطعة مستقيمة تصل بين رأسين غير متتاليين.</li><li>كيفية حساب مجموع قياسات الزوايا الداخلية لأي مضلع محدب باستخدام عدد أضلاعه (n-2) × 180°.</li><li>كيفية إيجاد قياس الزاوية الداخلية الواحدة لمضلع منتظم بقسمة مجموع الزوايا الداخلية على عدد الأضلاع.</li><li>كيفية إيجاد عدد أضلاع المضلع المنتظم إذا عُلم قياس إحدى زواياه الداخلية.</li><li>تعريف الزاوية الخارجية للمضلع كزاوية محصورة بين أحد الأضلاع وامتداد الضلع المجاور.</li><li>مجموع قياسات الزوايا الخارجية لأي مضلع محدب هو قيمة ثابتة (360 درجة).</li><li>كيفية إيجاد قياس الزاوية الخارجية الواحدة لمضلع منتظم بقسمة 360 درجة على عدد الأضلاع.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><div class="icon">📖</div> الشرح التفصيلي</div>
+    
+      <div class="explanation-block">
+        <h3>مفاهيم أساسية حول المضلعات</h3>
+        <p>المضلع هو شكل مغلق يتكون من ثلاث قطع مستقيمة أو أكثر، تلتقي كل قطعة بطرفي قطعتين أخريين، ولا تقع أي قطعتين منها على استقامة واحدة. المضلع المحدب هو مضلع يكون قياس أي من زواياه الداخلية أقل من 180 درجة، ولا يقطع امتداد أي ضلع فيه أي ضلع آخر من أضلاع المضلع. المضلع المنتظم هو مضلع محدب جميع أضلاعه متطابقة وجميع زواياه متطابقة. القطر هو قطعة مستقيمة تصل بين أي رأسين غير متتاليين في المضلع.</p>
+      </div>
+    
+      <div class="explanation-block">
+        <h3>مجموع قياسات الزوايا الداخلية للمضلع</h3>
+        <p>يمكن تقسيم أي مضلع محدب إلى مثلثات عن طريق رسم جميع الأقطار الممكنة من رأس واحد. عدد المثلثات المتكونة دائماً أقل باثنين من عدد أضلاع المضلع (n-2). بما أن مجموع قياسات زوايا المثلث الواحد 180 درجة، فإن مجموع قياسات الزوايا الداخلية للمضلع هو حاصل ضرب عدد المثلثات في 180 درجة. على سبيل المثال، في خماسي (n=5)، يمكن رسم 3 أقطار من رأس واحد لتقسيمه إلى 3 مثلثات. مجموع الزوايا الداخلية = 3 × 180° = 540°.</p>
+      </div>
+    
+      <div class="explanation-block">
+        <h3>قياس الزاوية الداخلية لمضلع منتظم</h3>
+        <p>في المضلع المنتظم، تكون جميع الزوايا الداخلية متطابقة. لإيجاد قياس الزاوية الداخلية الواحدة لمضلع منتظم، نقسم مجموع قياسات الزوايا الداخلية على عدد الأضلاع (أو عدد الزوايا).</p>
+      </div>
+    
+      <div class="explanation-block">
+        <h3>إيجاد عدد أضلاع المضلع المنتظم</h3>
+        <p>إذا علم قياس الزاوية الداخلية الواحدة لمضلع منتظم، يمكننا استخدام صيغة مجموع الزوايا الداخلية لإنشاء معادلة وحلها لإيجاد عدد الأضلاع (n). طريقة بديلة هي إيجاد قياس الزاوية الخارجية (180° - الزاوية الداخلية)، ثم استخدام صيغة الزاوية الخارجية للمضلع المنتظم (360°/n) لإيجاد n.</p>
+      </div>
+    
+      <div class="explanation-block">
+        <h3>مجموع قياسات الزوايا الخارجية للمضلع</h3>
+        <p>الزاوية الخارجية هي الزاوية المحصورة بين أحد أضلاع المضلع وامتداد الضلع المجاور له. مجموع قياسات الزوايا الخارجية لأي مضلع محدب، بأخذ زاوية واحدة عند كل رأس، يساوي دائماً 360 درجة، بغض النظر عن عدد أضلاع المضلع.</p>
+      </div>
+    
+      <div class="explanation-block">
+        <h3>قياس الزاوية الخارجية لمضلع منتظم</h3>
+        <p>في المضلع المنتظم، تكون جميع الزوايا الخارجية متطابقة. لإيجاد قياس الزاوية الخارجية الواحدة، نقسم 360 درجة على عدد الأضلاع (n). تجدر الإشارة إلى أن الزاوية الداخلية والزاوية الخارجية عند نفس الرأس متكاملتان (مجموعهما 180 درجة).</p>
+      </div>
+    
+  </div>
+
+  <div class="section">
+    <div class="section-title"><div class="icon">📐</div> القوانين والقواعد</div>
+    
+      <div class="formula-card">
+        <div class="formula-name">مجموع قياسات الزوايا الداخلية للمضلع</div>
+        <div class="formula-math">S = (n - 2) × 180°</div>
+        <div class="formula-desc">حيث S هو مجموع قياسات الزوايا الداخلية، و n هو عدد أضلاع المضلع.</div>
+      </div>
+    
+      <div class="formula-card">
+        <div class="formula-name">قياس الزاوية الداخلية لمضلع منتظم</div>
+        <div class="formula-math">A_int = [(n - 2) × 180°] / n</div>
+        <div class="formula-desc">حيث A_int هو قياس الزاوية الداخلية الواحدة، و n هو عدد أضلاع المضلع المنتظم.</div>
+      </div>
+    
+      <div class="formula-card">
+        <div class="formula-name">مجموع قياسات الزوايا الخارجية للمضلع</div>
+        <div class="formula-math">S_ext = 360°</div>
+        <div class="formula-desc">مجموع قياسات الزوايا الخارجية لأي مضلع محدب هو دائماً 360 درجة.</div>
+      </div>
+    
+      <div class="formula-card">
+        <div class="formula-name">قياس الزاوية الخارجية لمضلع منتظم</div>
+        <div class="formula-math">A_ext = 360° / n</div>
+        <div class="formula-desc">حيث A_ext هو قياس الزاوية الخارجية الواحدة، و n هو عدد أضلاع المضلع المنتظم.</div>
+      </div>
+    
+  </div>
+
+  <div class="section">
+    <div class="section-title"><div class="icon">💡</div> أمثلة محلولة</div>
+    
+      <div class="example-card">
+        <div class="example-q">أوجد مجموع قياسات الزوايا الداخلية لسباعي محدب.</div>
+        <ol class="example-steps">
+          <li>السباعي له 7 أضلاع، إذن n = 7.</li><li>استخدم قانون مجموع قياسات الزوايا الداخلية: S = (n - 2) × 180°.</li><li>عوض بقيمة n: S = (7 - 2) × 180°.</li><li>احسب: S = 5 × 180° = 900°.</li>
+        </ol>
+        <div class="example-answer">الإجابة: 900 درجة.</div>
+      </div>
+    
+      <div class="example-card">
+        <div class="example-q">أوجد قياسات جميع الزوايا الداخلية للرباعي المجاور إذا كانت زواياه 3x, 90°, 90°, x.</div>
+        <ol class="example-steps">
+          <li>الشكل رباعي، إذن n = 4.</li><li>مجموع قياسات الزوايا الداخلية للرباعي = (4 - 2) × 180° = 360°.</li><li>اجمع قياسات الزوايا المعطاة وساوها بالمجموع: 3x + 90° + 90° + x = 360°.</li><li>بسط المعادلة: 4x + 180° = 360°.</li><li>اطرح 180° من الطرفين: 4x = 180°.</li><li>اقسم على 4: x = 45°.</li><li>أوجد قياس كل زاوية: m∠A = 3x = 3(45°) = 135°، m∠B = 90°، m∠C = 90°، m∠D = x = 45°.</li>
+        </ol>
+        <div class="example-answer">الإجابة: الزوايا هي 135°، 90°، 90°، 45°.</div>
+      </div>
+    
+      <div class="example-card">
+        <div class="example-q">أوجد قياس الزاوية الداخلية لسجادة على شكل ثماني منتظم.</div>
+        <ol class="example-steps">
+          <li>الثماني المنتظم له 8 أضلاع، إذن n = 8.</li><li>أوجد مجموع قياسات الزوايا الداخلية: S = (8 - 2) × 180° = 6 × 180° = 1080°.</li><li>لإيجاد قياس الزاوية الداخلية الواحدة، اقسم المجموع على عدد الأضلاع: A_int = 1080° / 8.</li><li>احسب: A_int = 135°.</li>
+        </ol>
+        <div class="example-answer">الإجابة: 135 درجة.</div>
+      </div>
+    
+      <div class="example-card">
+        <div class="example-q">إذا كان قياس الزاوية الداخلية لمضلع منتظم يساوي 144°، فأوجد عدد أضلاعه.</div>
+        <ol class="example-steps">
+          <li>استخدم قانون قياس الزاوية الداخلية لمضلع منتظم: A_int = [(n - 2) × 180°] / n.</li><li>عوض بقيمة A_int: 144 = [(n - 2) × 180] / n.</li><li>اضرب الطرفين في n: 144n = (n - 2) × 180.</li><li>وزع 180: 144n = 180n - 360.</li><li>اطرح 180n من الطرفين: -36n = -360.</li><li>اقسم على -36: n = 10.</li>
+        </ol>
+        <div class="example-answer">الإجابة: 10 أضلاع (عشاري).</div>
+      </div>
+    
+      <div class="example-card">
+        <div class="example-q">أوجد قيمة x في الشكل المجاور الذي يمثل زوايا خارجية: (2x-5)°, 5x°, 2x°, (6x-5)°, (3x+10)°.</div>
+        <ol class="example-steps">
+          <li>مجموع قياسات الزوايا الخارجية لأي مضلع محدب هو 360°.</li><li>اجمع قياسات الزوايا الخارجية المعطاة وساوها بـ 360°: (2x-5) + 5x + 2x + (6x-5) + (3x+10) = 360.</li><li>اجمع الحدود المتشابهة (حدود x والثوابت): (2x + 5x + 2x + 6x + 3x) + (-5 - 5 + 10) = 360.</li><li>بسط المعادلة: 18x + 0 = 360.</li><li>اقسم على 18: x = 20.</li>
+        </ol>
+        <div class="example-answer">الإجابة: x = 20.</div>
+      </div>
+    
+  </div>
+
+  <div class="section">
+    <div class="section-title"><div class="icon">❓</div> اختبر نفسك</div>
+    <div id="scoreBar" class="score-bar">
+      <h2>نتيجتك</h2>
+      <div class="score"><span id="scoreNum">0</span> / 10</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div id="quizContainer">
+    
+          <div class="quiz-card" data-correct="0" data-type="mcq" id="q0">
+            <div class="quiz-q"><span class="q-num">1</span> مجموع قياسات الزوايا الداخلية لمضلع له 10 أضلاع هو:</div>
+            <ul class="quiz-options">
+              
+                <li onclick="selectOption(this, 0)" data-index="0">
+                  <span class="letter">أ</span> 1440°
+                </li>
+              
+                <li onclick="selectOption(this, 0)" data-index="1">
+                  <span class="letter">ب</span> 1800°
+                </li>
+              
+                <li onclick="selectOption(this, 0)" data-index="2">
+                  <span class="letter">ج</span> 1080°
+                </li>
+              
+                <li onclick="selectOption(this, 0)" data-index="3">
+                  <span class="letter">د</span> 1260°
+                </li>
+              
+            </ul>
+            <div class="quiz-explanation" id="exp0">باستخدام القانون S = (n-2) × 180°، حيث n=10. S = (10-2) × 180° = 8 × 180° = 1440°.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="1" data-type="mcq" id="q1">
+            <div class="quiz-q"><span class="q-num">2</span> قياس الزاوية الداخلية لمضلع منتظم ذي 9 أضلاع (تساعي منتظم) هو:</div>
+            <ul class="quiz-options">
+              
+                <li onclick="selectOption(this, 1)" data-index="0">
+                  <span class="letter">أ</span> 120°
+                </li>
+              
+                <li onclick="selectOption(this, 1)" data-index="1">
+                  <span class="letter">ب</span> 140°
+                </li>
+              
+                <li onclick="selectOption(this, 1)" data-index="2">
+                  <span class="letter">ج</span> 150°
+                </li>
+              
+                <li onclick="selectOption(this, 1)" data-index="3">
+                  <span class="letter">د</span> 160°
+                </li>
+              
+            </ul>
+            <div class="quiz-explanation" id="exp1">مجموع الزوايا الداخلية = (9-2) × 180° = 7 × 180° = 1260°. قياس الزاوية الواحدة = 1260° / 9 = 140°.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="false" data-type="tf" id="q2">
+            <div class="quiz-q"><span class="q-num">3</span> مجموع قياسات الزوايا الخارجية لمضلع محدب ذي 5 أضلاع هو 540°.</div>
+            <div class="tf-options">
+              <button class="tf-btn" onclick="selectTF(this, 2, true)">✓ صح</button>
+              <button class="tf-btn" onclick="selectTF(this, 2, false)">✗ خطأ</button>
+            </div>
+            <div class="quiz-explanation" id="exp2">مجموع قياسات الزوايا الخارجية لأي مضلع محدب هو دائماً 360°، بغض النظر عن عدد الأضلاع.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="2" data-type="mcq" id="q3">
+            <div class="quiz-q"><span class="q-num">4</span> إذا كان قياس الزاوية الخارجية لمضلع منتظم هو 45°، فما عدد أضلاع هذا المضلع؟</div>
+            <ul class="quiz-options">
+              
+                <li onclick="selectOption(this, 3)" data-index="0">
+                  <span class="letter">أ</span> 6
+                </li>
+              
+                <li onclick="selectOption(this, 3)" data-index="1">
+                  <span class="letter">ب</span> 7
+                </li>
+              
+                <li onclick="selectOption(this, 3)" data-index="2">
+                  <span class="letter">ج</span> 8
+                </li>
+              
+                <li onclick="selectOption(this, 3)" data-index="3">
+                  <span class="letter">د</span> 9
+                </li>
+              
+            </ul>
+            <div class="quiz-explanation" id="exp3">باستخدام القانون A_ext = 360° / n، إذن n = 360° / A_ext = 360° / 45° = 8.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="1" data-type="mcq" id="q4">
+            <div class="quiz-q"><span class="q-num">5</span> أي من العبارات التالية تصف 'القطر' بشكل صحيح؟</div>
+            <ul class="quiz-options">
+              
+                <li onclick="selectOption(this, 4)" data-index="0">
+                  <span class="letter">أ</span> قطعة مستقيمة تصل بين رأسين متتاليين في المضلع.
+                </li>
+              
+                <li onclick="selectOption(this, 4)" data-index="1">
+                  <span class="letter">ب</span> قطعة مستقيمة تصل بين رأسين غير متتاليين في المضلع.
+                </li>
+              
+                <li onclick="selectOption(this, 4)" data-index="2">
+                  <span class="letter">ج</span> ضلع من أضلاع المضلع.
+                </li>
+              
+                <li onclick="selectOption(this, 4)" data-index="3">
+                  <span class="letter">د</span> خط يمر بمركز المضلع.
+                </li>
+              
+            </ul>
+            <div class="quiz-explanation" id="exp4">القطر هو قطعة مستقيمة تصل بين أي رأسين غير متتاليين في المضلع.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="false" data-type="tf" id="q5">
+            <div class="quiz-q"><span class="q-num">6</span> المضلع المنتظم هو مضلع جميع أضلاعه متطابقة فقط.</div>
+            <div class="tf-options">
+              <button class="tf-btn" onclick="selectTF(this, 5, true)">✓ صح</button>
+              <button class="tf-btn" onclick="selectTF(this, 5, false)">✗ خطأ</button>
+            </div>
+            <div class="quiz-explanation" id="exp5">المضلع المنتظم هو مضلع جميع أضلاعه متطابقة وجميع زواياه متطابقة.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="0" data-type="mcq" id="q6">
+            <div class="quiz-q"><span class="q-num">7</span> في مضلع رباعي، إذا كانت قياسات ثلاث زوايا هي 80°، 95°، 110°، فما قياس الزاوية الرابعة؟</div>
+            <ul class="quiz-options">
+              
+                <li onclick="selectOption(this, 6)" data-index="0">
+                  <span class="letter">أ</span> 75°
+                </li>
+              
+                <li onclick="selectOption(this, 6)" data-index="1">
+                  <span class="letter">ب</span> 80°
+                </li>
+              
+                <li onclick="selectOption(this, 6)" data-index="2">
+                  <span class="letter">ج</span> 85°
+                </li>
+              
+                <li onclick="selectOption(this, 6)" data-index="3">
+                  <span class="letter">د</span> 90°
+                </li>
+              
+            </ul>
+            <div class="quiz-explanation" id="exp6">مجموع قياسات الزوايا الداخلية للرباعي هو 360°. مجموع الزوايا المعطاة = 80° + 95° + 110° = 285°. الزاوية الرابعة = 360° - 285° = 75°.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="2" data-type="mcq" id="q7">
+            <div class="quiz-q"><span class="q-num">8</span> إذا كان قياس الزاوية الداخلية لمضلع منتظم هو 160°، فما عدد أضلاعه؟</div>
+            <ul class="quiz-options">
+              
+                <li onclick="selectOption(this, 7)" data-index="0">
+                  <span class="letter">أ</span> 12
+                </li>
+              
+                <li onclick="selectOption(this, 7)" data-index="1">
+                  <span class="letter">ب</span> 15
+                </li>
+              
+                <li onclick="selectOption(this, 7)" data-index="2">
+                  <span class="letter">ج</span> 18
+                </li>
+              
+                <li onclick="selectOption(this, 7)" data-index="3">
+                  <span class="letter">د</span> 20
+                </li>
+              
+            </ul>
+            <div class="quiz-explanation" id="exp7">الزاوية الخارجية = 180° - 160° = 20°. عدد الأضلاع = 360° / 20° = 18.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="false" data-type="tf" id="q8">
+            <div class="quiz-q"><span class="q-num">9</span> يمكن تقسيم مضلع ذي n من الأضلاع إلى (n-1) مثلثات برسم أقطار من رأس واحد.</div>
+            <div class="tf-options">
+              <button class="tf-btn" onclick="selectTF(this, 8, true)">✓ صح</button>
+              <button class="tf-btn" onclick="selectTF(this, 8, false)">✗ خطأ</button>
+            </div>
+            <div class="quiz-explanation" id="exp8">يمكن تقسيمه إلى (n-2) مثلثات.</div>
+          </div>
+        
+          <div class="quiz-card" data-correct="1" data-type="mcq" id="q9">
+            <div class="quiz-q"><span class="q-num">10</span> ما مجموع قياسات الزوايا الخارجية لمضلع محدب ذي 12 ضلعاً؟</div>
+            <ul class="quiz-options">
+              
+                <li onclick="selectOption(this, 9)" data-index="0">
+                  <span class="letter">أ</span> 180°
+                </li>
+              
+                <li onclick="selectOption(this, 9)" data-index="1">
+                  <span class="letter">ب</span> 360°
+                </li>
+              
+                <li onclick="selectOption(this, 9)" data-index="2">
+                  <span class="letter">ج</span> 720°
+                </li>
+              
+                <li onclick="selectOption(this, 9)" data-index="3">
+                  <span class="letter">د</span> 1080°
+                </li>
+              
+            </ul>
+            <div class="quiz-explanation" id="exp9">مجموع قياسات الزوايا الخارجية لأي مضلع محدب هو دائماً 360°، بغض النظر عن عدد الأضلاع.</div>
+          </div>
+        
+    </div>
+    <button class="check-btn" onclick="checkAnswers()">تحقق من الإجابات</button>
+  </div>
+
+</div>
+
+<script>
+const answers = {};
+const totalQ = 10;
+
+function selectOption(el, qIndex) {
+  const card = document.getElementById('q' + qIndex);
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.quiz-options li').forEach(li => li.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qIndex] = parseInt(el.dataset.index);
+}
+
+function selectTF(el, qIndex, value) {
+  const card = document.getElementById('q' + qIndex);
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  card.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qIndex] = value;
+}
+
+function checkAnswers() {
+  let score = 0;
+  for (let i = 0; i < totalQ; i++) {
+    const card = document.getElementById('q' + i);
+    const exp = document.getElementById('exp' + i);
+    const correct = card.dataset.correct;
+    const type = card.dataset.type;
+    const userAns = answers[i];
+
+    if (userAns === undefined) continue;
+
+    let isCorrect = false;
+    if (type === 'mcq') {
+      isCorrect = userAns === parseInt(correct);
+      card.querySelectorAll('.quiz-options li').forEach(li => {
+        if (parseInt(li.dataset.index) === parseInt(correct)) li.classList.add('correct-answer');
+        else if (li.classList.contains('selected') && !isCorrect) li.classList.add('wrong-answer');
+      });
+    } else {
+      isCorrect = (userAns === (correct === 'true'));
+      card.querySelectorAll('.tf-btn').forEach(b => {
+        const btnVal = b.textContent.includes('صح');
+        if (btnVal === (correct === 'true')) b.classList.add('correct-answer');
+        else if (b.classList.contains('selected') && !isCorrect) b.classList.add('wrong-answer');
+      });
+    }
+
+    card.classList.add(isCorrect ? 'correct' : 'wrong');
+    exp.classList.add('show', isCorrect ? 'correct-exp' : 'wrong-exp');
+    if (isCorrect) score++;
+  }
+
+  const scoreBar = document.getElementById('scoreBar');
+  scoreBar.style.display = 'block';
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('progressFill').style.width = ((score / totalQ) * 100) + '%';
+  scoreBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+
+</body>
+</html>
