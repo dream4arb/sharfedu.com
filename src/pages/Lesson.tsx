@@ -2160,7 +2160,7 @@ export default function Lesson() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full"
+                    className="w-full min-h-[70vh]"
                   >
                     <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50">
                       <div className="text-center mb-4 sm:mb-6">
