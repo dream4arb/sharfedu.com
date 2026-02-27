@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowLeft, Play, Sparkles, Star, Users, BookOpen } from "lucide-react";
+import { ArrowLeft, Sparkles, Star, Users, BookOpen } from "lucide-react";
 import { Link } from "wouter";
-import { useToast } from "@/hooks/use-toast";
 import heroStudentImg from "@/assets/images/hero-student-new.jpg";
 
 const heroImageUrl = "/hero-main.webp";
 const heroImageFallback = "/hero-main.png";
 
 export function Hero() {
-  const { toast } = useToast();
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
       <div className="absolute inset-0 -z-10">
@@ -50,7 +49,7 @@ export function Hero() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Link href="/courses/1">
+              <Link href="/register">
                 <Button 
                   size="lg" 
                   className="rounded-full font-bold shadow-lg shadow-primary/25"
@@ -60,18 +59,19 @@ export function Hero() {
                   <ArrowLeft className="mr-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="rounded-full font-semibold"
-                data-testid="button-watch-video"
-                onClick={() => toast({ title: "قريباً", description: "سيتم إضافة الفيديو التعريفي في نسخة لاحقة" })}
-              >
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center ml-2">
-                  <Play className="w-3 h-3 text-primary fill-primary" />
-                </div>
-                شاهد الفيديو
-              </Button>
+              <Link href="/features">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="rounded-full font-semibold"
+                  data-testid="button-view-features"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center ml-2">
+                    <Sparkles className="w-3 h-3 text-primary" />
+                  </div>
+                  المميزات
+                </Button>
+              </Link>
             </div>
 
             <div className="flex items-center justify-center lg:justify-start gap-8">
