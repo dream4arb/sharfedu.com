@@ -84,7 +84,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#grades" className="text-white/60 transition-colors flex items-center gap-2 hover-elevate" data-testid="footer-link-grades">
+                <Link href="/stages" className="text-white/60 transition-colors flex items-center gap-2 hover-elevate" data-testid="footer-link-grades">
                   <span className="w-1 h-1 rounded-full bg-primary" />المراحل الدراسية
                 </Link>
               </li>

@@ -10,6 +10,7 @@ export async function generateSitemapFiles(): Promise<{ totalUrls: number; writt
   const staticPages = [
     { loc: "/", changefreq: "weekly", priority: "1.0" },
     { loc: "/features", changefreq: "monthly", priority: "0.8" },
+    { loc: "/stages", changefreq: "monthly", priority: "0.9" },
     { loc: "/login", changefreq: "monthly", priority: "0.5" },
     { loc: "/register", changefreq: "monthly", priority: "0.6" },
     { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
