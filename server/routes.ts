@@ -37,7 +37,6 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     const pathsToTry = [
       path.join(process.cwd(), "attached_assets", folder, filename),
       path.join(process.cwd(), "server", "public", "attached_assets", folder, filename),
-      path.join(process.cwd(), "..", "attached_assets", folder, filename),
     ];
     for (const p of pathsToTry) {
       try { await access(p); return res.sendFile(p); } catch {}

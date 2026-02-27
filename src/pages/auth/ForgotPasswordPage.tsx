@@ -4,15 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getApiUrl } from "@/lib/api-base";
-import { usePageSeo } from "@/hooks/use-page-seo";
 import { Loader2, Mail, ArrowRight } from "lucide-react";
 
 export default function ForgotPasswordPage() {
-  usePageSeo({
-    title: "استعادة كلمة المرور",
-    description: "استعد كلمة المرور الخاصة بحسابك على منصة شارف التعليمية.",
-    keywords: "استعادة كلمة المرور, نسيت كلمة المرور, شارف",
-  });
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);

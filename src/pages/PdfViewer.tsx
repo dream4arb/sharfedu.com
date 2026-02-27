@@ -2,13 +2,8 @@ import React, { useMemo } from "react";
 import { useLocation, Link } from "wouter";
 import { FileText, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePageSeo } from "@/hooks/use-page-seo";
 
 export default function PdfViewer() {
-  usePageSeo({
-    title: "عرض ملف PDF",
-    description: "عرض ملف الدرس أو الملخص بصيغة PDF - منصة شارف التعليمية.",
-  });
   const [location] = useLocation();
   const url = useMemo(() => {
     const search = location.includes("?") ? location.slice(location.indexOf("?")) : "";

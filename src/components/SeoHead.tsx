@@ -11,87 +11,62 @@ const STAGE_TITLES: Record<string, string> = {
 };
 
 const STAGE_DESCRIPTIONS: Record<string, string> = {
-  elementary: "دروس وشروحات المرحلة الابتدائية من الصف الأول إلى السادس. رياضيات، علوم، لغتي، إسلامية وغيرها - منصة شارف التعليمية.",
-  middle: "دروس وشروحات المرحلة المتوسطة من الأول إلى الثالث متوسط. رياضيات، علوم، اجتماعيات وغيرها - منصة شارف التعليمية.",
-  high: "دروس وشروحات المرحلة الثانوية والتحضير للجامعة. فيزياء، كيمياء، أحياء، رياضيات وغيرها - منصة شارف التعليمية.",
-  paths: "المسارات الأكاديمية والتخصصية للمرحلة الثانوية - إدارة أعمال، علوم صحية، حاسب آلي - منصة شارف التعليمية.",
-  qudurat: "تحضير شامل لاختبارات القدرات العامة والتحصيلي. تدريبات وأسئلة محلولة - منصة شارف التعليمية.",
+  elementary: "دروس ومواد المرحلة الابتدائية من الصف الأول إلى السادس - منصة شارف.",
+  middle: "دروس ومواد المرحلة المتوسطة - منصة شارف التعليمية.",
+  high: "دروس ومواد المرحلة الثانوية والتحضير للجامعة - منصة شارف.",
+  paths: "المسارات الأكاديمية والتخصصية - منصة شارف.",
+  qudurat: "تحضير اختبارات القدرات والتحصيلي - منصة شارف.",
 };
 
-const STAGE_KEYWORDS: Record<string, string> = {
-  elementary: "المرحلة الابتدائية, رياضيات ابتدائي, علوم ابتدائي, لغتي, شارف, تعليم, السعودية",
-  middle: "المرحلة المتوسطة, رياضيات متوسط, علوم متوسط, شارف, تعليم, السعودية",
-  high: "المرحلة الثانوية, فيزياء, كيمياء, أحياء, رياضيات ثانوي, شارف, تعليم, السعودية",
-  paths: "المسارات الثانوية, إدارة أعمال, علوم صحية, حاسب, شارف, السعودية",
-  qudurat: "القدرات العامة, التحصيلي, اختبارات القدرات, تحضير القدرات, شارف, السعودية",
-};
-
+/** تطبيق قيم افتراضية للـ SEO عند عدم وجود بيانات في قاعدة البيانات */
 function applyDefaults(path: string) {
   if (path === "/") {
     setPageMeta(DEFAULT_SEO.title, DEFAULT_SEO.description, DEFAULT_SEO.keywords);
     return;
   }
-  if (path === "/login") {
-    setPageMeta("تسجيل الدخول", "سجّل دخولك إلى منصة شارف التعليمية للوصول إلى دروسك ومتابعة تقدمك الدراسي.", DEFAULT_SEO.keywords);
-    return;
-  }
-  if (path === "/register") {
-    setPageMeta("إنشاء حساب جديد", "أنشئ حسابك المجاني على منصة شارف التعليمية وابدأ رحلتك التعليمية مع دروس تفاعلية لجميع المراحل.", DEFAULT_SEO.keywords);
-    return;
-  }
-  if (path === "/forgot-password") {
-    setPageMeta("استعادة كلمة المرور", "استعد كلمة المرور الخاصة بحسابك على منصة شارف التعليمية.", DEFAULT_SEO.keywords);
-    return;
-  }
-  if (path === "/reset-password") {
-    setPageMeta("إعادة تعيين كلمة المرور", "أدخل رمز التحقق وكلمة المرور الجديدة لإعادة تعيين حسابك.", DEFAULT_SEO.keywords);
-    return;
-  }
-  if (path === "/dashboard" || path === "/complete-profile") {
-    setPageMeta("لوحة التحكم", "لوحة تحكم الطالب - تتبع التقدم والدروس والاختبارات على منصة شارف التعليمية.", DEFAULT_SEO.keywords);
-    return;
-  }
-  if (path === "/profile") {
-    setPageMeta("الملف الشخصي", "إدارة ملفك الشخصي وإعدادات حسابك على منصة شارف التعليمية.", DEFAULT_SEO.keywords);
+  if (path === "/dashboard") {
+    setPageMeta("لوحة التحكم", "لوحة تحكم الطالب - تتبع التقدم والدروس والاختبارات على منصة شارف.", DEFAULT_SEO.keywords);
     return;
   }
   if (path === "/admin") {
-    setPageMeta("لوحة تحكم الإدارة", "إدارة المحتوى والمستخدمين والإعدادات - منصة شارف التعليمية.", DEFAULT_SEO.keywords);
+    setPageMeta("لوحة تحكم الإدارة", "إدارة المحتوى والمستخدمين والإعدادات - منصة شارف.", DEFAULT_SEO.keywords);
     return;
   }
   const coursesMatch = path.match(/^\/courses\/(.+)$/);
   if (coursesMatch) {
     const gradeLevel = coursesMatch[1];
     const title = STAGE_TITLES[gradeLevel] || "المواد الدراسية";
-    const desc = STAGE_DESCRIPTIONS[gradeLevel] || "اختر المادة وابدأ التعلم مع دروس تفاعلية وشروحات مبسّطة - منصة شارف التعليمية.";
-    const kw = STAGE_KEYWORDS[gradeLevel] || DEFAULT_SEO.keywords;
-    setPageMeta(title, desc, kw);
+    const desc = STAGE_DESCRIPTIONS[gradeLevel] || "اختر المادة وابدأ التعلم - منصة شارف.";
+    setPageMeta(title, desc, DEFAULT_SEO.keywords);
     return;
   }
   const stageMatch = path.match(/^\/stage\/(.+)$/);
   if (stageMatch) {
     const stageId = stageMatch[1];
     const title = STAGE_TITLES[stageId] || "المرحلة الدراسية";
-    const desc = STAGE_DESCRIPTIONS[stageId] || "دروس وشروحات تفاعلية لجميع المواد الدراسية - منصة شارف التعليمية.";
-    const kw = STAGE_KEYWORDS[stageId] || DEFAULT_SEO.keywords;
-    setPageMeta(title, desc, kw);
+    const desc = STAGE_DESCRIPTIONS[stageId] || "منصة شارف التعليمية.";
+    setPageMeta(title, desc, DEFAULT_SEO.keywords);
     return;
   }
   if (path.startsWith("/lesson/")) {
-    setPageMeta("الدرس", "شاهد الدرس والملخص والاختبارات التفاعلية - منصة شارف التعليمية.", DEFAULT_SEO.keywords);
+    setPageMeta("الدرس", "شاهد الدرس والملخص والاختبارات - منصة شارف.", DEFAULT_SEO.keywords);
     return;
   }
   if (path === "/pdf-viewer") {
-    setPageMeta("عرض ملف PDF", "عرض ملف الدرس أو الملخص بصيغة PDF - منصة شارف التعليمية.", DEFAULT_SEO.keywords);
+    setPageMeta("عرض PDF", "عرض الملف - منصة شارف.", DEFAULT_SEO.keywords);
     return;
   }
   if (path === "/admin/pdf-extractor") {
-    setPageMeta("استخراج PDF", "أدوات الإدارة - منصة شارف التعليمية.", DEFAULT_SEO.keywords);
+    setPageMeta("استخراج PDF", "أدوات الإدارة - منصة شارف.", DEFAULT_SEO.keywords);
     return;
   }
   setPageMeta(DEFAULT_SEO.title, DEFAULT_SEO.description, DEFAULT_SEO.keywords);
 }
 
+/**
+ * مكوّن SEO الديناميكي: يجلب البيانات من جدول seo_data ويحدّث الهيدر.
+ * الأولوية: قاعدة البيانات → القيم الافتراضية.
+ */
 export function SeoHead() {
   const [pathname] = useLocation();
 
@@ -101,6 +76,7 @@ export function SeoHead() {
     fetch(`/api/seo?path=${encodeURIComponent(path)}`)
       .then((r) => r.json())
       .then((data) => {
+        // استخدام بيانات من قاعدة البيانات إن وُجدت (title أو description)
         if (data && (data.title || data.description)) {
           setPageMeta({
             title: data.title || DEFAULT_SEO.title,

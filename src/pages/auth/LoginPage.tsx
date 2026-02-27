@@ -5,15 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getApiUrl } from "@/lib/api-base";
 import { useAuth } from "@/hooks/use-auth";
-import { usePageSeo } from "@/hooks/use-page-seo";
 import { Loader2, Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
-  usePageSeo({
-    title: "تسجيل الدخول",
-    description: "سجّل دخولك إلى منصة شارف التعليمية للوصول إلى دروسك ومتابعة تقدمك الدراسي.",
-    keywords: "تسجيل دخول, شارف, منصة تعليمية, حساب طالب",
-  });
   const [, setLocation] = useLocation();
   const { refetch } = useAuth();
   const [email, setEmail] = useState("");

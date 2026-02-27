@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, Upload, Copy, Check, FileJson, Image as ImageIcon, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { usePageSeo } from "@/hooks/use-page-seo";
 
 interface ExtractedQuestion {
   id: number;
@@ -16,10 +15,6 @@ interface ExtractedQuestion {
 }
 
 export default function PdfExtractor() {
-  usePageSeo({
-    title: "استخراج الأسئلة من PDF",
-    description: "أداة استخراج الأسئلة والاختبارات من ملفات PDF - أدوات إدارة منصة شارف التعليمية.",
-  });
   const [images, setImages] = useState<{ file: File; base64: string; preview: string }[]>([]);
   const [extractedQuestions, setExtractedQuestions] = useState<ExtractedQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);

@@ -12,7 +12,7 @@ import { eq } from "drizzle-orm";
 
 const __dirname = getDirname();
 
-const uploadsDir = path.join(__dirname, "..", "attached_assets", "uploads");
+const uploadsDir = path.join(__dirname, "..", "..", "attached_assets", "uploads");
 fs.promises.mkdir(uploadsDir, { recursive: true }).catch(() => {});
 
 const ALLOWED_MIME_TYPES = new Set([

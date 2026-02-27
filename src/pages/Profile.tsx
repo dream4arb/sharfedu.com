@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { usePageSeo } from "@/hooks/use-page-seo";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,11 +18,6 @@ const stages = [
 ];
 
 export default function Profile() {
-  usePageSeo({
-    title: "الملف الشخصي",
-    description: "إدارة ملفك الشخصي وإعدادات حسابك على منصة شارف التعليمية.",
-    keywords: "الملف الشخصي, إعدادات الحساب, شارف",
-  });
   const { user, logout, refetch: refetchUser } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();

@@ -223,9 +223,9 @@ export async function deleteCmsContent(id: number): Promise<boolean> {
   if (!row) return false;
   if ((row.contentType === "pdf" || row.contentType === "image") && row.dataValue.startsWith("/attached_assets/uploads/")) {
     const fileName = path.basename(row.dataValue);
-    const filePath = path.join(__dirname, "..", "attached_assets", "uploads", fileName);
+    const filePath = path.join(__dirname, "..", "..", "attached_assets", "uploads", fileName);
     const resolved = path.resolve(filePath);
-    const uploadsBase = path.resolve(__dirname, "..", "attached_assets", "uploads");
+    const uploadsBase = path.resolve(__dirname, "..", "..", "attached_assets", "uploads");
     if (resolved.startsWith(uploadsBase)) {
       try {
         await fs.promises.unlink(resolved);

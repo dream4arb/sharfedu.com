@@ -5,15 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getApiUrl } from "@/lib/api-base";
 import { useAuth } from "@/hooks/use-auth";
-import { usePageSeo } from "@/hooks/use-page-seo";
 import { Loader2, Mail, Lock } from "lucide-react";
 
 export default function RegisterPage() {
-  usePageSeo({
-    title: "إنشاء حساب جديد",
-    description: "أنشئ حسابك المجاني على منصة شارف التعليمية وابدأ رحلتك التعليمية مع دروس تفاعلية لجميع المراحل الدراسية.",
-    keywords: "تسجيل, إنشاء حساب, شارف, منصة تعليمية, طالب جديد",
-  });
   const [, setLocation] = useLocation();
   const { refetch } = useAuth();
   const [email, setEmail] = useState("");

@@ -1,13 +1,8 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { usePageSeo } from "@/hooks/use-page-seo";
 import { Cloud, Home } from "lucide-react";
 
 export default function NotFound() {
-  usePageSeo({
-    title: "الصفحة غير موجودة - 404",
-    description: "عذراً، الصفحة التي تبحث عنها غير موجودة. عد إلى الصفحة الرئيسية لمنصة شارف التعليمية.",
-  });
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-background p-4 text-center" dir="rtl">
       <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center text-white mx-auto mb-8 shadow-xl shadow-primary/30">

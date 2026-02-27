@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { usePageSeo } from "@/hooks/use-page-seo";
 import {
   Sidebar,
   SidebarContent,
@@ -174,11 +173,6 @@ async function fetchAdmin<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export default function AdminDashboard() {
-  usePageSeo({
-    title: "لوحة تحكم الإدارة",
-    description: "إدارة المحتوى والمستخدمين وإعدادات منصة شارف التعليمية.",
-    keywords: "لوحة الإدارة, إدارة المحتوى, شارف",
-  });
   const [, setLocation] = useLocation();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();

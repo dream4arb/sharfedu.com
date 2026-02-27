@@ -21,7 +21,7 @@ import { getDirname } from "../resolve-dir";
 
 const __dirname = getDirname();
 
-const uploadsDir = path.join(__dirname, "..", "attached_assets", "uploads");
+const uploadsDir = path.join(__dirname, "..", "..", "attached_assets", "uploads");
 mkdir(uploadsDir, { recursive: true }).catch(() => {});
 
 const ALLOWED_MIME_TYPES = new Set([

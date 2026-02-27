@@ -85,14 +85,8 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 5. **Admin (/admin)**: CMS dashboard (admin only)
 6. **Auth**: /login, /register, /forgot-password, /reset-password
 
-### SEO System
-- **Dynamic SEO**: Every page uses `usePageSeo()` hook (`src/hooks/use-page-seo.ts`) for auto-filled title, description, keywords
-- **SeoHead component** (`src/components/SeoHead.tsx`): Global component in App.tsx, fetches from `/api/seo` DB table first, falls back to defaults
-- **DB override**: Admin can customize SEO per path via `seo_data` table + admin API (`PUT /api/admin/seo`)
-- **Utility**: `setPageMeta()` in `src/lib/seo.ts` handles title, meta tags, OG tags, canonical URL
-
 ### Inline Admin Editing
-- **InlineAdminToolbar** (`src/components/admin/InlineAdminToolbar.tsx`): Expandable toolbar on Lesson page for managing PDF uploads (الدرس + الملخص), YouTube links, HTML content (شارف AI). Only visible to admin users.
+- **InlineAdminToolbar** (`src/components/admin/InlineAdminToolbar.tsx`): Expandable toolbar on Lesson page for managing PDF uploads, YouTube links, HTML content (شارف AI + الملخص). Only visible to admin users.
 - **Lesson sidebar controls**: Admin sees pencil/trash icons next to lessons, "إضافة درس"/"إضافة وحدة" buttons. Changes go through `PUT /api/admin/cms/structure`.
 - **Stage page controls** (`src/pages/Stage.tsx`): Admin sees add/edit/delete buttons for grades and subjects. Changes through same hierarchy API.
 - All inline edits use the same API/DB as the admin dashboard — no separate storage.
