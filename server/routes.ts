@@ -29,6 +29,213 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.json({ ok: true, service: "sharfedu-api" });
   });
 
+  const BASE_URL = process.env.BASE_URL || "https://sharfedu.com";
+
+  app.get("/sitemap.xml", async (_req, res) => {
+    try {
+      const { getAllLessons, getFullHierarchy } = await import("./data/cms-hierarchy");
+      const today = new Date().toISOString().split("T")[0];
+
+      const staticPages = [
+        { loc: "/", changefreq: "weekly", priority: "1.0" },
+        { loc: "/features", changefreq: "monthly", priority: "0.8" },
+        { loc: "/login", changefreq: "monthly", priority: "0.5" },
+        { loc: "/register", changefreq: "monthly", priority: "0.6" },
+        { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
+      ];
+
+      const stagePages: { loc: string; changefreq: string; priority: string }[] = [];
+      const hierarchy = getFullHierarchy();
+      for (const stage of hierarchy) {
+        stagePages.push({ loc: `/stage/${stage.slug}`, changefreq: "weekly", priority: "0.9" });
+        for (const grade of stage.grades ?? []) {
+          for (const subject of grade.subjects) {
+            stagePages.push({ loc: `/lesson/${stage.slug}/${subject.slug}`, changefreq: "weekly", priority: "0.8" });
+          }
+        }
+      }
+
+      const lessonPages: { loc: string; changefreq: string; priority: string }[] = [];
+      const allLessons = getAllLessons();
+      for (const lesson of allLessons) {
+        lessonPages.push({
+          loc: `/lesson/${lesson.stageSlug}/${lesson.subjectSlug}/${lesson.lessonId}`,
+          changefreq: "monthly",
+          priority: "0.7",
+        });
+      }
+
+      const allPages = [...staticPages, ...stagePages, ...lessonPages];
+
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+      for (const page of allPages) {
+        xml += `  <url>\n`;
+        xml += `    <loc>${BASE_URL}${page.loc}</loc>\n`;
+        xml += `    <lastmod>${today}</lastmod>\n`;
+        xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
+        xml += `    <priority>${page.priority}</priority>\n`;
+        xml += `  </url>\n`;
+      }
+      xml += `</urlset>`;
+
+      res.setHeader("Content-Type", "application/xml; charset=utf-8");
+      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.send(xml);
+    } catch (e) {
+      console.error("Sitemap error:", e);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
+  app.get("/robots.txt", (_req, res) => {
+    const content = [
+      "User-agent: *",
+      "Allow: /",
+      "",
+      "Disallow: /api/",
+      "Disallow: /admin",
+      "Disallow: /dashboard",
+      "Disallow: /profile",
+      "Disallow: /pdf-viewer",
+      "Disallow: /admin/pdf-extractor",
+      "",
+      `Sitemap: ${BASE_URL}/sitemap.xml`,
+    ].join("\n");
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.send(content);
+  });
+
+  app.post("/api/admin/generate-sitemap", requireAdmin, async (req, res) => {
+    try {
+      const { getAllLessons, getFullHierarchy } = await import("./data/cms-hierarchy");
+      const today = new Date().toISOString().split("T")[0];
+
+      const staticPages = [
+        { loc: "/", changefreq: "weekly", priority: "1.0" },
+        { loc: "/features", changefreq: "monthly", priority: "0.8" },
+        { loc: "/login", changefreq: "monthly", priority: "0.5" },
+        { loc: "/register", changefreq: "monthly", priority: "0.6" },
+        { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
+      ];
+      const stagePages: typeof staticPages = [];
+      const hierarchy = getFullHierarchy();
+      for (const stage of hierarchy) {
+        stagePages.push({ loc: `/stage/${stage.slug}`, changefreq: "weekly", priority: "0.9" });
+        for (const grade of stage.grades ?? []) {
+          for (const subject of grade.subjects) {
+            stagePages.push({ loc: `/lesson/${stage.slug}/${subject.slug}`, changefreq: "weekly", priority: "0.8" });
+          }
+        }
+      }
+      const lessonPages: typeof staticPages = [];
+      const allLessons = getAllLessons();
+      for (const lesson of allLessons) {
+        lessonPages.push({
+          loc: `/lesson/${lesson.stageSlug}/${lesson.subjectSlug}/${lesson.lessonId}`,
+          changefreq: "monthly",
+          priority: "0.7",
+        });
+      }
+
+      const allPages = [...staticPages, ...stagePages, ...lessonPages];
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+      for (const page of allPages) {
+        xml += `  <url>\n    <loc>${BASE_URL}${page.loc}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${page.changefreq}</changefreq>\n    <priority>${page.priority}</priority>\n  </url>\n`;
+      }
+      xml += `</urlset>`;
+
+      const robotsTxt = [
+        "User-agent: *", "Allow: /", "",
+        "Disallow: /api/", "Disallow: /admin", "Disallow: /dashboard",
+        "Disallow: /profile", "Disallow: /pdf-viewer", "Disallow: /admin/pdf-extractor", "",
+        `Sitemap: ${BASE_URL}/sitemap.xml`,
+      ].join("\n");
+
+      const { writeFile, access: fsAccess } = await import("fs/promises");
+      const serverDir = path.dirname(process.argv[1] || "");
+      const writtenTo: string[] = [];
+
+      const nodeAppPublic = path.resolve(serverDir, "server", "public");
+      try { await fsAccess(nodeAppPublic); await writeFile(path.resolve(nodeAppPublic, "sitemap.xml"), xml, "utf-8"); await writeFile(path.resolve(nodeAppPublic, "robots.txt"), robotsTxt, "utf-8"); writtenTo.push(nodeAppPublic); } catch {}
+
+      const publicHtml = path.resolve(serverDir, "..", "..");
+      try {
+        const testPath = path.resolve(publicHtml, "index.html");
+        await fsAccess(testPath);
+        await writeFile(path.resolve(publicHtml, "sitemap.xml"), xml, "utf-8");
+        await writeFile(path.resolve(publicHtml, "robots.txt"), robotsTxt, "utf-8");
+        writtenTo.push(publicHtml);
+      } catch {}
+
+      if (writtenTo.length === 0) {
+        const cwdPublic = path.resolve(process.cwd(), "server", "public");
+        try { await fsAccess(cwdPublic); await writeFile(path.resolve(cwdPublic, "sitemap.xml"), xml, "utf-8"); await writeFile(path.resolve(cwdPublic, "robots.txt"), robotsTxt, "utf-8"); writtenTo.push(cwdPublic); } catch {}
+      }
+
+      res.json({ success: true, totalUrls: allPages.length, writtenTo });
+    } catch (e: any) {
+      console.error("Generate sitemap error:", e);
+      res.status(500).json({ error: e.message || "Failed to generate sitemap" });
+    }
+  });
+
+  app.get("/api/admin/sitemap-info", requireAdmin, async (req, res) => {
+    try {
+      const { getAllLessons, getFullHierarchy } = await import("./data/cms-hierarchy");
+      const hierarchy = getFullHierarchy();
+
+      const staticPages = [
+        { url: "/", label: "الرئيسية", priority: "1.0" },
+        { url: "/features", label: "المميزات", priority: "0.8" },
+        { url: "/login", label: "تسجيل الدخول", priority: "0.5" },
+        { url: "/register", label: "إنشاء حساب", priority: "0.6" },
+        { url: "/privacy", label: "سياسة الخصوصية", priority: "0.3" },
+      ];
+
+      const stagePages: { url: string; label: string; priority: string }[] = [];
+      const STAGE_LABELS: Record<string, string> = {
+        elementary: "الابتدائية", middle: "المتوسطة", high: "الثانوية",
+        paths: "المسارات", qudurat: "القدرات والتحصيلي",
+      };
+      for (const stage of hierarchy) {
+        stagePages.push({ url: `/stage/${stage.slug}`, label: `مرحلة: ${STAGE_LABELS[stage.slug] || stage.name}`, priority: "0.9" });
+      }
+
+      const subjectPages: { url: string; label: string; priority: string }[] = [];
+      for (const stage of hierarchy) {
+        for (const grade of stage.grades ?? []) {
+          for (const subject of grade.subjects) {
+            subjectPages.push({
+              url: `/lesson/${stage.slug}/${subject.slug}`,
+              label: `${STAGE_LABELS[stage.slug] || stage.name} > ${subject.name}`,
+              priority: "0.8",
+            });
+          }
+        }
+      }
+
+      const allLessons = getAllLessons();
+      const lessonCount = allLessons.length;
+
+      res.json({
+        baseUrl: BASE_URL,
+        sitemapUrl: `${BASE_URL}/sitemap.xml`,
+        robotsUrl: `${BASE_URL}/robots.txt`,
+        totalUrls: staticPages.length + stagePages.length + subjectPages.length + lessonCount,
+        staticPages,
+        stagePages,
+        subjectPages,
+        lessonCount,
+        lastGenerated: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.error("Sitemap info error:", e);
+      res.status(500).json({ error: "Failed to get sitemap info" });
+    }
+  });
+
   app.get("/attached_assets/:folder/:filename", async (req, res) => {
     const { folder, filename } = req.params;
     if (!SAFE_NAME.test(folder) || !SAFE_NAME.test(filename)) {

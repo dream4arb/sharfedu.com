@@ -77,6 +77,13 @@ import {
   Share2,
   Calendar,
   Layers,
+  MapPin,
+  ExternalLink,
+  RefreshCw,
+  Copy,
+  FileText,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { StructureManager } from "@/components/admin/StructureManager";
 import { useToast } from "@/hooks/use-toast";
@@ -250,6 +257,21 @@ export default function AdminDashboard() {
   const [seoLoading, setSeoLoading] = useState(false);
   const [seoSaving, setSeoSaving] = useState(false);
   const [seoTab, setSeoTab] = useState("pages");
+
+  interface SitemapInfo {
+    baseUrl: string;
+    sitemapUrl: string;
+    robotsUrl: string;
+    totalUrls: number;
+    staticPages: { url: string; label: string; priority: string }[];
+    stagePages: { url: string; label: string; priority: string }[];
+    subjectPages: { url: string; label: string; priority: string }[];
+    lessonCount: number;
+    lastGenerated: string;
+  }
+  const [sitemapInfo, setSitemapInfo] = useState<SitemapInfo | null>(null);
+  const [sitemapLoading, setSitemapLoading] = useState(false);
+  const [sitemapExpanded, setSitemapExpanded] = useState<Record<string, boolean>>({});
 
   // إعدادات السنة الدراسية
   const [schoolYearStart, setSchoolYearStart] = useState("");
@@ -547,6 +569,40 @@ export default function AdminDashboard() {
       loadSeoForPath(seoPath);
     }
   }, [activeSection, seoPaths.length]);
+
+  const [sitemapGenerating, setSitemapGenerating] = useState(false);
+
+  const loadSitemapInfo = async () => {
+    setSitemapLoading(true);
+    try {
+      const info = await fetchAdmin<SitemapInfo>("/api/admin/sitemap-info");
+      setSitemapInfo(info);
+    } catch {
+      setSitemapInfo(null);
+    } finally {
+      setSitemapLoading(false);
+    }
+  };
+
+  const generateSitemap = async () => {
+    setSitemapGenerating(true);
+    try {
+      const result = await fetchAdmin<{ success: boolean; totalUrls: number }>("/api/admin/generate-sitemap", { method: "POST" });
+      if (result?.success) {
+        toast({ title: "تم توليد خريطة الموقع بنجاح", description: `${result.totalUrls} رابط تم تحديثه` });
+        await loadSitemapInfo();
+      }
+    } catch (e: unknown) {
+      toast({ title: "خطأ", description: (e as Error)?.message || "فشل في توليد خريطة الموقع", variant: "destructive" });
+    } finally {
+      setSitemapGenerating(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "تم النسخ" });
+  };
 
   const saveStats = async () => {
     const v = parseFloat(completionInput);
@@ -1703,8 +1759,8 @@ export default function AdminDashboard() {
                       {seoLoading ? (
                         <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
                       ) : (
-                        <Tabs value={seoTab} onValueChange={(v) => { setSeoTab(v); if (v === "general") { setSeoPath("/"); loadSeoForPath("/"); } }} className="w-full">
-                          <TabsList className="grid w-full grid-cols-3 mb-6">
+                        <Tabs value={seoTab} onValueChange={(v) => { setSeoTab(v); if (v === "general") { setSeoPath("/"); loadSeoForPath("/"); } if (v === "sitemap" && !sitemapInfo) { loadSitemapInfo(); } }} className="w-full">
+                          <TabsList className="grid w-full grid-cols-4 mb-6">
                             <TabsTrigger value="general" className="gap-2">
                               <Globe className="w-4 h-4" />
                               إعدادات عامة
@@ -1716,6 +1772,10 @@ export default function AdminDashboard() {
                             <TabsTrigger value="og" className="gap-2">
                               <Share2 className="w-4 h-4" />
                               Open Graph
+                            </TabsTrigger>
+                            <TabsTrigger value="sitemap" className="gap-2">
+                              <MapPin className="w-4 h-4" />
+                              خريطة الموقع
                             </TabsTrigger>
                           </TabsList>
 
@@ -1828,6 +1888,173 @@ export default function AdminDashboard() {
                                 حفظ إعدادات Open Graph
                               </Button>
                             </div>
+                          </TabsContent>
+
+                          <TabsContent value="sitemap" className="space-y-6 mt-0">
+                            <div className="flex items-center justify-between flex-wrap gap-3">
+                              <p className="text-sm text-muted-foreground flex-1">خريطة الموقع (sitemap.xml) تشمل جميع الصفحات والدروس. اضغط "توليد ونشر" لتحديث الملفات على الخادم.</p>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm" onClick={loadSitemapInfo} disabled={sitemapLoading} data-testid="button-refresh-sitemap">
+                                  <RefreshCw className={`w-4 h-4 ml-2 ${sitemapLoading ? "animate-spin" : ""}`} />
+                                  معاينة
+                                </Button>
+                                <Button size="sm" onClick={generateSitemap} disabled={sitemapGenerating} data-testid="button-generate-sitemap">
+                                  {sitemapGenerating ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Save className="w-4 h-4 ml-2" />}
+                                  توليد ونشر
+                                </Button>
+                              </div>
+                            </div>
+
+                            {sitemapLoading && !sitemapInfo ? (
+                              <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                            ) : sitemapInfo ? (
+                              <div className="space-y-6">
+                                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                  <div className="rounded-xl border bg-card p-4 text-center" data-testid="stat-total-urls">
+                                    <div className="text-3xl font-black text-primary">{sitemapInfo.totalUrls}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">إجمالي الروابط</div>
+                                  </div>
+                                  <div className="rounded-xl border bg-card p-4 text-center" data-testid="stat-static-pages">
+                                    <div className="text-3xl font-black text-blue-500">{sitemapInfo.staticPages.length}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">صفحات ثابتة</div>
+                                  </div>
+                                  <div className="rounded-xl border bg-card p-4 text-center" data-testid="stat-stage-pages">
+                                    <div className="text-3xl font-black text-green-500">{sitemapInfo.stagePages.length + sitemapInfo.subjectPages.length}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">مراحل ومواد</div>
+                                  </div>
+                                  <div className="rounded-xl border bg-card p-4 text-center" data-testid="stat-lesson-pages">
+                                    <div className="text-3xl font-black text-amber-500">{sitemapInfo.lessonCount}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">دروس</div>
+                                  </div>
+                                </div>
+
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle className="text-base">روابط خريطة الموقع</CardTitle>
+                                    <CardDescription>انسخ هذه الروابط وأضفها في Google Search Console</CardDescription>
+                                  </CardHeader>
+                                  <CardContent className="space-y-3">
+                                    <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
+                                      <FileText className="w-5 h-5 text-primary shrink-0" />
+                                      <code className="flex-1 text-sm font-mono truncate" dir="ltr" data-testid="text-sitemap-url">{sitemapInfo.sitemapUrl}</code>
+                                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(sitemapInfo.sitemapUrl)} data-testid="button-copy-sitemap">
+                                        <Copy className="w-4 h-4" />
+                                      </Button>
+                                      <a href={sitemapInfo.sitemapUrl} target="_blank" rel="noopener noreferrer">
+                                        <Button variant="ghost" size="sm" data-testid="button-open-sitemap">
+                                          <ExternalLink className="w-4 h-4" />
+                                        </Button>
+                                      </a>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
+                                      <FileText className="w-5 h-5 text-green-500 shrink-0" />
+                                      <code className="flex-1 text-sm font-mono truncate" dir="ltr" data-testid="text-robots-url">{sitemapInfo.robotsUrl}</code>
+                                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(sitemapInfo.robotsUrl)} data-testid="button-copy-robots">
+                                        <Copy className="w-4 h-4" />
+                                      </Button>
+                                      <a href={sitemapInfo.robotsUrl} target="_blank" rel="noopener noreferrer">
+                                        <Button variant="ghost" size="sm" data-testid="button-open-robots">
+                                          <ExternalLink className="w-4 h-4" />
+                                        </Button>
+                                      </a>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle className="text-base">تفاصيل الصفحات المفهرسة</CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="space-y-2">
+                                    <button
+                                      className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors text-right"
+                                      onClick={() => setSitemapExpanded(prev => ({ ...prev, static: !prev.static }))}
+                                      data-testid="toggle-static-pages"
+                                    >
+                                      <span className="font-medium text-sm flex items-center gap-2">
+                                        <Globe className="w-4 h-4 text-blue-500" />
+                                        صفحات ثابتة ({sitemapInfo.staticPages.length})
+                                      </span>
+                                      {sitemapExpanded.static ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                    </button>
+                                    {sitemapExpanded.static && (
+                                      <div className="mr-6 space-y-1 mb-3">
+                                        {sitemapInfo.staticPages.map(p => (
+                                          <div key={p.url} className="flex items-center justify-between text-sm p-2 rounded border-b last:border-0">
+                                            <span className="text-muted-foreground">{p.label}</span>
+                                            <code className="text-xs font-mono text-primary" dir="ltr">{p.url}</code>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    <button
+                                      className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors text-right"
+                                      onClick={() => setSitemapExpanded(prev => ({ ...prev, stages: !prev.stages }))}
+                                      data-testid="toggle-stage-pages"
+                                    >
+                                      <span className="font-medium text-sm flex items-center gap-2">
+                                        <MapPin className="w-4 h-4 text-green-500" />
+                                        المراحل الدراسية ({sitemapInfo.stagePages.length})
+                                      </span>
+                                      {sitemapExpanded.stages ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                    </button>
+                                    {sitemapExpanded.stages && (
+                                      <div className="mr-6 space-y-1 mb-3">
+                                        {sitemapInfo.stagePages.map(p => (
+                                          <div key={p.url} className="flex items-center justify-between text-sm p-2 rounded border-b last:border-0">
+                                            <span className="text-muted-foreground">{p.label}</span>
+                                            <code className="text-xs font-mono text-primary" dir="ltr">{p.url}</code>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    <button
+                                      className="w-full flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors text-right"
+                                      onClick={() => setSitemapExpanded(prev => ({ ...prev, subjects: !prev.subjects }))}
+                                      data-testid="toggle-subject-pages"
+                                    >
+                                      <span className="font-medium text-sm flex items-center gap-2">
+                                        <BookOpen className="w-4 h-4 text-purple-500" />
+                                        المواد الدراسية ({sitemapInfo.subjectPages.length})
+                                      </span>
+                                      {sitemapExpanded.subjects ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                    </button>
+                                    {sitemapExpanded.subjects && (
+                                      <div className="mr-6 space-y-1 mb-3 max-h-64 overflow-y-auto">
+                                        {sitemapInfo.subjectPages.map(p => (
+                                          <div key={p.url} className="flex items-center justify-between text-sm p-2 rounded border-b last:border-0">
+                                            <span className="text-muted-foreground">{p.label}</span>
+                                            <code className="text-xs font-mono text-primary" dir="ltr">{p.url}</code>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    <div className="flex items-center justify-between p-3 rounded-lg border bg-amber-50 dark:bg-amber-950/20">
+                                      <span className="font-medium text-sm flex items-center gap-2">
+                                        <FileText className="w-4 h-4 text-amber-500" />
+                                        الدروس التعليمية
+                                      </span>
+                                      <span className="text-sm text-muted-foreground">{sitemapInfo.lessonCount} درس</span>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+
+                                <div className="flex items-center gap-2 p-4 rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30 text-green-800 dark:text-green-200">
+                                  <CheckCircle2 className="h-5 w-5 shrink-0" />
+                                  <div className="text-sm">
+                                    <strong>خريطة الموقع تُحدّث تلقائياً</strong> — عند إضافة أي درس أو مادة جديدة في الهيكلية الدراسية، ستظهر تلقائياً في خريطة الموقع عند الزحف القادم من Google.
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-center py-12 text-muted-foreground">
+                                <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                                <p>اضغط "تحديث" لعرض معلومات خريطة الموقع</p>
+                              </div>
+                            )}
                           </TabsContent>
                         </Tabs>
                       )}
