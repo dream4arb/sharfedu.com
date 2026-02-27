@@ -17,11 +17,9 @@ import { saveHierarchyToDb } from "./hierarchyStore";
 import multer from "multer";
 import path from "path";
 import { mkdir } from "fs/promises";
-import { getDirname } from "../resolve-dir";
+import { getUploadsDir } from "../resolve-dir";
 
-const __dirname = getDirname();
-
-const uploadsDir = path.join(__dirname, "..", "..", "attached_assets", "uploads");
+const uploadsDir = getUploadsDir();
 mkdir(uploadsDir, { recursive: true }).catch(() => {});
 
 const ALLOWED_MIME_TYPES = new Set([

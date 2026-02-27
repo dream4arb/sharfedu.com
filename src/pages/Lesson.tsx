@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/sidebar";
 import PolygonAnglesQuizSSA from "@/components/lessons/PolygonAnglesQuizSSA";
 import { InlineAdminToolbar } from "@/components/admin/InlineAdminToolbar";
+import { InlineSeoEditor } from "@/components/admin/InlineSeoEditor";
 import { AdminSidebarControls, AdminLessonActions, AdminAddLessonButton, AdminChapterActions, AdminAddChapterButton } from "@/components/admin/AdminSidebarControls";
 
 type TabType = "lesson" | "video" | "summary" | "education" | "ssa";
@@ -1625,6 +1626,12 @@ export default function Lesson() {
                   pagePath={window.location.pathname}
                 />
               )}
+              <InlineSeoEditor
+                pagePath={window.location.pathname}
+                autoTitle={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} - ${subjectName || ""}`}
+                autoDescription={`درس ${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} في مادة ${subjectName || ""} - شرح الدرس والملخص والاختبارات على منصة شارف التعليمية.`}
+                autoKeywords={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""}, ${subjectName || ""}, منصة شارف`}
+              />
               {attachmentView !== null ? (
                 // عرض PDF المرفق في نفس الصفحة مكان رسالة الترحيب
                 <motion.div

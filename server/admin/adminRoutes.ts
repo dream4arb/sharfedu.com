@@ -2,7 +2,7 @@ import { Router, type Request } from "express";
 import path from "path";
 import fs from "fs";
 import bcrypt from "bcrypt";
-import { getDirname } from "../resolve-dir";
+import { getDirname, getUploadsDir } from "../resolve-dir";
 import multer from "multer";
 import * as storage from "./contentStorage";
 import * as cmsStorage from "./cmsStorage";
@@ -10,9 +10,7 @@ import { users } from "@shared/schema";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
 
-const __dirname = getDirname();
-
-const uploadsDir = path.join(__dirname, "..", "..", "attached_assets", "uploads");
+const uploadsDir = getUploadsDir();
 fs.promises.mkdir(uploadsDir, { recursive: true }).catch(() => {});
 
 const ALLOWED_MIME_TYPES = new Set([

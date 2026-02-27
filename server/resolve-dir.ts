@@ -26,3 +26,16 @@ export function getDirname(): string {
   if (typeof __dirname === "string") return __dirname;
   return path.dirname(getFilename());
 }
+
+export function getUploadsDir(): string {
+  const dir = getDirname();
+  const fromOneUp = path.resolve(dir, "..", "attached_assets", "uploads");
+  const fromTwoUp = path.resolve(dir, "..", "..", "attached_assets", "uploads");
+  try {
+    const fs = require("fs");
+    if (fs.existsSync(fromOneUp)) return fromOneUp;
+    if (fs.existsSync(fromTwoUp)) return fromTwoUp;
+  } catch {}
+  if (dir.includes("node_app")) return fromOneUp;
+  return fromTwoUp;
+}

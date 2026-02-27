@@ -4,9 +4,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { getLessonFullInfo } from "../data/cms-hierarchy";
 import fs from "fs";
 import path from "path";
-import { getDirname } from "../resolve-dir";
-
-const __dirname = getDirname();
+import { getUploadsDir } from "../resolve-dir";
 
 export async function upsertCmsContent(data: {
   lessonId: string;
@@ -223,9 +221,9 @@ export async function deleteCmsContent(id: number): Promise<boolean> {
   if (!row) return false;
   if ((row.contentType === "pdf" || row.contentType === "image") && row.dataValue.startsWith("/attached_assets/uploads/")) {
     const fileName = path.basename(row.dataValue);
-    const filePath = path.join(__dirname, "..", "..", "attached_assets", "uploads", fileName);
+    const uploadsBase = getUploadsDir();
+    const filePath = path.join(uploadsBase, fileName);
     const resolved = path.resolve(filePath);
-    const uploadsBase = path.resolve(__dirname, "..", "..", "attached_assets", "uploads");
     if (resolved.startsWith(uploadsBase)) {
       try {
         await fs.promises.unlink(resolved);

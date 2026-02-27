@@ -834,12 +834,6 @@ export function InlineAdminToolbar({
         )}
       </Card>
 
-      <InlineSeoEditor
-        pagePath={pagePath || window.location.pathname}
-        autoTitle={`${lessonTitle} - ${subjectName || ""}`}
-        autoDescription={`درس ${lessonTitle} في مادة ${subjectName || ""} - شرح الدرس والملخص والاختبارات على منصة شارف التعليمية.`}
-        autoKeywords={`${lessonTitle}, ${subjectName || ""}, شرح ${lessonTitle}, ملخص ${lessonTitle}, منصة شارف`}
-      />
 
       <Dialog
         open={confirmDialog.open}
