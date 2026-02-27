@@ -36,7 +36,13 @@ export default function Home() {
     <div className="min-h-screen bg-background" dir="rtl">
       <Navbar />
       <main>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-2">
+        <Hero />
+        <SearchBar />
+        <StageSelector />
+        <Features />
+        <Stats />
+        <CTA />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <InlineSeoEditor
             pagePath="/"
             autoTitle={DEFAULT_SEO.title}
@@ -44,12 +50,6 @@ export default function Home() {
             autoKeywords={DEFAULT_SEO.keywords}
           />
         </div>
-        <Hero />
-        <SearchBar />
-        <StageSelector />
-        <Features />
-        <Stats />
-        <CTA />
       </main>
       <Footer />
       <WelcomePopup />
