@@ -31,6 +31,11 @@ export async function registerRoutes(httpServer: Server, app: Express) {
 
   const BASE_URL = process.env.BASE_URL || "https://sharfedu.com";
 
+  app.get("/lesson-preview.html", (_req, res) => {
+    const filePath = path.resolve(process.cwd(), "server", "public", "lesson-preview.html");
+    res.sendFile(filePath);
+  });
+
   app.get("/sitemap.xml", async (_req, res) => {
     try {
       const { getAllLessons, getFullHierarchy } = await import("./data/cms-hierarchy");
