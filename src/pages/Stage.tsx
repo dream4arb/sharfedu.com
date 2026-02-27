@@ -330,7 +330,7 @@ export default function Stage() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(120,120,255,0.15),transparent)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(34,197,94,0.08),transparent_50%)]" />
           <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground/90 mb-10">
+            <div className="flex items-center gap-2 text-sm text-foreground/70 mb-10">
               <Link href="/" className="hover:text-foreground transition-colors" data-testid="link-breadcrumb-home">الرئيسية</Link>
               <ArrowLeft className="w-4 h-4" />
               <span className="text-foreground font-medium">{stage.title}</span>
