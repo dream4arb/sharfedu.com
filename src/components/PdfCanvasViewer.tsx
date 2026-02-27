@@ -85,15 +85,15 @@ export function PdfCanvasViewer({ url, title }: PdfCanvasViewerProps) {
   }, [renderPdf]);
 
   return (
-    <div className="w-full min-h-[60vh]" data-testid="pdf-canvas-viewer">
+    <div className="w-full" data-testid="pdf-canvas-viewer" style={{ minHeight: status === "ready" ? "auto" : "60vh" }}>
       {status === "loading" && (
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center justify-center" style={{ minHeight: "60vh" }}>
           <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
           <p className="text-sm text-muted-foreground">جاري تحميل الملف...</p>
         </div>
       )}
       {status === "error" && (
-        <div className="text-center py-8 min-h-[60vh] flex flex-col items-center justify-center">
+        <div className="text-center flex flex-col items-center justify-center" style={{ minHeight: "60vh" }}>
           <p className="text-destructive font-semibold mb-2">تعذّر تحميل ملف PDF</p>
           <p className="text-xs text-muted-foreground mb-4 dir-ltr">{errMsg}</p>
           <button

@@ -1588,6 +1588,7 @@ export default function Lesson() {
                       onClick={handleMarkComplete}
                       className="gap-1.5 text-xs sm:text-sm px-2.5 sm:px-4"
                       data-testid="button-mark-complete"
+                      aria-label={isCompleted(subjectId, lessonId) ? "الدرس مكتمل" : "تحديد كمكتمل"}
                     >
                       {isCompleted(subjectId, lessonId) ? (
                         <>
