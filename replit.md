@@ -30,7 +30,7 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 ├── script/build.ts          # Build script (Vite frontend + esbuild backend)
 ├── src/                     # Frontend source
 │   ├── App.tsx              # Main app with routing
-│   ├── pages/               # Page components (Home, Lesson, Stage, Dashboard, Admin, Auth)
+│   ├── pages/               # Page components (Home, Features, Lesson, Stage, Dashboard, Admin, Auth)
 │   ├── components/          # UI components (home, layout, lessons, ui)
 │   ├── hooks/               # Custom hooks (auth, mobile, progress)
 │   └── lib/                 # Utilities (queryClient, seo, theme)

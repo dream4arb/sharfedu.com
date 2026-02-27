@@ -54,7 +54,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "الرئيسية" },
-    { href: "#features", label: "المميزات" },
+    { href: "/features", label: "المميزات" },
   ];
 
   return (
