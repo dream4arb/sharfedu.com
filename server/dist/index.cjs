@@ -873,9 +873,9 @@ async function deleteCmsContent(id) {
   if (!row) return false;
   if ((row.contentType === "pdf" || row.contentType === "image") && row.dataValue.startsWith("/attached_assets/uploads/")) {
     const fileName = import_path5.default.basename(row.dataValue);
-    const filePath = import_path5.default.join(__dirname4, "..", "..", "attached_assets", "uploads", fileName);
+    const filePath = import_path5.default.join(__dirname4, "..", "attached_assets", "uploads", fileName);
     const resolved = import_path5.default.resolve(filePath);
-    const uploadsBase = import_path5.default.resolve(__dirname4, "..", "..", "attached_assets", "uploads");
+    const uploadsBase = import_path5.default.resolve(__dirname4, "..", "attached_assets", "uploads");
     if (resolved.startsWith(uploadsBase)) {
       try {
         await import_fs.default.promises.unlink(resolved);
@@ -1252,7 +1252,7 @@ var init_legacyMigration = __esm({
     import_drizzle_orm8 = require("drizzle-orm");
     init_cms_hierarchy();
     __dirname7 = getDirname();
-    attachedRoot2 = import_path8.default.resolve(__dirname7, "..", "..", "attached_assets");
+    attachedRoot2 = import_path8.default.resolve(__dirname7, "..", "attached_assets");
     FILE_TO_LESSON_OVERRIDE = {
       "lesson_4-1.pdf": { lessonId: "5-1", tabType: "lesson" }
     };
@@ -1296,7 +1296,7 @@ var init_cmsRoutes = __esm({
     import_promises3 = require("fs/promises");
     init_resolve_dir();
     __dirname8 = getDirname();
-    uploadsDir2 = import_path9.default.join(__dirname8, "..", "..", "attached_assets", "uploads");
+    uploadsDir2 = import_path9.default.join(__dirname8, "..", "attached_assets", "uploads");
     (0, import_promises3.mkdir)(uploadsDir2, { recursive: true }).catch(() => {
     });
     ALLOWED_MIME_TYPES2 = /* @__PURE__ */ new Set([
@@ -1983,7 +1983,7 @@ init_schema();
 init_db();
 var import_drizzle_orm4 = require("drizzle-orm");
 var __dirname5 = getDirname();
-var uploadsDir = import_path6.default.join(__dirname5, "..", "..", "attached_assets", "uploads");
+var uploadsDir = import_path6.default.join(__dirname5, "..", "attached_assets", "uploads");
 import_fs2.default.promises.mkdir(uploadsDir, { recursive: true }).catch(() => {
 });
 var ALLOWED_MIME_TYPES = /* @__PURE__ */ new Set([
@@ -2309,7 +2309,7 @@ async function readTextFile(p) {
   return (0, import_promises2.readFile)(p, "utf-8");
 }
 var __dirname6 = getDirname();
-var attachedRoot = import_path7.default.resolve(__dirname6, "..", "..", "attached_assets");
+var attachedRoot = import_path7.default.resolve(__dirname6, "..", "attached_assets");
 var router4 = (0, import_express4.Router)();
 router4.get("/lesson/:lessonId/tab/:tabType", async (req, res) => {
   try {
@@ -2837,7 +2837,8 @@ async function registerRoutes(httpServer2, app2) {
     }
     const pathsToTry = [
       import_path10.default.join(process.cwd(), "attached_assets", folder, filename),
-      import_path10.default.join(process.cwd(), "server", "public", "attached_assets", folder, filename)
+      import_path10.default.join(process.cwd(), "server", "public", "attached_assets", folder, filename),
+      import_path10.default.join(process.cwd(), "..", "attached_assets", folder, filename)
     ];
     for (const p of pathsToTry) {
       try {

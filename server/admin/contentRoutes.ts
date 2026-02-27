@@ -13,7 +13,7 @@ async function readTextFile(p: string): Promise<string> {
 }
 
 const __dirname = getDirname();
-const attachedRoot = path.resolve(__dirname, "..", "..", "attached_assets");
+const attachedRoot = path.resolve(__dirname, "..", "attached_assets");
 
 const router = Router();
 

@@ -10,7 +10,7 @@ import { eq, and } from "drizzle-orm";
 import { getAllLessons } from "../data/cms-hierarchy";
 
 const __dirname = getDirname();
-const attachedRoot = path.resolve(__dirname, "..", "..", "attached_assets");
+const attachedRoot = path.resolve(__dirname, "..", "attached_assets");
 
 const FILE_TO_LESSON_OVERRIDE: Record<string, { lessonId: string; tabType: string }> = {
   "lesson_4-1.pdf": { lessonId: "5-1", tabType: "lesson" },
