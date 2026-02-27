@@ -346,6 +346,34 @@ export default function Lesson() {
   // Only set currentLesson if lessonId is provided and valid
   const currentLesson = lessonId && lessons.length > 0 ? (lessons.find(l => l.id === lessonId) || null) : null;
   const currentLessonIndex = lessonId && lessons.length > 0 ? lessons.findIndex(l => l.id === lessonId) : -1;
+
+  const stageShortNames: Record<string, string> = {
+    elementary: "ابتدائي", middle: "متوسط", high: "ثانوي",
+  };
+  const gradeShortMap: Record<string, Record<string, string>> = {
+    elementary: { "1": "اول ابتدائي", "2": "ثاني ابتدائي", "3": "ثالث ابتدائي", "4": "رابع ابتدائي", "5": "خامس ابتدائي", "6": "سادس ابتدائي" },
+    middle: { "1": "اول متوسط", "2": "ثاني متوسط", "3": "ثالث متوسط" },
+    high: { "1": "اول ثانوي", "2": "ثاني ثانوي", "3": "ثالث ثانوي" },
+  };
+  const gradeShort = (() => {
+    const sg = typeof window !== "undefined" ? sessionStorage.getItem("lesson_grade") : null;
+    const ss = typeof window !== "undefined" ? sessionStorage.getItem("lesson_stage") : null;
+    if (ss && sg && gradeShortMap[ss]?.[sg]) return gradeShortMap[ss][sg];
+    const fromUrl = subjectData?.grades?.[0];
+    if (fromUrl && gradeShortMap[internalStage]?.[String(fromUrl)]) return gradeShortMap[internalStage][String(fromUrl)];
+    return stageShortNames[internalStage] || "";
+  })();
+  const currentSemesterName = (() => {
+    if (!lessonId) return "";
+    for (let i = 0; i < semesters.length; i++) {
+      for (const ch of semesters[i].chapters) {
+        if (ch.lessons.some(l => l.id === lessonId)) {
+          return i === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني";
+        }
+      }
+    }
+    return "";
+  })();
   
   // Get subject name with error handling
   let subjectName = "المادة";
@@ -484,7 +512,9 @@ export default function Lesson() {
     if (!currentLesson || !subjectName) return;
     const title = getLessonDisplayTitle(currentLesson, lessonTitlesFromApi);
     const autoTitle = `${title} - ${subjectName}`;
-    const autoDesc = `درس ${title} في مادة ${subjectName} - شرح الدرس والملخص والاختبارات على منصة شارف التعليمية.`;
+    const gradePart = gradeShort ? ` ${gradeShort}` : "";
+    const semPart = currentSemesterName ? ` ${currentSemesterName}` : "";
+    const autoDesc = `درس ${title} مادة ${subjectName}${gradePart}${semPart} - شرح الدرس والملخصات والاختبارات على منصة شارف التعليمية`;
     const autoKw = `${title}, ${subjectName}, شرح ${title}, ملخص ${title}, اختبار ${title}, منصة شارف`;
     const lessonPath = window.location.pathname;
     fetch(`/api/seo?path=${encodeURIComponent(lessonPath)}`)
@@ -504,7 +534,7 @@ export default function Lesson() {
         }
       })
       .catch(() => setPageMeta(autoTitle, autoDesc, autoKw));
-  }, [currentLesson, subjectName, lessonTitlesFromApi]);
+  }, [currentLesson, subjectName, lessonTitlesFromApi, gradeShort, currentSemesterName]);
 
   const toggleSemester = (semesterId: string) => {
     setOpenSemesters(prev => {
@@ -1629,7 +1659,7 @@ export default function Lesson() {
               <InlineSeoEditor
                 pagePath={window.location.pathname}
                 autoTitle={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} - ${subjectName || ""}`}
-                autoDescription={`درس ${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} في مادة ${subjectName || ""} - شرح الدرس والملخص والاختبارات على منصة شارف التعليمية.`}
+                autoDescription={`درس ${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} مادة ${subjectName || ""}${gradeShort ? ` ${gradeShort}` : ""}${currentSemesterName ? ` ${currentSemesterName}` : ""} - شرح الدرس والملخصات والاختبارات على منصة شارف التعليمية`}
                 autoKeywords={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""}, ${subjectName || ""}, منصة شارف`}
               />
               {attachmentView !== null ? (
