@@ -2,17 +2,31 @@ import express, { type Express } from "express";
 import { existsSync } from "fs";
 import path from "path";
 
-const publicPath = path.resolve(process.cwd(), "server", "public");
+function resolvePublicPath(): string {
+  const candidates = [
+    path.resolve(process.cwd(), "server", "public"),
+    path.resolve(path.dirname(process.argv[1] || ""), "server", "public"),
+    path.resolve(path.dirname(process.argv[1] || ""), "..", "server", "public"),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return candidates[0];
+}
+
+const publicPath = resolvePublicPath();
 
 export function serveStatic(app: Express) {
   if (!existsSync(publicPath)) {
     if (process.env.NODE_ENV === "production") {
+      console.log(`[static] Public directory not found, tried: ${publicPath}`);
       return;
     }
     throw new Error(
       `Could not find the build directory: ${publicPath}, make sure to build the client first (npm run build)`,
     );
   }
+  console.log(`[static] Serving static files from: ${publicPath}`);
 
   app.use(
     express.static(publicPath, {
