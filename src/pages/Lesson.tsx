@@ -1246,10 +1246,10 @@ export default function Lesson() {
           <Sidebar side="right" className="border-l border-border/50 bg-background/95">
             <SidebarHeader className="p-5 border-b border-border/50 bg-card/50">
               <div className="flex items-center gap-3">
-                <Link href="/" aria-label="الصفحة الرئيسية" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/80 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors" data-testid="link-home">
+                <Link href="/" aria-label="الصفحة الرئيسية" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/60 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors border border-border/50" data-testid="link-home">
                   <Home className="w-5 h-5" />
                 </Link>
-                <Link href={homeLink} aria-label="الرجوع للمرحلة" className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-colors" data-testid="link-stage">
+                <Link href={homeLink} aria-label="الرجوع للمرحلة" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/60 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors border border-border/50" data-testid="link-stage">
                   <LayoutDashboard className="w-5 h-5" />
                 </Link>
                 <div className="flex-1 min-w-0">
