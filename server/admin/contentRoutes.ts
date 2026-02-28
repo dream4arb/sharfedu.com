@@ -201,6 +201,28 @@ router.get("/lesson/:lessonId/has-pdf", async (req, res) => {
   }
 });
 
+router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+    const content = await cmsStorage.getCmsContentFull(lessonId, "lesson");
+    if (!content || content.contentType !== "pdf" || !content.dataValue) {
+      return res.status(400).json({ message: "لا يوجد ملف PDF في تبويب الدرس" });
+    }
+    let pdfPath = content.dataValue;
+    if (pdfPath.startsWith("/attached_assets/")) {
+      const { resolve } = await import("path");
+      pdfPath = resolve(process.cwd(), pdfPath.slice(1));
+    }
+    const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
+    generateLessonHtmlFromPdf(lessonId, pdfPath).then((r) => {
+      if (!r.success) console.error(`[شارف AI] regenerate failed: ${r.message}`);
+    });
+    res.json({ ok: true, message: "بدأ التوليد" });
+  } catch (e: any) {
+    res.status(500).json({ message: e?.message || "خطأ" });
+  }
+});
+
 router.get("/lesson/:lessonId/ssa-status", async (req, res) => {
   try {
     const { getGenerationStatus } = await import("../lib/generateLessonHtml");
