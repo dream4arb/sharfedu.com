@@ -99,7 +99,7 @@ const comparisonItems = [
   { feature: "اختبارات تفاعلية فورية مع تصحيح", sharaf: true, traditional: false },
   { feature: "تتبع التقدم والأداء المتقدم", sharaf: true, traditional: false },
   { feature: "متاح 24/7 من أي مكان وأي جهاز", sharaf: true, traditional: false },
-  { feature: "تفاعل مباشر مع المعلم", sharaf: false, traditional: true },
+  { feature: "تفاعل مباشر مع المعلم", sharaf: false, traditional: true, sharafComingSoon: true },
 ];
 
 const steps = [
@@ -533,6 +533,8 @@ export default function Features() {
                         <div className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                           <Check className="w-4 h-4 text-green-600" />
                         </div>
+                      ) : (item as any).sharafComingSoon ? (
+                        <span className="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-full whitespace-nowrap">قريباً</span>
                       ) : (
                         <div className="w-7 h-7 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                           <X className="w-4 h-4 text-red-500" />
