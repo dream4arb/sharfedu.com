@@ -1869,14 +1869,23 @@ export default function Lesson() {
                     onClick={async () => {
                       if (!lessonIdFromParams) return;
                       try {
+                        // إظهار حالة التوليد فوراً والتحويل لتبويب شارف AI
+                        setSsaGenerating(true);
+                        setActiveTab("ssa");
+                        
                         const res = await fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/regenerate-ssa`, {
                           method: "POST"
                         });
-                        if (res.ok) {
-                          window.location.reload();
+                        
+                        if (!res.ok) {
+                          setSsaGenerating(false);
+                          const errData = await res.json();
+                          console.error("Regeneration failed:", errData.message);
                         }
+                        // لا نحتاج لتحديث الصفحة يدوياً، لأن useEffect الخاص بـ ssa-status سيقوم بالمهمة
                       } catch (err) {
                         console.error("Failed to regenerate:", err);
+                        setSsaGenerating(false);
                       }
                     }}
                     data-testid="button-regenerate-content"
