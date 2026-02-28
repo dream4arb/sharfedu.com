@@ -322,7 +322,7 @@ export default function Stages() {
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-r from-primary to-cyan-500 relative overflow-hidden">
+      <section className="py-16 mb-16 bg-gradient-to-r from-primary to-cyan-500 relative overflow-hidden">
         <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 800 200">
           <circle cx="100" cy="100" r="80" fill="white" />
           <circle cx="700" cy="50" r="60" fill="white" />
