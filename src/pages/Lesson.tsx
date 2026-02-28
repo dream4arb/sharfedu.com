@@ -1859,6 +1859,32 @@ export default function Lesson() {
                 autoDescription={`درس ${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} مادة ${subjectName || ""}${gradeShort ? ` ${gradeShort}` : ""}${currentSemesterName ? ` ${currentSemesterName}` : ""} - شرح الدرس والملخصات والاختبارات على منصة شارف التعليمية`}
                 autoKeywords={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""}, ${subjectName || ""}, منصة شارف`}
               />
+              {user?.role === "admin" && (
+                <div className="flex justify-start px-1 pb-4 mt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700 dark:border-amber-900/50 dark:hover:bg-amber-900/20 rounded-xl font-bold shadow-sm"
+                    onClick={async () => {
+                      if (!lessonIdFromParams) return;
+                      try {
+                        const res = await fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/regenerate-ssa`, {
+                          method: "POST"
+                        });
+                        if (res.ok) {
+                          window.location.reload();
+                        }
+                      } catch (err) {
+                        console.error("Failed to regenerate:", err);
+                      }
+                    }}
+                    data-testid="button-regenerate-content"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    تحديث المحتوى (إعادة التوليد)
+                  </Button>
+                </div>
+              )}
               {attachmentView !== null ? (
                 // عرض PDF المرفق في نفس الصفحة مكان رسالة الترحيب
                 <motion.div
