@@ -46,24 +46,33 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     if (!lessonId || !rating || rating < 1 || rating > 5) {
       return res.status(400).json({ error: "Invalid rating" });
     }
-    const ratingsFile = path.resolve(process.cwd(), "server", "data", "lesson-ratings.json");
-    const fs = require("fs");
-    let ratings: any[] = [];
-    try { ratings = JSON.parse(fs.readFileSync(ratingsFile, "utf-8")); } catch {}
-    const user = (req as any).user;
-    ratings.push({
-      lessonId,
-      lessonTitle: lessonTitle || lessonId,
-      rating: Number(rating),
-      comment: comment?.trim() || "",
-      stage: stage || "",
-      subject: subject || "",
-      userId: user?.id || null,
-      userName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email : "زائر",
-      timestamp: new Date().toISOString(),
-    });
-    fs.writeFileSync(ratingsFile, JSON.stringify(ratings, null, 2), "utf-8");
-    res.json({ success: true });
+    try {
+      const dataDir = path.resolve(process.cwd(), "server", "data");
+      const fs = require("fs");
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      const ratingsFile = path.join(dataDir, "lesson-ratings.json");
+      let ratings: any[] = [];
+      try { ratings = JSON.parse(fs.readFileSync(ratingsFile, "utf-8")); } catch {}
+      const user = (req as any).user;
+      ratings.push({
+        lessonId,
+        lessonTitle: lessonTitle || lessonId,
+        rating: Number(rating),
+        comment: comment?.trim() || "",
+        stage: stage || "",
+        subject: subject || "",
+        userId: user?.id || null,
+        userName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email : "زائر",
+        timestamp: new Date().toISOString(),
+      });
+      fs.writeFileSync(ratingsFile, JSON.stringify(ratings, null, 2), "utf-8");
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error("[Rating] Error saving rating:", err?.message);
+      res.status(500).json({ error: "فشل حفظ التقييم" });
+    }
   });
 
 

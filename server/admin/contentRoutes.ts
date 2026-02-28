@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { access, readFile } from "fs/promises";
+import fs from "fs";
+import { access, readFile, readdir } from "fs/promises";
 import path from "path";
 import { getDirname } from "../resolve-dir";
 import * as storage from "./contentStorage";
@@ -225,7 +226,7 @@ router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
         ... (await (async () => {
              try {
                const uploadsDir = resolve(process.cwd(), "attached_assets", "uploads");
-               const files = await fs.promises.readdir(uploadsDir);
+               const files = await readdir(uploadsDir);
                const match = files.find(f => f.includes(lessonId) && f.endsWith(".pdf"));
                return match ? [resolve(uploadsDir, match)] : [];
              } catch { return []; }

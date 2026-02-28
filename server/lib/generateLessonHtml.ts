@@ -10,7 +10,28 @@ export function getGenerationStatus(lessonId: string) {
   return generationStatus.get(lessonId) || null;
 }
 
-const PROMPT_FILES_DIR = path.resolve(getDirname(), "..", "prompt-files");
+function resolvePromptFilesDir(): string {
+  const candidates = [
+    path.resolve(getDirname(), "..", "prompt-files"),
+    path.resolve(getDirname(), "prompt-files"),
+    path.resolve(process.cwd(), "prompt-files"),
+    path.resolve(path.dirname(process.argv[1] || ""), "prompt-files"),
+  ];
+  const fs = require("fs");
+  let firstExisting: string | null = null;
+  for (const dir of candidates) {
+    try {
+      if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) {
+        const files = fs.readdirSync(dir);
+        if (files.length > 0) return dir;
+        if (!firstExisting) firstExisting = dir;
+      }
+    } catch {}
+  }
+  return firstExisting || candidates[0];
+}
+
+const PROMPT_FILES_DIR = resolvePromptFilesDir();
 
 const MAX_PROMPT_CHARS = 900_000;
 
