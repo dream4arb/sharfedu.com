@@ -97,7 +97,7 @@ export function Navbar() {
               <button
                 onClick={() => setStagesOpen(!stagesOpen)}
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1 ${
-                  location.startsWith('/stage') 
+                  location.startsWith('/stage/') 
                     ? "text-white bg-primary" 
                     : "text-foreground"
                 }`}
