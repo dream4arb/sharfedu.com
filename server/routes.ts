@@ -36,6 +36,11 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.sendFile(filePath);
   });
 
+  app.get("/preview-lesson.html", (_req, res) => {
+    const filePath = path.resolve(process.cwd(), "server", "public", "preview-lesson.html");
+    res.sendFile(filePath);
+  });
+
   app.post("/api/lesson-rating", (req, res) => {
     const { lessonId, lessonTitle, rating } = req.body;
     if (!lessonId || !rating || rating < 1 || rating > 5) {

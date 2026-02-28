@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الغلاف الجوي والطقس - منصة شارف التعليمية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f0f23;
+      --bg-secondary: #1a1a3e;
+      --bg-card: rgba(255,255,255,0.04);
+      --accent: #00d4aa;
+      --accent-purple: #7b68ee;
+      --accent-coral: #ff6b6b;
+      --accent-success: #00e676;
+      --accent-warning: #ffd93d;
+      --text-primary: #e8e8ff;
+      --text-secondary: #8888bb;
+      --glass-border: rgba(255,255,255,0.08);
+      --glass-blur: blur(20px);
+      --glow-accent: 0 0 30px rgba(0,212,170,0.15);
+      --glow-purple: 0 0 30px rgba(123,104,238,0.15);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --radius-xs: 12px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Tajawal',sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height:1.9;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* شريط التقدم العائم */
+    #progress-bar {
+      position:fixed; top:0; right:0; height:3px; z-index:1000;
+      background: linear-gradient(90deg, var(--accent), var(--accent-purple), var(--accent-coral));
+      width:0%; transition: width 0.1s;
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    /* خلفية الكواكب المتحركة */
+    .stars-bg {
+      position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.15), transparent),
+        radial-gradient(2px 2px at 40% 70%, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.12), transparent),
+        radial-gradient(2px 2px at 80% 50%, rgba(255,255,255,0.08), transparent),
+        radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 70% 90%, rgba(255,255,255,0.07), transparent),
+        radial-gradient(2px 2px at 50% 10%, rgba(255,255,255,0.12), transparent);
+    }
+
+    .page-wrapper { position:relative; z-index:1; }
+    .container { max-width:1100px; margin:0 auto; padding:0 20px; }
+
+    /* ========== HERO ========== */
+    .hero-section {
+      min-height:420px; display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden; padding:60px 20px 50px;
+      background: linear-gradient(135deg, #0f0f23, #1a1a3e, #0d1b3e, #0f0f23);
+      background-size: 400% 400%;
+      animation: gradient-shift 15s ease infinite;
+    }
+    @keyframes gradient-shift {
+      0%,100% { background-position:0% 50%; }
+      25% { background-position:100% 0%; }
+      50% { background-position:100% 100%; }
+      75% { background-position:0% 100%; }
+    }
+    .hero-orb {
+      position:absolute; border-radius:50%; filter:blur(80px); opacity:0.4; pointer-events:none;
+      animation: orb-float 20s ease-in-out infinite;
+    }
+    .hero-orb-1 { width:400px; height:400px; background:var(--accent); top:-200px; right:-100px; }
+    .hero-orb-2 { width:350px; height:350px; background:var(--accent-purple); bottom:-150px; left:-100px; animation-delay:7s; }
+    .hero-orb-3 { width:200px; height:200px; background:var(--accent-coral); top:50%; left:50%; animation-delay:12s; }
+    @keyframes orb-float {
+      0%,100% { transform:translate(0,0) scale(1); }
+      33% { transform:translate(40px,-40px) scale(1.1); }
+      66% { transform:translate(-30px,30px) scale(0.9); }
+    }
+    .hero-content { position:relative; z-index:2; text-align:center; max-width:800px; }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background: rgba(0,212,170,0.1); border:1px solid rgba(0,212,170,0.3);
+      padding:8px 24px; border-radius:50px; font-size:14px; font-weight:700;
+      color:var(--accent); margin-bottom:24px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-badge::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(1.5);} }
+    .hero-title {
+      font-size:clamp(32px,6vw,56px); font-weight:900;
+      background: linear-gradient(135deg, #ffffff, var(--accent), var(--accent-purple));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; line-height:1.3; margin-bottom:16px;
+    }
+    .hero-subtitle { font-size:18px; color:var(--text-secondary); font-weight:500; max-width:600px; margin:0 auto 30px; line-height:1.8; }
+    .hero-stats {
+      display:flex; justify-content:center; gap:12px; flex-wrap:wrap;
+    }
+    .hero-stat-chip {
+      background:var(--bg-card); backdrop-filter:var(--glass-blur);
+      border:1px solid var(--glass-border); border-radius:var(--radius-sm);
+      padding:12px 20px; text-align:center; min-width:100px;
+    }
+    .hero-stat-chip .val { font-size:22px; font-weight:900; color:var(--accent); display:block; }
+    .hero-stat-chip .lbl { font-size:12px; color:var(--text-secondary); }
+    .platform-badge {
+      margin-top:28px; display:inline-block;
+      background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(123,104,238,0.15));
+      border:1px solid rgba(0,212,170,0.3); padding:12px 36px; border-radius:50px;
+      font-size:15px; font-weight:800; color:white;
+      box-shadow: var(--glow-accent);
+    }
+
+    /* ========== الأقسام ========== */
+    .lesson-section {
+      margin:32px 0; position:relative;
+    }
+    .section-card {
+      background:var(--bg-card); backdrop-filter:var(--glass-blur);
+      border:1px solid var(--glass-border); border-radius:var(--radius);
+      padding:36px 28px; position:relative; overflow:hidden;
+      transition: border-color 0.4s, box-shadow 0.4s;
+    }
+    .section-card:hover {
+      border-color: rgba(0,212,170,0.2);
+      box-shadow: var(--glow-accent);
+    }
+    .section-card::before {
+      content:attr(data-section-num); position:absolute; top:-20px; left:20px;
+      font-size:180px; font-weight:900; color:rgba(255,255,255,0.02);
+      line-height:1; pointer-events:none; z-index:0;
+    }
+    .section-card > * { position:relative; z-index:1; }
+
+    .section-header {
+      display:flex; align-items:center; gap:14px; margin-bottom:28px;
+    }
+    .section-icon {
+      width:52px; height:52px; border-radius:var(--radius-xs);
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px; flex-shrink:0;
+    }
+    .section-icon.teal { background:linear-gradient(135deg,rgba(0,212,170,0.2),rgba(0,212,170,0.05)); box-shadow:inset 0 0 20px rgba(0,212,170,0.1); }
+    .section-icon.purple { background:linear-gradient(135deg,rgba(123,104,238,0.2),rgba(123,104,238,0.05)); box-shadow:inset 0 0 20px rgba(123,104,238,0.1); }
+    .section-icon.coral { background:linear-gradient(135deg,rgba(255,107,107,0.2),rgba(255,107,107,0.05)); box-shadow:inset 0 0 20px rgba(255,107,107,0.1); }
+    .section-icon.gold { background:linear-gradient(135deg,rgba(255,217,61,0.2),rgba(255,217,61,0.05)); box-shadow:inset 0 0 20px rgba(255,217,61,0.1); }
+    .section-icon.green { background:linear-gradient(135deg,rgba(0,230,118,0.2),rgba(0,230,118,0.05)); box-shadow:inset 0 0 20px rgba(0,230,118,0.1); }
+
+    .section-title {
+      font-size:clamp(22px,4vw,30px); font-weight:800;
+      background: linear-gradient(135deg, var(--text-primary), var(--accent));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+
+    /* بطاقة المعلومة المضيئة */
+    .info-glow {
+      background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(123,104,238,0.05));
+      border:1px solid rgba(0,212,170,0.15); border-radius:var(--radius-sm);
+      padding:20px 24px; margin-bottom:20px; font-size:16px; line-height:2;
+      color:var(--text-primary); font-weight:500;
+      border-right:4px solid var(--accent);
+    }
+
+    /* بطاقات المصطلحات */
+    .term-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+    .term-card {
+      background: rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+      border-radius:var(--radius-sm); padding:20px; transition:all 0.3s;
+      position:relative; overflow:hidden;
+    }
+    .term-card:hover { border-color:rgba(0,212,170,0.3); transform:translateY(-2px); box-shadow:var(--glow-accent); }
+    .term-card.primary { border-right:3px solid var(--accent); }
+    .term-card.secondary { border-right:3px solid var(--accent-purple); }
+    .term-name { font-weight:800; font-size:17px; margin-bottom:8px; }
+    .term-card.primary .term-name { color:var(--accent); }
+    .term-card.secondary .term-name { color:var(--accent-purple); }
+    .term-def { color:var(--text-secondary); font-size:15px; line-height:1.8; }
+
+    /* بطاقات القواعد */
+    .rule-card {
+      background: linear-gradient(135deg, rgba(123,104,238,0.1), rgba(0,212,170,0.05));
+      border:1px solid rgba(123,104,238,0.2); border-radius:var(--radius-sm);
+      padding:24px; text-align:center; margin-bottom:16px;
+      transition:all 0.3s;
+    }
+    .rule-card:hover { box-shadow:var(--glow-purple); border-color:rgba(123,104,238,0.4); }
+    .rule-formula {
+      font-size:28px; font-weight:900; margin:16px 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      direction:ltr; display:inline-block;
+    }
+    .rule-desc { color:var(--text-secondary); font-weight:500; }
+
+    /* خطوات الحل */
+    .steps-timeline { position:relative; padding-right:40px; }
+    .steps-timeline::before {
+      content:''; position:absolute; right:18px; top:0; bottom:0; width:2px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent-purple), transparent);
+    }
+    .step-item { display:flex; gap:20px; margin-bottom:24px; align-items:flex-start; position:relative; }
+    .step-marker {
+      min-width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:16px; color:white; flex-shrink:0; position:relative; z-index:2;
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+      box-shadow: 0 0 20px rgba(0,212,170,0.3);
+    }
+    .step-body {
+      flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+      border-radius:var(--radius-xs); padding:18px 20px;
+      transition: border-color 0.3s;
+    }
+    .step-body:hover { border-color:rgba(0,212,170,0.2); }
+    .step-body strong { color:var(--accent); display:block; margin-bottom:6px; }
+
+    /* الرسوم التوضيحية */
+    .visual-gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px; }
+    .visual-card {
+      background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+      border-radius:var(--radius-sm); padding:24px; text-align:center;
+      transition:all 0.3s;
+    }
+    .visual-card:hover { border-color:rgba(123,104,238,0.3); box-shadow:var(--glow-purple); }
+    .visual-card svg { overflow:visible; max-width:100%; height:auto; }
+    .visual-title { font-size:15px; font-weight:700; color:var(--accent-purple); margin-top:14px; }
+    .svg-scroll { overflow-x:auto; max-width:100%; padding:10px 0; }
+    .svg-scroll svg { min-width: 400px; } /* Ensure SVGs don't shrink too much */
+
+
+    /* الأمثلة المحلولة */
+    .example-card {
+      background: linear-gradient(135deg, rgba(123,104,238,0.08), rgba(255,107,107,0.04));
+      border:1px solid rgba(123,104,238,0.15); border-radius:var(--radius-sm);
+      padding:28px; margin-bottom:20px;
+    }
+    .example-title { color:var(--accent-purple); font-weight:800; font-size:18px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+    .solution-step {
+      padding:14px 18px; margin:10px 0; border-radius:var(--radius-xs);
+      background:rgba(255,255,255,0.03); border-right:3px solid var(--accent-purple);
+      color:var(--text-primary); font-size:15px; line-height:1.9;
+    }
+    .solution-step .step-label { color:var(--accent); font-weight:800; margin-bottom:4px; display:block; font-size:13px; }
+    .solution-result {
+      background:linear-gradient(135deg,rgba(0,230,118,0.1),rgba(0,212,170,0.05));
+      border:1px solid rgba(0,230,118,0.2); border-radius:var(--radius-xs);
+      padding:16px; text-align:center; margin-top:14px;
+      font-weight:800; font-size:18px; color:var(--accent-success);
+    }
+
+    /* المرجع السريع */
+    .ref-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+    .ref-item {
+      background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,212,170,0.02));
+      border:1px solid rgba(0,212,170,0.15); border-radius:var(--radius-xs);
+      padding:18px; text-align:center; transition:all 0.3s;
+    }
+    .ref-item:hover { border-color:rgba(0,212,170,0.4); box-shadow:var(--glow-accent); }
+    .ref-label { font-weight:800; color:var(--accent); margin-bottom:8px; font-size:14px; }
+    .ref-formula { font-size:20px; font-weight:900; color:var(--text-primary); direction:ltr; }
+
+    /* ========== الاختبار التفاعلي ========== */
+    .quiz-wrapper {
+      background: linear-gradient(135deg, rgba(123,104,238,0.06), rgba(255,107,107,0.04));
+      border:1px solid rgba(123,104,238,0.15); border-radius:var(--radius);
+      padding:0; overflow:hidden;
+    }
+    .quiz-header {
+      background: linear-gradient(135deg, rgba(123,104,238,0.15), rgba(0,212,170,0.08));
+      padding:20px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+      border-bottom:1px solid var(--glass-border);
+    }
+    .quiz-progress-bar { flex:1; min-width:200px; height:6px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
+    .quiz-progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-purple)); border-radius:10px; transition:width 0.5s; width:0%; }
+    .quiz-counter { font-weight:800; color:var(--accent); font-size:14px; white-space:nowrap; }
+    .quiz-body { padding:28px; }
+
+    .q-card {
+      background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+      border-radius:var(--radius-sm); padding:28px; margin-bottom:16px;
+      transition: all 0.4s;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fade-in-up 0.5s forwards;
+    }
+    @keyframes fade-in-up {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .q-card.fade-out {
+      animation: fade-out-down 0.5s forwards;
+    }
+    @keyframes fade-out-down {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(20px); }
+    }
+
+    .q-card.correct { border-color:var(--accent-success); box-shadow:0 0 25px rgba(0,230,118,0.15); background:rgba(0,230,118,0.05); }
+    .q-card.wrong { border-color:var(--accent-coral); box-shadow:0 0 25px rgba(255,107,107,0.15); background:rgba(255,107,107,0.05); }
+    .q-num {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:38px; height:38px; border-radius:var(--radius-xs);
+      background:linear-gradient(135deg, var(--accent), var(--accent-purple));
+      color:white; font-weight:900; font-size:16px; margin-left:12px;
+      box-shadow: 0 0 15px rgba(0,212,170,0.2);
+    }
+    .q-text { font-size:18px; font-weight:700; margin-bottom:20px; color:var(--text-primary); display:flex; align-items:center; }
+    .opts { display:grid; gap:12px; }
+    .opt-btn {
+      display:flex; align-items:center; gap:12px; width:100%;
+      padding:16px 20px; border:1px solid var(--glass-border);
+      border-radius:var(--radius-xs); background:rgba(255,255,255,0.02);
+      cursor:pointer; font-family:'Tajawal',sans-serif; font-size:15px;
+      font-weight:600; text-align:right; color:var(--text-primary);
+      transition:all 0.3s; position:relative; overflow:hidden;
+    }
+    .opt-btn::before {
+      content:''; position:absolute; top:0; right:0; width:0; height:100%;
+      background:linear-gradient(90deg, transparent, rgba(0,212,170,0.05));
+      transition:width 0.3s;
+    }
+    .opt-btn:hover { border-color:rgba(0,212,170,0.3); }
+    .opt-btn:hover::before { width:100%; }
+    .opt-letter {
+      min-width:32px; height:32px; border-radius:10px; display:flex; align-items:center;
+      justify-content:center; font-weight:800; font-size:14px; flex-shrink:0;
+      background:rgba(255,255,255,0.06); color:var(--text-secondary);
+      border:1px solid var(--glass-border);
+    }
+    .opt-btn.selected-correct { background:rgba(0,230,118,0.1); border-color:var(--accent-success); }
+    .opt-btn.selected-correct .opt-letter { background:var(--accent-success); color:#0f0f23; border-color:var(--accent-success); }
+    .opt-btn.selected-wrong { background:rgba(255,107,107,0.1); border-color:var(--accent-coral); }
+    .opt-btn.selected-wrong .opt-letter { background:var(--accent-coral); color:white; border-color:var(--accent-coral); }
+    .opt-btn.show-correct { background:rgba(0,230,118,0.08); border-color:var(--accent-success); }
+    .opt-btn.show-correct .opt-letter { background:var(--accent-success); color:#0f0f23; border-color:var(--accent-success); }
+    .opt-btn:disabled { cursor:default; }
+    .feedback { margin-top:14px; padding:12px 16px; border-radius:var(--radius-xs); font-weight:700; font-size:14px; }
+    .feedback.correct-fb { background:rgba(0,230,118,0.1); color:var(--accent-success); border:1px solid rgba(0,230,118,0.2); }
+    .feedback.wrong-fb { background:rgba(255,107,107,0.1); color:var(--accent-coral); border:1px solid rgba(255,107,107,0.2); }
+
+    .result-box {
+      background: linear-gradient(135deg, rgba(123,104,238,0.15), rgba(0,212,170,0.15));
+      border:1px solid rgba(0,212,170,0.3); border-radius:var(--radius);
+      padding:48px 32px; text-align:center; margin-top:28px;
+      box-shadow: 0 0 60px rgba(0,212,170,0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fade-in-up 0.5s forwards;
+    }
+    .result-score {
+      font-size:72px; font-weight:900;
+      background:linear-gradient(135deg,var(--accent),var(--accent-purple));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .result-msg { font-size:24px; font-weight:800; margin:16px 0; color:var(--text-primary); }
+    .result-detail { color:var(--text-secondary); font-size:16px; margin-bottom:24px; }
+    .result-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn-retry {
+      padding:14px 40px; border-radius:50px; border:none; font-family:'Tajawal',sans-serif;
+      font-size:16px; font-weight:800; cursor:pointer; transition:all 0.3s;
+      background:linear-gradient(135deg,var(--accent),var(--accent-purple));
+      color:white; box-shadow:0 0 25px rgba(0,212,170,0.3);
+    }
+    .btn-retry:hover { transform:scale(1.05); box-shadow:0 0 40px rgba(0,212,170,0.4); }
+    .btn-share {
+      padding:14px 40px; border-radius:50px; font-family:'Tajawal',sans-serif;
+      font-size:16px; font-weight:800; cursor:pointer; transition:all 0.3s;
+      background:transparent; color:var(--text-primary);
+      border:1px solid var(--glass-border);
+    }
+    .btn-share:hover { border-color:rgba(0,212,170,0.3); }
+
+    /* ========== قائمة الإنجاز ========== */
+    .checklist { list-style:none; }
+    .checklist li {
+      padding:14px 18px; margin-bottom:10px; border-radius:var(--radius-xs);
+      background:rgba(255,255,255,0.03); border:1px solid var(--glass-border);
+      display:flex; align-items:center; gap:14px; font-weight:600;
+      cursor:pointer; transition:all 0.3s; font-size:15px;
+    }
+    .checklist li:hover { border-color:rgba(0,212,170,0.2); }
+    .checklist li.done { background:rgba(0,230,118,0.06); border-color:rgba(0,230,118,0.2); color:var(--text-secondary); text-decoration:line-through; }
+    .check-box {
+      width:26px; height:26px; border-radius:8px; border:2px solid rgba(255,255,255,0.15);
+      display:flex; align-items:center; justify-content:center; font-size:14px;
+      flex-shrink:0; transition:all 0.3s; color:transparent;
+    }
+    .checklist li.done .check-box { background:var(--accent-success); border-color:var(--accent-success); color:white; }
+
+    /* ========== Footer ========== */
+    .page-footer {
+      text-align:center; padding:40px 20px; margin-top:48px;
+      border-top:1px solid var(--glass-border);
+      color:var(--text-secondary); font-size:14px;
+    }
+    .page-footer strong { color:var(--accent); }
+
+    /* ========== متجاوب ========== */
+    @media(max-width:768px) {
+      .hero-section { padding:40px 16px 30px; min-height:320px; }
+      .hero-title { font-size:28px; }
+      .section-card { padding:24px 18px; }
+      .term-grid, .visual-gallery, .ref-grid { grid-template-columns:1fr; }
+      .steps-timeline { padding-right:30px; }
+      .steps-timeline::before { right:13px; }
+      .step-marker { min-width:30px; height:30px; font-size:13px; }
+      .quiz-body { padding:18px; }
+      .q-card { padding:20px; }
+      .result-score { font-size:48px; }
+      .hero-stats { gap:8px; }
+      .hero-stat-chip { padding:8px 14px; min-width:80px; }
+      .hero-stat-chip .val { font-size:18px; }
+    }
+  </style>
+<style>html,body{max-width:100%!important;overflow-x:hidden!important;width:100%!important;margin:0!important;padding:0!important}*{box-sizing:border-box!important}img,video,canvas,svg,table,iframe{max-width:100%!important}pre,code{overflow-x:auto!important;white-space:pre-wrap!important;word-break:break-word!important}</style><script>function _sh(){var els=document.body.children;var h=0;for(var i=0;i<els.length;i++){var r=els[i].getBoundingClientRect();var b=r.top+r.height+window.scrollY;if(b>h)h=b}h=Math.ceil(h);if(h<100)h=document.documentElement.scrollHeight;window.parent.postMessage({type:"sharef-iframe-height",height:h},"*")}window.addEventListener("load",function(){_sh();setTimeout(_sh,300);setTimeout(_sh,1000);new ResizeObserver(_sh).observe(document.body)});</script></head>
+<body>
+  <div id="progress-bar"></div>
+  <div class="stars-bg"></div>
+  <div class="page-wrapper">
+
+    <!-- Hero -->
+    <section class="hero-section">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+      <div class="hero-content">
+        <div class="hero-badge">✨ منصة شارف التعليمية</div>
+        <h1 class="hero-title">الغلاف الجوي والطقس</h1>
+        <p class="hero-subtitle">استكشف عالم الغلاف الجوي الساحر والطقس المتقلب في درس تفاعلي شامل. تعلم كيف تؤثر الغازات والطبقات ودورة الماء في حياتنا اليومية، واكتشف أسرار الرياح وتكون الغيوم.</p>
+        <div class="hero-stats">
+          <div class="hero-stat-chip">
+            <span class="val">15+</span>
+            <span class="lbl">مفهوم</span>
+          </div>
+          <div class="hero-stat-chip">
+            <span class="val">8+</span>
+            <span class="lbl">أمثلة</span>
+          </div>
+          <div class="hero-stat-chip">
+            <span class="val">10</span>
+            <span class="lbl">أسئلة</span>
+          </div>
+          <div class="hero-stat-chip">
+            <span class="val">5</span>
+            <span class="lbl">رسوم</span>
+          </div>
+        </div>
+        <div class="platform-badge">📚 شرح تفاعلي شامل • تدريب غير محدود</div>
+      </div>
+    </section>
+
+    <div class="container">
+
+      <!-- 1. لماذا هذا الدرس مهم -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="01">
+          <div class="section-header">
+            <div class="section-icon teal">🎯</div>
+            <h2 class="section-title">لماذا هذا الدرس مهم؟</h2>
+          </div>
+          <div class="info-glow">الحياة على سطح الأرض غير ممكنة من دون الهواء. يقوم الغلاف الجوي بتزويد الأرض بجميع الغازات اللازمة للحياة، ويحمي المخلوقات الحية من الأشعة الضارة، ويمتص الحرارة ويوزعها. حركة الغلاف الجوي تسبب تغير الطقس الذي يؤثر في حياتنا اليومية.</div>
+        </div>
+      </div>
+
+      <!-- 2. المصطلحات -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="02">
+          <div class="section-header">
+            <div class="section-icon purple">📖</div>
+            <h2 class="section-title">المصطلحات الأساسية</h2>
+          </div>
+          <div class="term-grid">
+            <div class="term-card primary">
+              <div class="term-name">الغلاف الجوي</div>
+              <div class="term-def">طبقة الغازات المحيطة بالأرض.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">الهواء</div>
+              <div class="term-def">خليط غازي يشكل الغلاف الجوي للأرض.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">الغيوم</div>
+              <div class="term-def">مناطق في الغلاف الجوي تحتوي على قطيرات ماء أو بلورات جليد، يمكن رؤيتها.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">الهباء الجوي</div>
+              <div class="term-def">مواد صلبة وسائلة دقيقة معلقة في الغلاف الجوي مثل الغبار والأملاح وحبوب اللقاح.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">التروبوسفير</div>
+              <div class="term-def">أقرب طبقات الغلاف الجوي لسطح الأرض وتضم معظم الغيوم والتغيرات الطقسية.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">الستراتوسفير</div>
+              <div class="term-def">الطبقة التي تلي التروبوسفير وتحتوي على معظم الأوزون الجوي.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">الميزوسفير</div>
+              <div class="term-def">الطبقة التي تلي الستراتوسفير وتعتبر الأكثر برودة.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">الثيرموسفير</div>
+              <div class="term-def">الطبقة التي تلي الميزوسفير وتزداد فيها الحرارة بشكل سريع.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">الإكسوسفير</div>
+              <div class="term-def">الطبقة العليا من الغلاف الجوي، تتلاشى عند حدود الفضاء الخارجي.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">دورة الماء</div>
+              <div class="term-def">حركة الماء المستمرة بين المحيطات واليابسة والغلاف الجوي.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">التبخر</div>
+              <div class="term-def">تحول الماء من الحالة السائلة إلى الغازية.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">التكثف</div>
+              <div class="term-def">تحول بخار الماء إلى قطيرات ماء سائلة.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">الهطول</div>
+              <div class="term-def">سقوط الماء من الغلاف الجوي على شكل أمطار أو ثلوج أو برد.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">الطقس</div>
+              <div class="term-def">الحالة السائدة في الغلاف الجوي.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">الرطوبة</div>
+              <div class="term-def">مقدار بخار الماء في الغلاف الجوي.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">درجة الندى</div>
+              <div class="term-def">درجة الحرارة التي يصل عندها الهواء إلى حالة الإشباع ببخار الماء.</div>
+            </div>
+            <div class="term-card primary">
+              <div class="term-name">الرطوبة النسبية</div>
+              <div class="term-def">كمية بخار الماء الموجودة في الهواء مقارنة بكمية بخار الماء التي يستطيع الهواء حملها عند درجة حرارة معينة.</div>
+            </div>
+            <div class="term-card secondary">
+              <div class="term-name">قوة كوريولوس</div>
+              <div class="term-def">ظاهرة انحراف الهواء المتحرك بسبب دوران الأرض.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. القواعد الذهبية -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="03">
+          <div class="section-header">
+            <div class="section-icon gold">⚡</div>
+            <h2 class="section-title">القواعد الذهبية</h2>
+          </div>
+          <div class="rule-card">
+            <div class="rule-formula">الهواء له كتلة ووزن ← يولد ضغطاً</div>
+            <div class="rule-desc">يتناقص ضغط الهواء كلما ارتفعنا في الغلاف الجوي بسبب تناقص وزن الهواء الذي يعلونا.</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-formula">ارتفاع درجة الحرارة ← زيادة التبخر ← زيادة الرطوبة</div>
+            <div class="rule-desc">كمية بخار الماء التي يمكن أن يحملها الهواء الساخن أكبر من كمية بخار الماء التي يحملها الهواء البارد.</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-formula">التوصيل + الحمل ← انتقال الحرارة في الغلاف الجوي</div>
+            <div class="rule-desc">تسخن طاقة الشمس سطح الأرض، وتنتقل الحرارة عبر التوصيل والحمل، مكونة تيارات حمل.</div>
+          </div>
+          <div class="rule-card">
+            <div class="rule-formula">اختلاف الضغط والحرارة ← حركة الهواء (الرياح)</div>
+            <div class="rule-desc">يتحرك الهواء من مناطق الضغط المرتفع إلى مناطق الضغط المنخفض، وكلما زاد الفرق زادت سرعة الرياح.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. خطوات الحل -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="04">
+          <div class="section-header">
+            <div class="section-icon teal">🧩</div>
+            <h2 class="section-title">خطوات الحل (تجربة ملاحظة التكثف والتبخر)</h2>
+          </div>
+          <div class="steps-timeline">
+            <div class="step-item">
+              <div class="step-marker">1</div>
+              <div class="step-body">
+                <strong>التحضير</strong>
+                املأ كأسًا زجاجيًا بالماء المثلج، وتأكد من جفاف السطح الخارجي للزجاج.
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-marker">2</div>
+              <div class="step-body">
+                <strong>الملاحظة الأولية</strong>
+                راقب الكأس الزجاجية المملوءة لمدة عشر دقائق.
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-marker">3</div>
+              <div class="step-body">
+                <strong>تسجيل البيانات</strong>
+                لاحظ ما يحدث على السطح الخارجي للزجاج (تكون قطرات الماء).
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-marker">4</div>
+              <div class="step-body">
+                <strong>التبخر</strong>
+                اسكب 500 مل من الماء في حوض واسع.
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-marker">5</div>
+              <div class="step-body">
+                <strong>المراقبة طويلة المدى</strong>
+                اترك الحوض بضعة أيام، واستخدم مسطرة لقياس ارتفاع الماء كل يوم، ثم سجل بياناتك.
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-marker">6</div>
+              <div class="step-body">
+                <strong>التحليل والاستنتاج</strong>
+                استنتج سبب تشكل قطرات الماء على السطح الخارجي للزجاج (التكثف)، وأين ذهب الماء المفقود من الحوض (التبخر).
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. الرسوم التوضيحية -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="05">
+          <div class="section-header">
+            <div class="section-icon purple">📐</div>
+            <h2 class="section-title">الرسوم التوضيحية</h2>
+          </div>
+          <div class="visual-gallery">
+            <div class="visual-card">
+              <div class="svg-scroll">
+                <svg width="400" height="250" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="50" y="50" width="300" height="150" rx="10" fill="rgba(255,255,255,0.02)" stroke="var(--glass-border)"/>
+                  <circle cx="200" cy="125" r="80" fill="rgba(0,212,170,0.1)" stroke="#00d4aa" stroke-width="2"/>
+                  <path d="M200 45 A80 80 0 0 1 270.71 125 L200 125 Z" fill="rgba(123,104,238,0.1)" stroke="#7b68ee" stroke-width="2"/>
+                  <path d="M200 45 A80 80 0 0 0 129.29 125 L200 125 Z" fill="rgba(255,107,107,0.1)" stroke="#ff6b6b" stroke-width="2"/>
+                  <text x="200" y="125" text-anchor="middle" dominant-baseline="middle" fill="#e8e8ff" font-family="Tajawal" font-size="14" font-weight="bold">الغلاف الجوي</text>
+                  <text x="235" y="80" text-anchor="middle" fill="#e8e8ff" font-family="Tajawal" font-size="12">N₂ (78%)</text>
+                  <text x="165" y="80" text-anchor="middle" fill="#e8e8ff" font-family="Tajawal" font-size="12">O₂ (21%)</text>
+                  <text x="200" y="170" text-anchor="middle" fill="#e8e8ff" font-family="Tajawal" font-size="12">غازات أخرى (1%)</text>
+                </svg>
+              </div>
+              <div class="visual-title">نسب الغازات الرئيسية في الغلاف الجوي</div>
+            </div>
+
+            <div class="visual-card">
+              <div class="svg-scroll">
+                <svg width="400" height="350" viewBox="0 0 400 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="50" y="20" width="300" height="310" rx="10" fill="rgba(255,255,255,0.02)" stroke="var(--glass-border)"/>
+                  <line x1="100" y1="310" x2="300" y2="310" stroke="#8888bb" stroke-dasharray="4 2"/>
+                  <line x1="100" y1="260" x2="300" y2="260" stroke="#8888bb" stroke-dasharray="4 2"/>
+                  <line x1="100" y1="190" x2="300" y2="190" stroke="#8888bb" stroke-dasharray="4 2"/>
+                  <line x1="100" y1="120" x2="300" y2="120" stroke="#8888bb" stroke-dasharray="4 2"/>
+                  <line x1="100" y1="50" x2="300" y2="50" stroke="#8888bb" stroke-dasharray="4 2"/>
+
+                  <path d="M100 310 C120 290 150 280 180 260 C210 240 240 220 270 190 C300 160 320 100 300 50" stroke="#00d4aa" stroke-width="3" fill="none"/>
+                  <text x="50" y="315" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="end">0 كم</text>
+                  <text x="50" y="265" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="end">10 كم</text>
+                  <text x="50" y="195" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="end">50 كم</text>
+                  <text x="50" y="125" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="end">85 كم</text>
+                  <text x="50" y="55" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="end">500 كم+</text>
+
+                  <text x="350" y="290" fill="#00d4aa" font-family="Tajawal" font-size="14" text-anchor="start">التروبوسفير</text>
+                  <text x="350" y="225" fill="#00d4aa" font-family="Tajawal" font-size="14" text-anchor="start">الستراتوسفير</text>
+                  <text x="350" y="155" fill="#00d4aa" font-family="Tajawal" font-size="14" text-anchor="start">الميزوسفير</text>
+                  <text x="350" y="85" fill="#00d4aa" font-family="Tajawal" font-size="14" text-anchor="start">الثيرموسفير</text>
+                  <text x="350" y="35" fill="#00d4aa" font-family="Tajawal" font-size="14" text-anchor="start">الإكسوسفير</text>
+                </svg>
+              </div>
+              <div class="visual-title">طبقات الغلاف الجوي وتوزيع الحرارة</div>
+            </div>
+
+            <div class="visual-card">
+              <div class="svg-scroll">
+                <svg width="600" height="300" viewBox="0 0 600 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="20" y="20" width="560" height="260" rx="10" fill="rgba(255,255,255,0.02)" stroke="var(--glass-border)"/>
+
+                  <!-- Ocean -->
+                  <rect x="20" y="200" width="560" height="80" fill="rgba(123,104,238,0.1)" stroke="#7b68ee" stroke-width="1"/>
+                  <text x="300" y="240" fill="#e8e8ff" font-family="Tajawal" font-size="14" text-anchor="middle">المحيطات</text>
+
+                  <!-- Land -->
+                  <rect x="200" y="150" width="200" height="50" fill="rgba(0,212,170,0.05)" stroke="#00d4aa" stroke-width="1"/>
+                  <text x="300" y="175" fill="#e8e8ff" font-family="Tajawal" font-size="14" text-anchor="middle">اليابسة</text>
+
+                  <!-- Sun -->
+                  <circle cx="500" cy="80" r="30" fill="rgba(255,217,61,0.2)" stroke="#ffd93d" stroke-width="2"/>
+                  <text x="500" y="80" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="middle" dominant-baseline="middle">الشمس</text>
+
+                  <!-- Evaporation -->
+                  <path d="M450 180 C470 150 480 100 450 70" stroke="#00d4aa" stroke-width="2" marker-end="url(#arrowhead)" />
+                  <text x="470" y="120" fill="#e8e8ff" font-family="Tajawal" font-size="12">تبخر</text>
+
+                  <!-- Transpiration -->
+                  <path d="M250 140 C270 110 280 60 250 30" stroke="#00d4aa" stroke-width="2" marker-end="url(#arrowhead)" />
+                  <text x="270" y="80" fill="#e8e8ff" font-family="Tajawal" font-size="12">نتح</text>
+
+                  <!-- Condensation (Cloud) -->
+                  <ellipse cx="300" cy="70" rx="80" ry="30" fill="rgba(255,255,255,0.05)" stroke="#8888bb" stroke-width="1"/>
+                  <text x="300" y="70" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="middle">غيوم</text>
+                  <path d="M300 30 C320 50 340 70 300 90" stroke="#7b68ee" stroke-width="2" marker-end="url(#arrowhead)" />
+                  <text x="320" y="50" fill="#e8e8ff" font-family="Tajawal" font-size="12">تكثف</text>
+
+                  <!-- Precipitation -->
+                  <path d="M300 100 L280 180" stroke="#7b68ee" stroke-width="2" marker-end="url(#arrowhead)" />
+                  <text x="270" y="140" fill="#e8e8ff" font-family="Tajawal" font-size="12">هطول</text>
+
+                  <!-- Runoff -->
+                  <path d="M220 190 L150 210" stroke="#7b68ee" stroke-width="2" marker-end="url(#arrowhead)" />
+                  <text x="180" y="200" fill="#e8e8ff" font-family="Tajawal" font-size="12">جريان</text>
+
+                  <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#00d4aa" />
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
+              <div class="visual-title">مراحل دورة الماء الأساسية</div>
+            </div>
+
+            <div class="visual-card">
+              <div class="svg-scroll">
+                <svg width="450" height="250" viewBox="0 0 450 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="20" y="20" width="410" height="210" rx="10" fill="rgba(255,255,255,0.02)" stroke="var(--glass-border)"/>
+
+                  <!-- Ground -->
+                  <rect x="50" y="180" width="350" height="50" fill="rgba(0,212,170,0.05)" stroke="#00d4aa" stroke-width="1"/>
+                  <text x="225" y="205" fill="#e8e8ff" font-family="Tajawal" font-size="14" text-anchor="middle">سطح الأرض</text>
+
+                  <!-- Warm Air Rising -->
+                  <path d="M150 180 C150 120 200 80 250 80 C300 80 350 120 350 180" stroke="#ff6b6b" stroke-width="3" stroke-dasharray="5 5"/>
+                  <path d="M250 80 L250 50" stroke="#ff6b6b" stroke-width="3" marker-end="url(#arrowhead-coral)"/>
+                  <text x="250" y="65" fill="#ff6b6b" font-family="Tajawal" font-size="12" text-anchor="middle">هواء ساخن يرتفع</text>
+
+                  <!-- Cool Air Sinking -->
+                  <path d="M100 50 L100 150" stroke="#7b68ee" stroke-width="3" marker-end="url(#arrowhead-purple)"/>
+                  <text x="100" y="100" fill="#7b68ee" font-family="Tajawal" font-size="12" text-anchor="middle" writing-mode="vertical-rl">هواء بارد يهبط</text>
+
+                  <path d="M400 50 L400 150" stroke="#7b68ee" stroke-width="3" marker-end="url(#arrowhead-purple)"/>
+                  <text x="400" y="100" fill="#7b68ee" font-family="Tajawal" font-size="12" text-anchor="middle" writing-mode="vertical-rl">هواء بارد يهبط</text>
+
+                  <defs>
+                    <marker id="arrowhead-coral" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#ff6b6b" />
+                    </marker>
+                    <marker id="arrowhead-purple" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#7b68ee" />
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
+              <div class="visual-title">انتقال الحرارة بالحمل في الغلاف الجوي</div>
+            </div>
+
+            <div class="visual-card">
+              <div class="svg-scroll">
+                <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="20" y="20" width="360" height="260" rx="10" fill="rgba(255,255,255,0.02)" stroke="var(--glass-border)"/>
+
+                  <!-- Globe -->
+                  <circle cx="200" cy="150" r="100" fill="rgba(123,104,238,0.1)" stroke="#7b68ee" stroke-width="2"/>
+                  <line x1="100" y1="150" x2="300" y2="150" stroke="#8888bb" stroke-dasharray="4 2"/>
+                  <text x="200" y="150" fill="#e8e8ff" font-family="Tajawal" font-size="12" text-anchor="middle">خط الاستواء</text>
+
+                  <!-- Northern Hemisphere Wind -->
+                  <path d="M200 50 C250 60 270 100 250 140" stroke="#00d4aa" stroke-width="3" marker-end="url(#arrowhead-teal)"/>
+                  <path d="M200 50 C150 60 130 100 150 140" stroke="#00d4aa" stroke-width="3" marker-end="url(#arrowhead-teal)"/>
+                  <text x="200" y="35" fill="#00d4aa" font-family="Tajawal" font-size="12" text-anchor="middle">القطب الشمالي</text>
+                  <text x="270" y="100" fill="#e8e8ff" font-family="Tajawal" font-size="10">انحراف لليمين</text>
+
+                  <!-- Southern Hemisphere Wind -->
+                  <path d="M200 250 C250 240 270 200 250 160" stroke="#ff6b6b" stroke-width="3" marker-end="url(#arrowhead-coral)"/>
+                  <path d="M200 250 C150 240 130 200 150 160" stroke="#ff6b6b" stroke-width="3" marker-end="url(#arrowhead-coral)"/>
+                  <text x="200" y="265" fill="#ff6b6b" font-family="Tajawal" font-size="12" text-anchor="middle">القطب الجنوبي</text>
+                  <text x="130" y="200" fill="#e8e8ff" font-family="Tajawal" font-size="10">انحراف لليسار</text>
+
+                  <defs>
+                    <marker id="arrowhead-teal" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#00d4aa" />
+                    </marker>
+                    <marker id="arrowhead-coral" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#ff6b6b" />
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
+              <div class="visual-title">تأثير قوة كوريولوس على حركة الرياح</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. أمثلة محلولة -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="06">
+          <div class="section-header">
+            <div class="section-icon coral">💡</div>
+            <h2 class="section-title">أمثلة محلولة</h2>
+          </div>
+          <div class="example-card">
+            <div class="example-title">مثال 1: حساب سرعة الرياح</div>
+            <div class="solution-step">
+              <span class="step-label">السؤال:</span> تحركت الرياح مسافة 14 كم خلال ساعتين. ما سرعتها؟
+            </div>
+            <div class="solution-step">
+              <span class="step-label">المعطيات:</span> المسافة (ف) = 14 كم، الزمن (ز) = 2 ساعة.
+            </div>
+            <div class="solution-step">
+              <span class="step-label">المطلوب:</span> السرعة (ع).
+            </div>
+            <div class="solution-step">
+              <span class="step-label">طريقة الحل:</span> ع = ف / ز = 14 كم / 2 ساعة = 7 كم/ساعة.
+            </div>
+            <div class="solution-result">السرعة = 7 كم/ساعة</div>
+          </div>
+
+          <div class="example-card">
+            <div class="example-title">مثال 2: حساب سرعة الرياح</div>
+            <div class="solution-step">
+              <span class="step-label">السؤال:</span> تحركت الرياح مسافة 20 كم في ساعتين. فما سرعتها؟
+            </div>
+            <div class="solution-step">
+              <span class="step-label">المعطيات:</span> المسافة (ف) = 20 كم، الزمن (ز) = 2 ساعة.
+            </div>
+            <div class="solution-step">
+              <span class="step-label">المطلوب:</span> السرعة (ع).
+            </div>
+            <div class="solution-step">
+              <span class="step-label">طريقة الحل:</span> ع = ف / ز = 20 كم / 2 ساعة = 10 كم/ساعة.
+            </div>
+            <div class="solution-result">السرعة = 10 كم/ساعة</div>
+          </div>
+
+          <div class="example-card">
+            <div class="example-title">مثال 3: حساب سرعة الرياح</div>
+            <div class="solution-step">
+              <span class="step-label">السؤال:</span> تحركت الرياح مسافة 69 كم في 3 ساعات. فما سرعتها؟
+            </div>
+            <div class="solution-step">
+              <span class="step-label">المعطيات:</span> المسافة (ف) = 69 كم، الزمن (ز) = 3 ساعات.
+            </div>
+            <div class="solution-step">
+              <span class="step-label">المطلوب:</span> السرعة (ع).
+            </div>
+            <div class="solution-step">
+              <span class="step-label">طريقة الحل:</span> ع = ف / ز = 69 كم / 3 ساعات = 23 كم/ساعة.
+            </div>
+            <div class="solution-result">السرعة = 23 كم/ساعة</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. المرجع السريع -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="07">
+          <div class="section-header">
+            <div class="section-icon teal">📋</div>
+            <h2 class="section-title">المرجع السريع</h2>
+          </div>
+          <div class="ref-grid">
+            <div class="ref-item">
+              <div class="ref-label">النيتروجين</div>
+              <div class="ref-formula">N₂ (78%)</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">الأكسجين</div>
+              <div class="ref-formula">O₂ (21%)</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">بخار الماء</div>
+              <div class="ref-formula">0-4%</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">ثاني أكسيد الكربون</div>
+              <div class="ref-formula">CO₂</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">التروبوسفير</div>
+              <div class="ref-formula">حتى 10 كم</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">الستراتوسفير</div>
+              <div class="ref-formula">10 - 50 كم</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">الميزوسفير</div>
+              <div class="ref-formula">50 - 85 كم</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">الثيرموسفير</div>
+              <div class="ref-formula">85 - 500 كم</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-label">معادلة السرعة</div>
+              <div class="ref-formula">السرعة = المسافة / الزمن</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. الاختبار التفاعلي -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="08" style="padding:0;background:transparent;border:none;backdrop-filter:none;">
+          <div class="quiz-wrapper">
+            <div class="quiz-header">
+              <div class="section-header" style="margin:0;">
+                <div class="section-icon purple">🎲</div>
+                <h2 class="section-title" style="font-size:22px;">الاختبار التفاعلي</h2>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress"></div></div>
+                <span class="quiz-counter" id="quiz-counter">0/0</span>
+              </div>
+            </div>
+            <div class="quiz-body">
+              <div id="quiz-area"></div>
+              <div id="quiz-result"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. قائمة الإنجاز -->
+      <div class="lesson-section">
+        <div class="section-card" data-section-num="09">
+          <div class="section-header">
+            <div class="section-icon green">✅</div>
+            <h2 class="section-title">قائمة الإنجاز</h2>
+          </div>
+          <ul class="checklist" id="checklist">
+            <li><span class="check-box">✓</span>فهم مكونات الغلاف الجوي الرئيسية ونسبها.</li>
+            <li><span class="check-box">✓</span>تحديد خصائص طبقات الغلاف الجوي المختلفة.</li>
+            <li><span class="check-box">✓</span>شرح مراحل دورة الماء في الطبيعة (التبخر، التكثف، الهطول).</li>
+            <li><span class="check-box">✓</span>توضيح مفهوم الرطوبة ودرجة الندى والرطوبة النسبية.</li>
+            <li><span class="check-box">✓</span>وصف كيفية تكون الغيوم وأنواعها المختلفة.</li>
+            <li><span class="check-box">✓</span>تفسير حركة الرياح وتأثير قوة كوريولوس.</li>
+            <li><span class="check-box">✓</span>تطبيق معادلة حساب سرعة الرياح.</li>
+            <li><span class="check-box">✓</span>التمييز بين عمليتي التوصيل والحمل الحراري في نقل الطاقة.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="page-footer">
+      صُمم بعناية بواسطة <strong>منصة شارف التعليمية</strong>
+    </div>
+  </div>
+
+  <script>
+    // شريط التقدم
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById('progress-bar').style.width = (window.scrollY/h*100)+'%';
+    });
+
+    // قائمة الإنجاز
+    document.querySelectorAll('#checklist li').forEach(li => {
+      li.addEventListener('click', () => li.classList.toggle('done'));
+    });
+
+    // الاختبار التفاعلي
+    const quizQuestions = [
+      {
+        question: "ما الغاز الأكثر وفرة في الغلاف الجوي؟",
+        options: ["الأكسجين", "النيتروجين", "ثاني أكسيد الكربون", "بخار الماء"],
+        correct: 1,
+        feedback: "النيتروجين يشكل حوالي 78% من الغلاف الجوي."
+      },
+      {
+        question: "أي طبقة من الغلاف الجوي هي الأقرب لسطح الأرض وتضم معظم الغيوم؟",
+        options: ["الستراتوسفير", "الميزوسفير", "التروبوسفير", "الثيرموسفير"],
+        correct: 2,
+        feedback: "التروبوسفير هي الطبقة المتقلبة والأقرب لسطح الأرض."
+      },
+      {
+        question: "ما العملية التي يتحول فيها الماء السائل إلى بخار ويرتفع إلى الغلاف الجوي؟",
+        options: ["التكثف", "الهطول", "التبخر", "النتح"],
+        correct: 2,
+        feedback: "التبخر هو تحول الماء من الحالة السائلة إلى الغازية."
+      },
+      {
+        question: "ما الذي يصف الطقس؟",
+        options: ["متوسط درجات الحرارة على المدى الطويل", "الحالة السائدة في الغلاف الجوي", "كمية الغازات في الغلاف الجوي", "ارتفاع طبقات الغلاف الجوي"],
+        correct: 1,
+        feedback: "الطقس يصف الحالة السائدة في الغلاف الجوي في لحظة معينة."
+      },
+      {
+        question: "ما اسم الظاهرة التي تسبب انحراف الرياح بسبب دوران الأرض؟",
+        options: ["ظاهرة الاحتباس الحراري", "ظاهرة النينو", "قوة كوريولوس", "ظاهرة الدفيئة"],
+        correct: 2,
+        feedback: "قوة كوريولوس هي المسؤولة عن انحراف الرياح."
+      },
+      {
+        question: "أي من العمليات التالية ليست جزءًا من دورة الماء؟",
+        options: ["التبخر", "التكثف", "الهطول", "التآكل"],
+        correct: 3,
+        feedback: "التآكل عملية جيولوجية وليست جزءًا من دورة الماء المائية."
+      },
+      {
+        question: "ما الذي يحدث لضغط الهواء كلما ارتفعنا في الغلاف الجوي؟",
+        options: ["يزداد", "يتناقص", "يبقى ثابتاً", "يتذبذب بشكل عشوائي"],
+        correct: 1,
+        feedback: "يتناقص ضغط الهواء كلما ارتفعنا بسبب تناقص وزن الهواء الذي يعلو."
+      },
+      {
+        question: "ما هي الطبقة التي يتركز فيها معظم الأوزون الجوي وتحمي الأرض من الأشعة فوق البنفسجية؟",
+        options: ["التروبوسفير", "الستراتوسفير", "الميزوسفير", "الإكسوسفير"],
+        correct: 1,
+        feedback: "طبقة الأوزون تتركز في الستراتوسفير."
+      },
+      {
+        question: "ما نوع الغيوم التي تتكون على ارتفاعات عالية جداً من بلورات جليدية؟",
+        options: ["الغيوم الركامية", "الغيوم الطبقية", "الغيوم المرتفعة (الريشية)", "غيوم المزن الركامية"],
+        correct: 2,
+        feedback: "الغيوم المرتفعة تتكون من بلورات جليدية بسبب ارتفاعها الكبير."
+      },
+      {
+        question: "عندما يسخن الهواء، ماذا يحدث لجزيئاته؟",
+        options: ["تتباطأ وتتقارب", "تتسارع وتتباعد", "تبقى ثابتة", "تتحول إلى سائل"],
+        correct: 1,
+        feedback: "تسخين الهواء يزيد من سرعة وحركة جزيئاته."
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let quizArea = document.getElementById('quiz-area');
+    let quizResult = document.getElementById('quiz-result');
+    let quizProgress = document.getElementById('quiz-progress');
+    let quizCounter = document.getElementById('quiz-counter');
+
+    function loadQuestion() {
+      if (currentQuestionIndex < quizQuestions.length) {
+        const q = quizQuestions[currentQuestionIndex];
+        quizArea.innerHTML = `
+          <div class="q-card" id="q-card-${currentQuestionIndex}">
+            <div class="q-text"><span class="q-num">${currentQuestionIndex + 1}</span> ${q.question}</div>
+            <div class="opts">
+              ${q.options.map((opt, i) => `
+                <button class="opt-btn" data-index="${i}">
+                  <span class="opt-letter">${String.fromCharCode(0x0623 + i)}</span> ${opt}
+                </button>
+              `).join('')}
+            </div>
+            <div class="feedback" id="feedback-${currentQuestionIndex}" style="display:none;"></div>
+          </div>
+        `;
+        document.querySelectorAll(`#q-card-${currentQuestionIndex} .opt-btn`).forEach(button => {
+          button.addEventListener('click', selectOption);
+        });
+        updateQuizProgress();
+      } else {
+        showQuizResults();
+      }
+    }
+
+    function selectOption(event) {
+      const selectedButton = event.currentTarget;
+      const selectedIndex = parseInt(selectedButton.dataset.index);
+      const q = quizQuestions[currentQuestionIndex];
+      const feedbackDiv = document.getElementById(`feedback-${currentQuestionIndex}`);
+      const qCard = document.getElementById(`q-card-${currentQuestionIndex}`);
+
+      // Disable all options
+      document.querySelectorAll(`#q-card-${currentQuestionIndex} .opt-btn`).forEach(btn => {
+        btn.disabled = true;
+      });
+
+      if (selectedIndex === q.correct) {
+        score++;
+        selectedButton.classList.add('selected-correct');
+        feedbackDiv.classList.add('correct-fb');
+        feedbackDiv.innerHTML = `صحيح! ${q.feedback}`;
+        feedbackDiv.style.display = 'block';
+        qCard.classList.add('correct');
+        setTimeout(() => {
+          qCard.classList.add('fade-out');
+          setTimeout(() => {
+            currentQuestionIndex++;
+            loadQuestion();
+          }, 500); // Match fade-out animation duration
+        }, 1500);
+      } else {
+        selectedButton.classList.add('selected-wrong');
+        feedbackDiv.classList.add('wrong-fb');
+        feedbackDiv.innerHTML = `خطأ! الإجابة الصحيحة هي: ${q.options[q.correct]}. ${q.feedback}`;
+        feedbackDiv.style.display = 'block';
+        qCard.classList.add('wrong');
+        // Show the correct answer
+        document.querySelector(`#q-card-${currentQuestionIndex} .opt-btn[data-index="${q.correct}"]`).classList.add('show-correct');
+        setTimeout(() => {
+          qCard.classList.add('fade-out');
+          setTimeout(() => {
+            currentQuestionIndex++;
+            loadQuestion();
+          }, 500); // Match fade-out animation duration
+        }, 3000); // Give more time to read feedback for wrong answer
+      }
+    }
+
+    function updateQuizProgress() {
+      const progress = (currentQuestionIndex / quizQuestions.length) * 100;
+      quizProgress.style.width = `${progress}%`;
+      quizCounter.textContent = `${currentQuestionIndex}/${quizQuestions.length}`;
+    }
+
+    function showQuizResults() {
+      quizArea.style.display = 'none';
+      let message = '';
+      let detail = '';
+      if (score === quizQuestions.length) {
+        message = "ممتاز! لقد أتقنت الدرس!";
+        detail = `أحسنت، لقد أجبت على جميع الأسئلة (${score} من ${quizQuestions.length}) بشكل صحيح.`;
+      } else if (score >= quizQuestions.length / 2) {
+        message = "جيد جداً! تحتاج لبعض المراجعة.";
+        detail = `لقد أجبت على ${score} من ${quizQuestions.length} سؤال بشكل صحيح. يمكنك المحاولة مرة أخرى لتحسين نتيجتك.`;
+      } else {
+        message = "لا بأس! تحتاج لمراجعة الدرس.";
+        detail = `لقد أجبت على ${score} من ${quizQuestions.length} سؤال بشكل صحيح. ننصحك بمراجعة الدرس والمحاولة مرة أخرى.`;
+      }
+
+      quizResult.innerHTML = `
+        <div class="result-box">
+          <div class="result-score">${score}/${quizQuestions.length}</div>
+          <div class="result-msg">${message}</div>
+          <div class="result-detail">${detail}</div>
+          <div class="result-btns">
+            <button class="btn-retry" id="retry-quiz">إعادة المحاولة</button>
+            <button class="btn-share" id="share-results">مشاركة النتيجة</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('retry-quiz').addEventListener('click', resetQuiz);
+      document.getElementById('share-results').addEventListener('click', shareResults);
+    }
+
+    function resetQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      quizArea.style.display = 'block';
+      quizResult.innerHTML = '';
+      loadQuestion();
+      updateQuizProgress();
+    }
+
+    function shareResults() {
+      const shareText = `لقد حققت ${score} من ${quizQuestions.length} في اختبار الغلاف الجوي والطقس على منصة شارف التعليمية! #تعليم #الغلاف_الجوي`;
+      if (navigator.share) {
+        navigator.share({
+          title: 'نتيجتي في اختبار الغلاف الجوي والطقس',
+          text: shareText,
+          url: window.location.href
+        }).catch((error) => console.log('Error sharing', error));
+      } else {
+        alert(`يمكنك مشاركة نتيجتك: ${shareText}`);
+      }
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadQuestion();
+      updateQuizProgress();
+    });
+  </script>
+</body>
+</html>
