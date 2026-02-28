@@ -208,10 +208,23 @@ router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
     // 1. مسح المحتوى القديم فوراً من قاعدة البيانات لضمان عدم استرجاعه
     await cmsStorage.deleteCmsContentByLesson(lessonId, "education");
     
-    const content = await cmsStorage.getCmsContentFull(lessonId, "lesson");
+    // 2. محاولة جلب ملف الـ PDF من تبويب الدرس أو المحتوى الأصلي
+    let content = await cmsStorage.getCmsContentFull(lessonId, "lesson");
+    
+    // إذا لم يجد PDF في تبويب الدرس، نحاول البحث عن أي ملف PDF مرتبط بالدرس في النظام
     if (!content || content.contentType !== "pdf" || !content.dataValue) {
-      return res.status(400).json({ message: "لا يوجد ملف PDF في تبويب الدرس" });
+      // محاولة البحث في المسارات الافتراضية للملفات المرفقة
+      const { resolve } = await import("path");
+      const possiblePdfPath = resolve(process.cwd(), "attached_assets", "pdfs", `${lessonId}.pdf`);
+      const { access } = await import("fs/promises");
+      try {
+        await access(possiblePdfPath);
+        content = { contentType: "pdf", dataValue: `/attached_assets/pdfs/${lessonId}.pdf` };
+      } catch (e) {
+        return res.status(400).json({ message: "لا يوجد ملف PDF مرتبط بهذا الدرس للقيام بعملية التوليد" });
+      }
     }
+
     let pdfPath = content.dataValue;
     if (pdfPath.startsWith("/attached_assets/")) {
       const { resolve } = await import("path");
@@ -219,14 +232,15 @@ router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
     }
     const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
     
-    // 2. بدء عملية التوليد في الخلفية
+    // 3. بدء عملية التوليد في الخلفية
     generateLessonHtmlFromPdf({ lessonId, pdfPath, isRegeneration: true }).then((r) => {
       if (!r.success) console.error(`[شارف AI] regenerate failed: ${r.message}`);
     });
     
     res.json({ ok: true, message: "تم مسح المحتوى القديم وبدأ التوليد الجديد" });
   } catch (e: any) {
-    res.status(500).json({ message: e?.message || "خطأ" });
+    console.error("Regenerate SSA error:", e);
+    res.status(500).json({ message: e?.message || "خطأ داخلي في الخادم" });
   }
 });
 
