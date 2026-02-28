@@ -79,11 +79,20 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 
 ### Key Pages
 1. **Home (/)**: Landing with Hero, SearchBar, StageSelector, Features
-2. **Stage (/stage/:stageId)**: Grades and subjects per stage; admin sees inline add/edit/delete for grades & subjects
-3. **Lesson (/lesson/:stage/:subject/:lessonId)**: Tabs: الدرس، الفيديو، شارف AI، الملخص; admin sees InlineAdminToolbar (PDF/YouTube/HTML management) + sidebar lesson/chapter CRUD
-4. **Dashboard (/dashboard)**: Student progress (protected)
-5. **Admin (/admin)**: CMS dashboard (admin only)
-6. **Auth**: /login, /register, /forgot-password, /reset-password
+2. **Features (/features)**: Professional marketing page with hero, feature cards, stats charts, comparison table, testimonials
+3. **Stage (/stage/:stageId)**: Grades and subjects per stage; admin sees inline add/edit/delete for grades & subjects
+4. **Lesson (/lesson/:stage/:subject/:lessonId)**: Tabs: الدرس، الفيديو، شارف AI، الملخص; admin sees InlineAdminToolbar (PDF/YouTube/HTML management) + sidebar lesson/chapter CRUD
+5. **Dashboard (/dashboard)**: Student progress (protected)
+6. **Admin (/admin)**: CMS dashboard (admin only)
+7. **Auth**: /login, /register, /forgot-password, /reset-password
+
+### شارف AI Auto-Generation
+- **Flow**: When a PDF is uploaded to the "تبويب الدرس" (lesson tab), the system automatically sends it to Gemini 2.5-flash to generate a full interactive HTML lesson page
+- **Backend**: `server/lib/generateLessonHtml.ts` handles PDF→Gemini→HTML generation; triggered from `POST /api/admin/cms/content/upload` when tabType="lesson" and file is PDF
+- **Storage**: Generated HTML is saved to `cms_content` with `tabType: "education"`, which the `ssa-html` endpoint serves
+- **Frontend**: شارف AI tab (`Lesson.tsx`) checks if lesson has PDF via `/api/content/lesson/:id/has-pdf`; if no PDF → shows empty state; if generating → shows progress; polls `/api/content/lesson/:id/ssa-status` during generation
+- **Manual regenerate**: `POST /api/admin/cms/content/generate-ssa` with `{ lessonId }` triggers regeneration
+- **Model**: Uses `gemini-2.5-flash` (not 1.5-flash) — older models may return 404
 
 ### Inline Admin Editing
 - **InlineAdminToolbar** (`src/components/admin/InlineAdminToolbar.tsx`): Expandable toolbar on Lesson page for managing PDF uploads, YouTube links, HTML content (شارف AI + الملخص). Only visible to admin users.

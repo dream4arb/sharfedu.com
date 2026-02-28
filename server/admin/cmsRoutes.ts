@@ -258,10 +258,70 @@ router.post("/content/upload", upload.single("file"), async (req: Request & { fi
       contentType,
       dataValue: url,
     });
+
+    if (tabType === "lesson" && file.mimetype === "application/pdf") {
+      const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
+      const pdfPath = path.resolve(uploadsDir, file.filename);
+      generateLessonHtmlFromPdf(String(lessonId), pdfPath)
+        .then((result) => {
+          if (!result.success) {
+            console.error(`[شارف AI] فشل التوليد التلقائي للدرس ${lessonId}: ${result.message}`);
+          }
+        })
+        .catch((err) => {
+          console.error(`[شارف AI] خطأ في التوليد التلقائي:`, err?.message);
+        });
+    }
+
     res.json({ ok: true, url });
   } catch (e) {
     console.error("CMS upload:", e);
     res.status(500).json({ message: "خطأ في الرفع" });
+  }
+});
+
+router.post("/content/generate-ssa", async (req, res) => {
+  try {
+    const { lessonId } = req.body;
+    if (!lessonId) return res.status(400).json({ message: "lessonId مطلوب" });
+
+    const lessonContent = await cmsStorage.getCmsContentFull(String(lessonId), "lesson");
+    if (!lessonContent || lessonContent.contentType !== "pdf" || !lessonContent.dataValue) {
+      return res.status(400).json({ message: "لا يوجد ملف PDF في تبويب الدرس" });
+    }
+
+    const pdfUrl = lessonContent.dataValue;
+    let pdfPath = pdfUrl;
+    if (pdfUrl.startsWith("/attached_assets/")) {
+      pdfPath = path.resolve(process.cwd(), pdfUrl.slice(1));
+    }
+
+    const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
+    const result = await generateLessonHtmlFromPdf(String(lessonId), pdfPath);
+    if (result.success) {
+      res.json({ ok: true, message: result.message });
+    } else {
+      res.status(500).json({ message: result.message });
+    }
+  } catch (e: any) {
+    console.error("Generate SSA:", e);
+    res.status(500).json({ message: e?.message || "خطأ في التوليد" });
+  }
+});
+
+router.get("/content/generate-ssa/status/:lessonId", async (req, res) => {
+  const { getGenerationStatus } = await import("../lib/generateLessonHtml");
+  const status = getGenerationStatus(req.params.lessonId);
+  res.json(status || { status: "idle" });
+});
+
+router.get("/content/has-lesson-pdf/:lessonId", async (req, res) => {
+  try {
+    const content = await cmsStorage.getCmsContentFull(req.params.lessonId, "lesson");
+    const hasPdf = !!(content && content.contentType === "pdf" && content.dataValue);
+    res.json({ hasPdf });
+  } catch {
+    res.json({ hasPdf: false });
   }
 });
 

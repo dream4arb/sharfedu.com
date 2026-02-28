@@ -234,27 +234,93 @@ export default function Lesson() {
 
   const [hasSsaContent, setHasSsaContent] = useState<boolean | null>(null);
   const [loadingSsa, setLoadingSsa] = useState(false);
+  const [ssaGenerating, setSsaGenerating] = useState(false);
+  const [hasLessonPdf, setHasLessonPdf] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!lessonIdFromParams) {
+      setHasLessonPdf(null);
+      return;
+    }
+    if (cmsLessonContent?.contentType === "pdf" && cmsLessonContent?.dataValue) {
+      setHasLessonPdf(true);
+      return;
+    }
+    fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/has-pdf`)
+      .then((r) => r.json())
+      .then((d) => setHasLessonPdf(d.hasPdf === true))
+      .catch(() => setHasLessonPdf(false));
+  }, [lessonIdFromParams, cmsLessonContent]);
+
   useEffect(() => {
     if (!lessonIdFromParams || activeTab !== "ssa") {
       setHasSsaContent(null);
+      setSsaGenerating(false);
+      return;
+    }
+    if (hasLessonPdf === false) {
+      setHasSsaContent(false);
+      setLoadingSsa(false);
+      setSsaGenerating(false);
       return;
     }
     if (cmsEducationContent?.dataValue?.trim()) {
       setHasSsaContent(true);
       setLoadingSsa(false);
+      setSsaGenerating(false);
       return;
     }
     setLoadingSsa(true);
     fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/ssa-html`)
       .then((r) => {
-        setHasSsaContent(Boolean(r.ok && r.headers.get("content-type")?.includes("text/html")));
-        setLoadingSsa(false);
+        if (r.ok && r.headers.get("content-type")?.includes("text/html")) {
+          setHasSsaContent(true);
+          setLoadingSsa(false);
+          setSsaGenerating(false);
+        } else {
+          fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/ssa-status`)
+            .then((sr) => sr.json())
+            .then((status) => {
+              if (status.status === "generating") {
+                setSsaGenerating(true);
+                setHasSsaContent(false);
+                setLoadingSsa(false);
+              } else {
+                setHasSsaContent(false);
+                setLoadingSsa(false);
+                setSsaGenerating(false);
+              }
+            })
+            .catch(() => {
+              setHasSsaContent(false);
+              setLoadingSsa(false);
+            });
+        }
       })
       .catch(() => {
         setHasSsaContent(false);
         setLoadingSsa(false);
       });
-  }, [lessonIdFromParams, activeTab, cmsEducationContent]);
+  }, [lessonIdFromParams, activeTab, cmsEducationContent, hasLessonPdf]);
+
+  useEffect(() => {
+    if (!ssaGenerating || !lessonIdFromParams) return;
+    const interval = setInterval(() => {
+      fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/ssa-status`)
+        .then((r) => r.json())
+        .then((status) => {
+          if (status.status === "done") {
+            setSsaGenerating(false);
+            setHasSsaContent(true);
+          } else if (status.status === "error") {
+            setSsaGenerating(false);
+            setHasSsaContent(false);
+          }
+        })
+        .catch(() => {});
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [ssaGenerating, lessonIdFromParams]);
 
   const openAttachmentPdfInPage = (url: string | undefined, label: string) => {
     setAttachmentView({ url: url ?? "", label });
@@ -2229,14 +2295,33 @@ export default function Lesson() {
                     className="w-full"
                   >
                     {!currentLesson ? (
-                      <div className="py-12 text-center text-muted-foreground">يرجى اختيار درس من القائمة الجانبية</div>
+                      <div className="py-12 text-center text-muted-foreground" data-testid="ssa-no-lesson">يرجى اختيار درس من القائمة الجانبية</div>
+                    ) : hasLessonPdf === false ? (
+                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50" data-testid="ssa-no-pdf">
+                        <div className="text-center py-12">
+                          <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/40" />
+                          <p className="text-lg font-bold text-muted-foreground mb-2">لا يوجد ملف PDF في تبويب الدرس</p>
+                          <p className="text-sm text-muted-foreground">قم بإضافة ملف PDF للدرس أولاً ليتم توليد المحتوى التفاعلي تلقائياً بواسطة شارف AI</p>
+                        </div>
+                      </div>
                     ) : currentLesson.id === "5-1" ? (
                       <PolygonAnglesQuizSSA />
+                    ) : ssaGenerating ? (
+                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50" data-testid="ssa-generating">
+                        <div className="flex flex-col items-center justify-center py-12">
+                          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center text-white">
+                            <Sparkles className="w-8 h-8 animate-pulse" />
+                          </div>
+                          <p className="text-lg font-bold mb-2">شارف AI يُعدّ الدرس...</p>
+                          <p className="text-sm text-muted-foreground mb-4">جاري تحليل ملف PDF وتوليد المحتوى التفاعلي</p>
+                          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        </div>
+                      </div>
                     ) : loadingSsa ? (
                       <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50">
                         <div className="flex items-center justify-center py-12">
                           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                          <span className="mr-3 text-muted-foreground">جاري تحميل الأسئلة...</span>
+                          <span className="mr-3 text-muted-foreground">جاري تحميل المحتوى...</span>
                         </div>
                       </div>
                     ) : hasSsaContent ? (
@@ -2245,10 +2330,11 @@ export default function Lesson() {
                         lessonId={currentLesson.id}
                       />
                     ) : (
-                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50">
+                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50" data-testid="ssa-empty">
                         <div className="text-center py-12">
-                          <HelpCircle className="w-16 h-16 mx-auto mb-4 text-primary/50" />
-                          <p className="text-muted-foreground">لا يوجد محتوى أسئلة متاح حالياً لهذا الدرس</p>
+                          <Sparkles className="w-16 h-16 mx-auto mb-4 text-primary/50" />
+                          <p className="text-lg font-bold text-muted-foreground mb-2">لم يتم توليد المحتوى بعد</p>
+                          <p className="text-sm text-muted-foreground">سيتم توليد المحتوى تلقائياً عند إضافة ملف PDF للدرس</p>
                         </div>
                       </div>
                     )}

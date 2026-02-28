@@ -87,10 +87,16 @@ router.get("/lesson/:lessonId/education-html", async (req, res) => {
  */
 router.get("/lesson/:lessonId/ssa-html", async (req, res) => {
   const iframeFix = `<style>html,body{max-width:100%!important;overflow-x:hidden!important;width:100%!important;margin:0!important;padding:0!important}*{box-sizing:border-box!important}img,video,canvas,svg,table,iframe{max-width:100%!important}pre,code{overflow-x:auto!important;white-space:pre-wrap!important;word-break:break-word!important}</style><script>function _sh(){var els=document.body.children;var h=0;for(var i=0;i<els.length;i++){var r=els[i].getBoundingClientRect();var b=r.top+r.height+window.scrollY;if(b>h)h=b}h=Math.ceil(h);if(h<100)h=document.documentElement.scrollHeight;window.parent.postMessage({type:"sharef-iframe-height",height:h},"*")}window.addEventListener("load",function(){_sh();setTimeout(_sh,300);setTimeout(_sh,1000);new ResizeObserver(_sh).observe(document.body)});</script>`;
+  const fixBadge = (html: string) => {
+    return html
+      .replace(/شارف\s*AI\s*[✨⭐🌟💫]*\s*تم التوليد تلقائياً/g, "✨ منصة شارف التعليمية")
+      .replace(/●?\s*شارف\s*AI\s*[✨⭐🌟💫]+\s*تم التوليد[^<]*/g, "✨ منصة شارف التعليمية");
+  };
   const injectFix = (html: string) => {
-    if (html.includes("</head>")) return html.replace("</head>", iframeFix + "</head>");
-    if (html.includes("<body")) return html.replace("<body", iframeFix + "<body");
-    return iframeFix + html;
+    const fixed = fixBadge(html);
+    if (fixed.includes("</head>")) return fixed.replace("</head>", iframeFix + "</head>");
+    if (fixed.includes("<body")) return fixed.replace("<body", iframeFix + "<body");
+    return iframeFix + fixed;
   };
   try {
     const { lessonId } = req.params;
@@ -182,6 +188,35 @@ router.get("/lesson/:lessonId/json", async (req, res) => {
   } catch (e) {
     console.error("Content JSON error:", e);
     res.status(500).json({ message: "خطأ في جلب بيانات JSON." });
+  }
+});
+
+router.get("/lesson/:lessonId/has-pdf", async (req, res) => {
+  try {
+    const content = await cmsStorage.getCmsContentFull(req.params.lessonId, "lesson");
+    const hasPdf = !!(content && content.contentType === "pdf" && content.dataValue);
+    res.json({ hasPdf });
+  } catch {
+    res.json({ hasPdf: false });
+  }
+});
+
+router.get("/lesson/:lessonId/ssa-status", async (req, res) => {
+  try {
+    const { getGenerationStatus } = await import("../lib/generateLessonHtml");
+    const inMemoryStatus = getGenerationStatus(req.params.lessonId);
+    if (inMemoryStatus && inMemoryStatus.status === "generating") {
+      res.json(inMemoryStatus);
+      return;
+    }
+    const existing = await cmsStorage.getCmsContent(req.params.lessonId, "education");
+    if (existing && existing.trim().length > 100) {
+      res.json({ status: "done", updatedAt: Date.now() });
+      return;
+    }
+    res.json(inMemoryStatus || { status: "idle" });
+  } catch {
+    res.json({ status: "idle" });
   }
 });
 
