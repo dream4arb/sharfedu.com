@@ -207,8 +207,9 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(`lesson-rating-${lessonId}`);
-    if (stored) setSubmitted(true);
+    // تم إزالة التحقق من localStorage للسماح بالتقييم المتعدد عند تحديث الصفحة
+    // const stored = localStorage.getItem(`lesson-rating-${lessonId}`);
+    // if (stored) setSubmitted(true);
   }, [lessonId]);
 
   const handleSubmit = async () => {
