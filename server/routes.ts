@@ -36,6 +36,49 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.sendFile(filePath);
   });
 
+  app.post("/api/lesson-rating", (req, res) => {
+    const { lessonId, lessonTitle, rating } = req.body;
+    if (!lessonId || !rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: "Invalid rating" });
+    }
+    const ratingsFile = path.resolve(process.cwd(), "server", "data", "lesson-ratings.json");
+    const fs = require("fs");
+    let ratings: any[] = [];
+    try { ratings = JSON.parse(fs.readFileSync(ratingsFile, "utf-8")); } catch {}
+    ratings.push({
+      lessonId,
+      lessonTitle: lessonTitle || lessonId,
+      rating: Number(rating),
+      timestamp: new Date().toISOString(),
+      ip: req.ip
+    });
+    fs.writeFileSync(ratingsFile, JSON.stringify(ratings, null, 2), "utf-8");
+    res.json({ success: true });
+  });
+
+  app.get("/api/admin/lesson-ratings", requireAdmin, (_req, res) => {
+    const ratingsFile = path.resolve(process.cwd(), "server", "data", "lesson-ratings.json");
+    const fs = require("fs");
+    let ratings: any[] = [];
+    try { ratings = JSON.parse(fs.readFileSync(ratingsFile, "utf-8")); } catch {}
+    const grouped: Record<string, { lessonTitle: string; total: number; count: number; ratings: number[] }> = {};
+    ratings.forEach((r: any) => {
+      if (!grouped[r.lessonId]) grouped[r.lessonId] = { lessonTitle: r.lessonTitle, total: 0, count: 0, ratings: [] };
+      grouped[r.lessonId].total += r.rating;
+      grouped[r.lessonId].count++;
+      grouped[r.lessonId].ratings.push(r.rating);
+    });
+    const summary = Object.entries(grouped).map(([id, data]) => ({
+      lessonId: id,
+      lessonTitle: data.lessonTitle,
+      averageRating: Math.round((data.total / data.count) * 10) / 10,
+      totalRatings: data.count,
+      distribution: [1,2,3,4,5].map(v => data.ratings.filter((r: number) => r === v).length)
+    }));
+    summary.sort((a, b) => a.averageRating - b.averageRating);
+    res.json({ ratings: summary, totalReviews: ratings.length });
+  });
+
   app.get("/sitemap.xml", async (_req, res) => {
     try {
       const { getAllLessons, getFullHierarchy } = await import("./data/cms-hierarchy");

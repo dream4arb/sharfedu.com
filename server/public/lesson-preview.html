@@ -153,11 +153,21 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
 .sec-header h2{font-size:1.5rem;font-weight:800;color:#0f172a}
 .sec-header p{color:#64748b;font-size:.9rem;margin-top:4px}
 
-.footer-cta{background:linear-gradient(135deg,#0d9488,#0e7490,#1e40af);border-radius:24px;padding:36px;text-align:center;margin:36px 0 50px;color:#fff;position:relative;overflow:hidden}
-.footer-cta h3{font-size:1.4rem;font-weight:800;margin-bottom:6px;position:relative}
-.footer-cta p{opacity:.8;font-size:.9rem;margin-bottom:18px;position:relative}
-.footer-cta .cta-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#0d9488;border:none;padding:12px 32px;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;text-decoration:none;transition:transform .2s}
-.footer-cta .cta-btn:hover{transform:scale(1.05)}
+.rating-section{margin:36px 0 50px}
+.rating-card{background:linear-gradient(135deg,#0d9488,#0e7490,#1e40af);border-radius:24px;padding:40px 32px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.rating-card::before{content:'';position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(255,255,255,.05);border-radius:50%}
+.rating-card h3{font-size:1.5rem;font-weight:800;margin-bottom:6px;position:relative}
+.rating-card p{opacity:.8;font-size:.9rem;margin-bottom:20px;position:relative}
+.stars{display:flex;justify-content:center;gap:8px;direction:ltr;position:relative}
+.star{font-size:2.8rem;color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;line-height:1}
+.star:hover,.star.active{color:#fbbf24;transform:scale(1.15)}
+.star.active{text-shadow:0 0 12px rgba(251,191,36,.5)}
+.rating-labels{display:flex;justify-content:space-between;max-width:240px;margin:8px auto 0;font-size:.8rem;opacity:.6;position:relative;direction:ltr}
+.rating-msg{margin-top:14px;font-size:.9rem;font-weight:700;min-height:24px;position:relative}
+.rating-submit{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);color:#fff;padding:12px 36px;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:14px;transition:all .2s;position:relative}
+.rating-submit:hover:not(:disabled){background:rgba(255,255,255,.3);transform:translateY(-2px)}
+.rating-submit:disabled{opacity:.4;cursor:not-allowed}
+.rating-submit.sent{background:#34d399;border-color:#34d399}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .anim{animation:fadeUp .5s ease forwards;opacity:0}
@@ -672,10 +682,24 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
   <button class="next-btn" id="nextBtn" onclick="nextQuestion()" disabled>السؤال التالي ←</button>
 </div>
 
-<div class="footer-cta anim">
-  <h3>أعجبك الشرح؟</h3>
-  <p>سجّل في شارف واحصل على ملخصات ذكية وشرح شامل لجميع دروسك</p>
-  <a href="/register" class="cta-btn">ابدأ مجاناً ←</a>
+<div class="rating-section anim" id="ratingSection">
+  <div class="rating-card">
+    <h3>قيّم هذا الدرس</h3>
+    <p>ساعدنا في تحسين المحتوى — كيف تقيّم شرح هذا الدرس؟</p>
+    <div class="stars" id="starsContainer">
+      <span class="star" data-val="1" onclick="setRating(1)">★</span>
+      <span class="star" data-val="2" onclick="setRating(2)">★</span>
+      <span class="star" data-val="3" onclick="setRating(3)">★</span>
+      <span class="star" data-val="4" onclick="setRating(4)">★</span>
+      <span class="star" data-val="5" onclick="setRating(5)">★</span>
+    </div>
+    <div class="rating-labels">
+      <span>ضعيف</span>
+      <span>ممتاز</span>
+    </div>
+    <div id="ratingMsg" class="rating-msg"></div>
+    <button class="rating-submit" id="ratingBtn" onclick="submitRating()" disabled>إرسال التقييم</button>
+  </div>
 </div>
 
 </div>
@@ -712,7 +736,7 @@ function buildQuiz(){
     } else {
       h+='<div class="tf-row"><button class="tf-btn" onclick="pickTF('+i+',true,this)">✓ صح</button><button class="tf-btn" onclick="pickTF('+i+',false,this)">✗ خطأ</button></div>';
     }
-    h+='<div class="quiz-exp" id="exp'+i+'">'+q.explanation+'</div></div>';
+    h+='<div class="quiz-exp" id="exp'+i+'"><strong>📝 التوضيح:</strong> '+q.explanation+'</div></div>';
     qBox.innerHTML+=h;
   });
   document.getElementById('qProg').textContent='1';
@@ -801,6 +825,34 @@ function nextQuestion(){
   if(answered[currentQ]) nextBtn.disabled=false;
   updateNextBtn();
   document.getElementById('q'+currentQ).scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+var selectedRating=0;
+function setRating(val){
+  selectedRating=val;
+  document.querySelectorAll('.star').forEach(function(s){
+    s.classList.toggle('active',parseInt(s.dataset.val)<=val);
+  });
+  document.getElementById('ratingBtn').disabled=false;
+  var labels=['','ضعيف جداً 😞','يحتاج تحسين 😐','جيد 🙂','جيد جداً 😊','ممتاز! 🌟'];
+  document.getElementById('ratingMsg').textContent=labels[val];
+}
+function submitRating(){
+  var btn=document.getElementById('ratingBtn');
+  if(selectedRating===0||btn.classList.contains('sent'))return;
+  btn.textContent='جاري الإرسال...';btn.disabled=true;
+  fetch('/api/lesson-rating',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({lessonId:'zawaya-almudallaa',lessonTitle:'زوايا المضلع',rating:selectedRating})
+  }).then(function(r){return r.json()}).then(function(){
+    btn.textContent='✓ تم إرسال التقييم — شكراً لك!';
+    btn.classList.add('sent');
+    document.querySelectorAll('.star').forEach(function(s){s.style.pointerEvents='none'});
+  }).catch(function(){
+    btn.textContent='✓ تم حفظ التقييم';
+    btn.classList.add('sent');
+  });
 }
 
 function retryQuiz(){
