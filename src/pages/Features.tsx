@@ -236,7 +236,7 @@ export default function Features() {
               كل ما تحتاجه للتفوق{" "}
               <span className="relative inline-block">
                 في مكان واحد
-                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none">
+                <svg className="absolute -bottom-4 left-0 w-full" viewBox="0 0 200 12" fill="none">
                   <path d="M2 8C40 2 160 2 198 8" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round"/>
                 </svg>
               </span>
