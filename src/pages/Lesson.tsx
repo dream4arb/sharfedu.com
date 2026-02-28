@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { useCmsTabContent } from "@/hooks/use-cms-tab-content";
@@ -1875,27 +1875,26 @@ export default function Lesson() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700 dark:border-amber-900/50 dark:hover:bg-amber-900/20 rounded-xl font-bold shadow-sm"
+                    disabled={ssaGenerating}
+                    className="gap-2 text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700 dark:border-amber-900/50 dark:hover:bg-amber-900/20 rounded-xl font-bold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={async () => {
-                      if (!lessonIdFromParams) return;
+                      if (!lessonIdFromParams || ssaGenerating) return;
                       try {
-                        // 1. تفعيل حالة إعادة التوليد أولاً لمنع useEffect من إلغائها
                         setIsRegenerating(true);
                         setSsaGenerating(true);
                         setHasSsaContent(false);
                         
-                        // 2. مسح المحتوى من الذاكرة والـ DOM نهائياً قبل البدء
                         setCmsEducationContent(null);
                         const ssaContainer = document.querySelector('[data-testid="ssa-container"]');
                         if (ssaContainer) {
                           ssaContainer.innerHTML = '';
                         }
                         
-                        // 3. التحويل لتبويب شارف AI
                         setActiveTab("ssa");
                         
                         const res = await fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/regenerate-ssa`, {
                           method: "POST",
+                          credentials: "include",
                           headers: {
                             'Cache-Control': 'no-cache',
                             'Pragma': 'no-cache'
@@ -1905,20 +1904,29 @@ export default function Lesson() {
                         if (!res.ok) {
                           setSsaGenerating(false);
                           setIsRegenerating(false);
-                          const errData = await res.json();
-                          console.error("Regeneration failed:", errData.message);
+                          const errData = await res.json().catch(() => ({ message: "خطأ غير معروف" }));
+                          alert(`فشل التوليد: ${errData.message}`);
                         }
-                        // الـ polling في useEffect سيكتشف اكتمال التوليد ويحدث المحتوى
-                      } catch (err) {
+                      } catch (err: any) {
                         console.error("Failed to regenerate:", err);
                         setSsaGenerating(false);
                         setIsRegenerating(false);
+                        alert(`خطأ في الاتصال: ${err?.message || "تحقق من اتصال الإنترنت"}`);
                       }
                     }}
                     data-testid="button-regenerate-content"
                   >
-                    <RotateCcw className="w-4 h-4" />
-                    تحديث المحتوى (إعادة التوليد)
+                    {ssaGenerating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        جاري التوليد...
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw className="w-4 h-4" />
+                        تحديث المحتوى (إعادة التوليد)
+                      </>
+                    )}
                   </Button>
                 </div>
               )}
