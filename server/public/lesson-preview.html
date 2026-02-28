@@ -138,6 +138,16 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
 .check-btn{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#0d9488,#0891b2);color:#fff;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1rem;font-weight:800;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(13,148,136,.3)}
 .check-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(13,148,136,.4)}
 
+.quiz-progress{text-align:center;font-size:1rem;font-weight:700;color:#64748b;margin-bottom:16px;background:#fff;border-radius:12px;padding:10px;border:1px solid #e2e8f0}
+.quiz-progress span{color:#0d9488;font-size:1.2rem;font-weight:900}
+.next-btn{display:block;width:100%;padding:16px;background:linear-gradient(135deg,#0d9488,#0891b2);color:#fff;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1rem;font-weight:800;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(13,148,136,.3);margin-top:16px}
+.next-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px rgba(13,148,136,.4)}
+.next-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.retry-btn{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);color:#fff;padding:10px 28px;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:16px;transition:background .2s;position:relative}
+.retry-btn:hover{background:rgba(255,255,255,.3)}
+.quiz-card{display:none}
+.quiz-card.active{display:block}
+
 .sec-header{text-align:center;margin:44px 0 24px}
 .sec-header .icon-wrap{width:52px;height:52px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:1.4rem}
 .sec-header h2{font-size:1.5rem;font-weight:800;color:#0f172a}
@@ -647,7 +657,7 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
 <div class="sec-header anim" id="secQ">
   <div class="icon-wrap" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:#7c3aed">❓</div>
   <h2>اختبر فهمك</h2>
-  <p>10 أسئلة تفاعلية — اختر إجابتك ثم اضغط "تحقق"</p>
+  <p>10 أسئلة تفاعلية — أجب على كل سؤال ثم انتقل للتالي</p>
 </div>
 
 <div class="quiz-section">
@@ -655,9 +665,11 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
     <h2>نتيجتك النهائية</h2>
     <div class="score-num"><span id="sNum">0</span> / 10</div>
     <div class="score-bar-wrap"><div class="score-fill" id="sFill"></div></div>
+    <button class="retry-btn" onclick="retryQuiz()">أعد المحاولة</button>
   </div>
+  <div class="quiz-progress"><span id="qProg">1</span> / 10</div>
   <div id="quizBox"></div>
-  <button class="check-btn" onclick="checkAll()">✓ تحقق من الإجابات</button>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()" disabled>السؤال التالي ←</button>
 </div>
 
 <div class="footer-cta anim">
@@ -681,17 +693,126 @@ var questions=[
   {type:"true_false",question:"المضلع المنتظم هو مضلع محدب جميع أضلاعه متطابقة وجميع زواياه متطابقة.",correctAnswer:"true",explanation:"صحيح! هذا هو تعريف المضلع المنتظم بالضبط."},
   {type:"mcq",question:"قياس الزاوية الخارجية لمضلع سداسي منتظم هو:",options:["30°","45°","60°","72°"],correctAnswer:2,explanation:"A = 360° ÷ 6 = 60°"}
 ];
-var answers={},letters=['أ','ب','ج','د'];
+var letters=['أ','ب','ج','د'];
+var currentQ=0,score=0,answered=[];
 var qBox=document.getElementById('quizBox');
-questions.forEach(function(q,i){
-  var h='<div class="quiz-card" id="q'+i+'"><div class="quiz-q"><span class="qn">'+(i+1)+'</span><span>'+q.question+'</span></div>';
-  if(q.type==='mcq'){h+='<div class="quiz-opts">';q.options.forEach(function(o,oi){h+='<div class="quiz-opt" onclick="pickOpt('+i+','+oi+',this)" data-oi="'+oi+'"><span class="letter">'+letters[oi]+'</span><span>'+o+'</span></div>';});h+='</div>';}
-  else{h+='<div class="tf-row"><button class="tf-btn" onclick="pickTF('+i+',true,this)">✓ صح</button><button class="tf-btn" onclick="pickTF('+i+',false,this)">✗ خطأ</button></div>';}
-  h+='<div class="quiz-exp" id="exp'+i+'">'+q.explanation+'</div></div>';qBox.innerHTML+=h;
-});
-function pickOpt(qi,oi,el){var c=document.getElementById('q'+qi);if(c.classList.contains('correct')||c.classList.contains('wrong'))return;c.querySelectorAll('.quiz-opt').forEach(function(o){o.classList.remove('selected')});el.classList.add('selected');answers[qi]=oi;}
-function pickTF(qi,val,el){var c=document.getElementById('q'+qi);if(c.classList.contains('correct')||c.classList.contains('wrong'))return;c.querySelectorAll('.tf-btn').forEach(function(b){b.classList.remove('selected')});el.classList.add('selected');answers[qi]=val;}
-function checkAll(){var score=0;questions.forEach(function(q,i){var c=document.getElementById('q'+i),e=document.getElementById('exp'+i);if(answers[i]===undefined)return;var ok=false;if(q.type==='mcq'){ok=answers[i]===q.correctAnswer;c.querySelectorAll('.quiz-opt').forEach(function(o){if(parseInt(o.dataset.oi)===q.correctAnswer)o.classList.add('c-right');else if(o.classList.contains('selected')&&!ok)o.classList.add('c-wrong');});}else{ok=answers[i]===(q.correctAnswer==='true');c.querySelectorAll('.tf-btn').forEach(function(b){var t=b.textContent.indexOf('صح')!==-1;if(t===(q.correctAnswer==='true'))b.classList.add('c-right');else if(b.classList.contains('selected')&&!ok)b.classList.add('c-wrong');});}c.classList.add(ok?'correct':'wrong');e.classList.add('show',ok?'exp-ok':'exp-no');if(ok)score++;});var sb=document.getElementById('scoreBanner');sb.style.display='block';document.getElementById('sNum').textContent=score;document.getElementById('sFill').style.width=(score/10*100)+'%';sb.scrollIntoView({behavior:'smooth',block:'center'});}
+var nextBtn=document.getElementById('nextBtn');
+
+function buildQuiz(){
+  qBox.innerHTML='';
+  questions.forEach(function(q,i){
+    var h='<div class="quiz-card'+(i===0?' active':'')+'" id="q'+i+'">';
+    h+='<div class="quiz-q"><span class="qn">'+(i+1)+'</span><span>'+q.question+'</span></div>';
+    if(q.type==='mcq'){
+      h+='<div class="quiz-opts">';
+      q.options.forEach(function(o,oi){
+        h+='<div class="quiz-opt" onclick="pickOpt('+i+','+oi+',this)" data-oi="'+oi+'"><span class="letter">'+letters[oi]+'</span><span>'+o+'</span></div>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div class="tf-row"><button class="tf-btn" onclick="pickTF('+i+',true,this)">✓ صح</button><button class="tf-btn" onclick="pickTF('+i+',false,this)">✗ خطأ</button></div>';
+    }
+    h+='<div class="quiz-exp" id="exp'+i+'">'+q.explanation+'</div></div>';
+    qBox.innerHTML+=h;
+  });
+  document.getElementById('qProg').textContent='1';
+  nextBtn.disabled=true;
+  updateNextBtn();
+}
+
+function updateNextBtn(){
+  if(currentQ>=questions.length-1){
+    nextBtn.textContent='عرض النتيجة';
+  } else {
+    nextBtn.textContent='السؤال التالي ←';
+  }
+}
+
+function revealAnswer(qi){
+  if(answered[qi])return;
+  answered[qi]=true;
+  var q=questions[qi];
+  var card=document.getElementById('q'+qi);
+  var exp=document.getElementById('exp'+qi);
+  var userAns=card.dataset.userAnswer;
+  if(userAns===undefined)return;
+
+  var ok=false;
+  if(q.type==='mcq'){
+    var ua=parseInt(userAns);
+    ok=ua===q.correctAnswer;
+    card.querySelectorAll('.quiz-opt').forEach(function(o){
+      var oi=parseInt(o.dataset.oi);
+      if(oi===q.correctAnswer) o.classList.add('c-right');
+      else if(o.classList.contains('selected')&&!ok) o.classList.add('c-wrong');
+      o.style.pointerEvents='none';
+    });
+  } else {
+    var ua2=(userAns==='true');
+    ok=ua2===(q.correctAnswer==='true');
+    card.querySelectorAll('.tf-btn').forEach(function(b){
+      var isTrue=b.textContent.indexOf('صح')!==-1;
+      if(isTrue===(q.correctAnswer==='true')) b.classList.add('c-right');
+      else if(b.classList.contains('selected')&&!ok) b.classList.add('c-wrong');
+      b.style.pointerEvents='none';
+    });
+  }
+  card.classList.add(ok?'correct':'wrong');
+  exp.classList.add('show',ok?'exp-ok':'exp-no');
+  if(ok)score++;
+  nextBtn.disabled=false;
+}
+
+function pickOpt(qi,oi,el){
+  if(answered[qi])return;
+  var card=document.getElementById('q'+qi);
+  card.querySelectorAll('.quiz-opt').forEach(function(o){o.classList.remove('selected')});
+  el.classList.add('selected');
+  card.dataset.userAnswer=oi;
+  revealAnswer(qi);
+}
+
+function pickTF(qi,val,el){
+  if(answered[qi])return;
+  var card=document.getElementById('q'+qi);
+  card.querySelectorAll('.tf-btn').forEach(function(b){b.classList.remove('selected')});
+  el.classList.add('selected');
+  card.dataset.userAnswer=val;
+  revealAnswer(qi);
+}
+
+function nextQuestion(){
+  if(currentQ>=questions.length-1){
+    var sb=document.getElementById('scoreBanner');
+    sb.style.display='block';
+    document.getElementById('sNum').textContent=score;
+    document.getElementById('sFill').style.width=(score/questions.length*100)+'%';
+    document.querySelector('.quiz-progress').style.display='none';
+    nextBtn.style.display='none';
+    document.getElementById('q'+currentQ).classList.remove('active');
+    sb.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  document.getElementById('q'+currentQ).classList.remove('active');
+  currentQ++;
+  document.getElementById('q'+currentQ).classList.add('active');
+  document.getElementById('qProg').textContent=(currentQ+1);
+  nextBtn.disabled=true;
+  if(answered[currentQ]) nextBtn.disabled=false;
+  updateNextBtn();
+  document.getElementById('q'+currentQ).scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function retryQuiz(){
+  currentQ=0;score=0;answered=[];
+  document.getElementById('scoreBanner').style.display='none';
+  document.querySelector('.quiz-progress').style.display='block';
+  nextBtn.style.display='block';
+  buildQuiz();
+  document.getElementById('secQ').scrollIntoView({behavior:'smooth'});
+}
+
+buildQuiz();
 function toggleExample(h){var b=h.nextElementSibling,t=h.querySelector('.ex-toggle');if(b.classList.contains('open')){b.classList.remove('open');t.textContent='▼';}else{b.classList.add('open');t.textContent='▲';}}
 var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.style.animationPlayState='running';});},{threshold:0.1});document.querySelectorAll('.anim').forEach(function(el){el.style.animationPlayState='paused';obs.observe(el);});
 </script>
