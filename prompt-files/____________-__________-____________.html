@@ -1,0 +1,1529 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الغلاف الجوي والطقس - العلوم - منصة شارف التعليمية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --blue: #3b82f6;
+  --blue-dark: #1e40af;
+  --green: #10b981;
+  --green-dark: #065f46;
+  --orange: #f59e0b;
+  --orange-dark: #92400e;
+  --purple: #a855f7;
+  --red: #ef4444;
+  --bg: #f8fafc;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: #1e293b;
+  line-height: 1.8;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+  padding: 40px 20px;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.hero-deco {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.1;
+}
+
+.ds {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: float 20s infinite ease-in-out;
+}
+
+.ds:nth-child(1) { width: 200px; height: 200px; top: -100px; left: -100px; }
+.ds:nth-child(2) { width: 150px; height: 150px; top: 50%; right: -75px; animation-delay: -5s; }
+.ds:nth-child(3) { width: 100px; height: 100px; bottom: -50px; left: 30%; animation-delay: -10s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.hero-card {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: white;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.hsub {
+  font-size: clamp(16px, 3vw, 20px);
+  opacity: 0.95;
+  margin-bottom: 25px;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: 700;
+  border: 2px solid rgba(255,255,255,0.3);
+  margin-top: 20px;
+}
+
+/* المقدمة */
+.intro-box {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  margin: 30px 0;
+  box-shadow: var(--shadow);
+  border-right: 6px solid var(--blue);
+}
+
+.intro-box h2 {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--blue-dark);
+  margin-bottom: 20px;
+}
+
+.intro-box p {
+  font-size: 18px;
+  line-height: 2;
+  color: #475569;
+  margin-bottom: 15px;
+}
+
+/* صناديق المحتوى */
+.content-box {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 35px 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.content-box h3 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/* صندوق القاعدة */
+.rule-box {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 1px solid #bae6fd;
+  border-radius: 16px;
+  padding: 25px;
+  margin: 25px 0;
+}
+
+.rule-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.rule-icon {
+  background: #2563eb;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.rule-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0c4a6e;
+  margin: 0;
+}
+
+.rule-formula {
+  background: white;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin: 15px 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.rule-explanation {
+  font-size: 17px;
+  line-height: 1.9;
+  color: #334155;
+  margin-top: 15px;
+}
+
+/* صناديق الأمثلة */
+.example-box {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-right: 4px solid var(--example-color);
+}
+
+.example-box.type-1 { --example-color: #3b82f6; background: #f0f9ff; }
+.example-box.type-2 { --example-color: #10b981; background: #f0fdf4; }
+.example-box.type-3 { --example-color: #f59e0b; background: #fffbeb; }
+.example-box.type-4 { --example-color: #a855f7; background: #faf5ff; }
+
+/* الجداول */
+.styled-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.styled-table thead tr {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+}
+
+.styled-table th {
+  padding: 18px;
+  font-weight: 800;
+  text-align: center;
+  font-size: 17px;
+}
+
+.styled-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
+  text-align: center;
+  font-size: 16px;
+}
+
+.styled-table tbody tr:hover { background: #f8fafc; }
+.styled-table tbody tr:last-child td { border-bottom: none; }
+
+/* صندوق الملاحظة */
+.note-box {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 18px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: start;
+}
+
+.note-icon { font-size: 24px; flex-shrink: 0; }
+
+.note-content {
+  font-size: 16px;
+  color: #78350f;
+  line-height: 1.8;
+}
+
+/* SVG container - unified sizing */
+.svg-container {
+  display: flex;
+  justify-content: center;
+  margin: 30px auto;
+  overflow-x: auto;
+  max-width: 620px;
+  width: 100%;
+}
+
+.svg-container svg {
+  width: 100%;
+  max-width: 620px;
+  height: auto;
+  display: block;
+}
+
+/* قائمة الإنجاز */
+.checklist-section {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  box-shadow: var(--shadow);
+}
+
+.checklist-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--blue-dark);
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.checklist-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.checklist-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.checklist-checkbox { display: none; }
+
+.checklist-item label {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+}
+
+.checklist-item label:hover { background: #f1f5f9; border-color: var(--blue); }
+
+.check-mark {
+  width: 30px; height: 30px;
+  border: 3px solid #cbd5e1;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-left: 15px;
+  font-size: 18px;
+  color: transparent;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.checklist-checkbox:checked + label .check-mark {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+.checklist-checkbox:checked + label {
+  background: #f0fdf4;
+  border-color: var(--green);
+}
+
+.check-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.progress-container {
+  margin-top: 35px;
+  padding-top: 30px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.progress-number {
+  font-size: 32px;
+  color: var(--blue);
+  font-weight: 900;
+}
+
+.progress-bar {
+  height: 25px;
+  background: #e2e8f0;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  border-radius: 50px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.progress-message {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* التمارين */
+.exercises-section {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  box-shadow: var(--shadow);
+}
+
+.exercises-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--blue-dark);
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.exercise-item {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+}
+
+.exercise-question {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: start;
+  gap: 15px;
+}
+
+.exercise-number {
+  background: var(--blue);
+  color: white;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.answer-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.answer-btn {
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 700;
+  border: 3px solid #cbd5e1;
+  background: white;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.answer-btn:hover {
+  background: #f1f5f9;
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.answer-btn.correct { background: var(--green); border-color: var(--green); color: white; }
+.answer-btn.wrong { background: var(--red); border-color: var(--red); color: white; }
+
+.explanation {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 17px;
+  line-height: 1.8;
+  display: none;
+  font-weight: 600;
+}
+
+.explanation.show { display: block; }
+.explanation.correct-exp { background: #f0fdf4; border: 2px solid var(--green); color: var(--green-dark); }
+.explanation.wrong-exp { background: #fef2f2; border: 2px solid var(--red); color: #991b1b; }
+
+/* صفحة النتائج */
+.results-card { text-align: center; padding: 50px 30px; }
+.results-emoji { font-size: 120px; margin-bottom: 25px; }
+.score-big { font-size: 72px; font-weight: 900; color: var(--blue); margin-bottom: 20px; }
+.score-details { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; font-size: 24px; font-weight: 700; }
+.score-correct { color: var(--green); }
+.score-wrong { color: var(--red); }
+.results-message { font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 35px; }
+
+.restart-btn {
+  padding: 18px 50px;
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.restart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3); }
+
+/* FOOTER */
+footer {
+  background: #fafafa;
+  color: #757575;
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 60px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+footer p { margin: 5px 0; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { padding: 30px 20px; min-height: 220px; }
+  .content-box, .checklist-section, .exercises-section { padding: 25px; }
+  .answer-buttons { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-deco">
+    <div class="ds"></div>
+    <div class="ds"></div>
+    <div class="ds"></div>
+  </div>
+  <div class="hero-card">
+    <h1>الغلاف الجوي والطقس</h1>
+    <div class="hero-badge">📚 منصة شارف التعليمية</div>
+  </div>
+</section>
+
+<!-- المقدمة -->
+<section class="intro-box">
+  <h2>📖 مقدمة الدرس</h2>
+  <p>
+    الحياة على سطح الأرض غير ممكنة من دون الهواء. يقوم الغلاف الجوي – طبقة الغازات المحيطة بالأرض – بتزويد الأرض بجميع الغازات اللازمة للحياة، إضافة إلى حماية المخلوقات الحية من الأشعة فوق البنفسجية والأشعة السينية، وفي الوقت نفسه يقوم بامتصاص الحرارة وتوزيعها.
+  </p>
+  <p>
+    ✔ توضح سبب وجود ضغط للهواء<br>
+    ✔ تصف مكوّنات الغلاف الجوي وطبقاته<br>
+    ✔ تصف كيف تسبب الطاقة دورة الماء في الطبيعة<br>
+    ✔ تقارن بين طرق انتقال الطاقة على الأرض<br>
+    ✔ تصف أنواع الغيوم والهطول والرياح
+  </p>
+</section>
+
+<!-- ===== القسم 1: الهواء من حولنا ===== -->
+<div class="content-box">
+  <h3>🌬️ الهواء من حولنا</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    كان جاليليو جاليلي (1564 – 1642م) يرى أن الهواء أكثر من مجرد فراغ، بخلاف الاعتقاد السائد في عصره. ولإثبات ذلك قاس كتلة دورق مغلق بإحكام، ثم حقن فيه كمية إضافية من الهواء، ثم قاس كتلته مرة أخرى. واستنتج أن كتلة الدورق المحقون بالهواء أكبر من كتلته قبل الحقن، فاستنتج أن للهواء كتلة ومادة.
+  </p>
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    أصبح معروفًا للعلماء أن للهواء خصائص عديدة: فهو يخزن الحرارة ويُطلقها، ويحمل البخار، ويولّد ضغطًا بسبب وزنه. وتسهم جميع هذه الخصائص – مع الطاقة القادمة من الشمس – في تكوين الطقس اليومي لمنطقة ما على الأرض.
+  </p>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">💡</span>
+      <h4 class="rule-title">حقيقة مهمة</h4>
+    </div>
+    <div class="rule-explanation">
+      الغلاف الجوي يتأثر بالجاذبية لأنه يتكون من مادة وله كتلة، وهذا يبقيه قريبًا من الأرض ويمنعه من الانفلات. ويُعادل وزنه وزن طبقة ماء سُمكها 10 أمتار في جسم الإنسان.
+    </div>
+  </div>
+</div>
+
+<!-- ===== القسم 2: مكونات الغلاف الجوي ===== -->
+<div class="content-box">
+  <h3>🧪 مكونات الغلاف الجوي</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    يتكوّن الغلاف الجوي من عدة غازات، أهمها النيتروجين N₂ والأكسجين O₂. يشكّل النيتروجين نحو 78%، ويشكل الأكسجين نحو 21%. أما النسبة الضئيلة المتبقية فتتكوّن من غازات مختلفة مثل بخار الماء (0 – 4%) وثاني أكسيد الكربون CO₂ والأرجون.
+  </p>
+
+  <!-- رسم المخطط الدائري -->
+  <h4 style="text-align:center; font-size:18px; font-weight:900; color:#1e293b; margin-bottom:5px;">تركيب الغلاف الجوي</h4>
+  <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:30px; margin:25px 0;">
+    <!-- الدائرة -->
+    <svg viewBox="0 -10 300 310" width="280" height="280" style="flex-shrink:0;">
+      <!-- الدائرة - مركز (150,150) نصف قطر 120 -->
+      <!-- النيتروجين 78%: من الأعلى 0° إلى 280.8° -->
+      <path d="M150,150 L150,30 A120,120 0 1,1 44.5,215 Z" fill="#3b82f6"/>
+      <!-- الأكسجين 21%: من 280.8° إلى 356.4° -->
+      <path d="M150,150 L44.5,215 A120,120 0 0,1 91,41 Z" fill="#10b981"/>
+      <!-- غازات أخرى 1%: من 356.4° إلى 360° -->
+      <path d="M150,150 L91,41 A120,120 0 0,1 150,30 Z" fill="#f59e0b"/>
+
+      <!-- النيتروجين - مركز الشريحة الزرقاء (زاوية وسط ≈ 140°) -->
+      <text x="195" y="185" text-anchor="middle" font-size="16" font-weight="800" fill="white" font-family="Tajawal, sans-serif">النيتروجين</text>
+      <text x="195" y="205" text-anchor="middle" font-size="15" font-weight="700" fill="white" font-family="Tajawal, sans-serif">78%</text>
+
+      <!-- O₂ - مركز الشريحة الخضراء (زاوية وسط ≈ 285°) -->
+      <text x="82" y="125" text-anchor="middle" font-size="14" font-weight="800" fill="white" font-family="Tajawal, sans-serif">O₂</text>
+      <text x="82" y="143" text-anchor="middle" font-size="14" font-weight="700" fill="white" font-family="Tajawal, sans-serif">21%</text>
+
+      <!-- غازات أخرى 1% - خط مؤشر خارج الشريحة الصغيرة -->
+      <line x1="115" y1="38" x2="100" y2="12" stroke="#92400e" stroke-width="1.5"/>
+      <text x="95" y="9" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">1%</text>
+    </svg>
+    <!-- المفتاح كـ HTML -->
+    <div style="display:flex; flex-direction:column; gap:10px; font-family:Tajawal, sans-serif;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="width:20px;height:20px;border-radius:4px;background:#3b82f6;flex-shrink:0;"></span>
+        <span style="font-size:16px;font-weight:700;color:#334155;">النيتروجين 78%</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="width:20px;height:20px;border-radius:4px;background:#10b981;flex-shrink:0;"></span>
+        <span style="font-size:16px;font-weight:700;color:#334155;">الأكسجين 21%</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="width:20px;height:20px;border-radius:4px;background:#f59e0b;flex-shrink:0;"></span>
+        <span style="font-size:16px;font-weight:700;color:#334155;">غازات أخرى 1%</span>
+      </div>
+      <div style="border-top:1px solid #e2e8f0; padding-top:10px; margin-top:4px;">
+        <div style="font-size:13px;color:#64748b;line-height:1.9;">
+          أرجون 0.93%<br>
+          CO₂ نحو 0.03%<br>
+          بخار ماء 0 – 4%<br>
+          نيون، هيليوم، أوزون...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    يؤدي بخار الماء دورًا مهمًّا في الطقس، فهو المسؤول عن تكوّن الغيوم والأمطار. ويُعد غاز ثاني أكسيد الكربون CO₂ مهمًّا لأن النباتات تحتاج إليه لعملية البناء الضوئي، كما يقوم بامتصاص الحرارة وبثها من جديد في اتجاه سطح الأرض (وهذه العملية مهمة للحفاظ على دفء كوكب الأرض).
+  </p>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">💡</span>
+      <h4 class="rule-title">الهباء الجوي</h4>
+    </div>
+    <div class="rule-explanation">
+      يتكوّن الهباء الجوي من مواد صلبة مثل الغبار والأملاح وحبوب اللقاح، ومواد سائلة مثل القطيرات الحمضية. يدخل الغبار إلى الغلاف الجوي عن طريق الرياح أو بفعل البراكين، وتدخل الأملاح عندما تتحرك الرياح فوق المحيطات. وتعكس بعض هذه الدقائق الطاقة الشمسية، مما يؤثر في الطقس والمناخ.
+    </div>
+  </div>
+</div>
+
+<!-- ===== القسم 3: طبقات الغلاف الجوي ===== -->
+<div class="content-box">
+  <h3>🏔️ طبقات الغلاف الجوي</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    يُقسم الغلاف الجوي إلى طبقات بناءً على تغيّر درجة الحرارة مع اختلاف الارتفاعات. تتضمّن الطبقات السفلى التروبوسفير والستراتوسفير، بينما تتضمن الطبقات العليا الميزوسفير والثيرموسفير والإكسوسفير.
+  </p>
+
+  <!-- رسم طبقات الغلاف الجوي -->
+  <div class="svg-container">
+    <svg viewBox="0 0 620 480" width="620" height="480">
+      <text x="310" y="30" text-anchor="middle" font-size="18" font-weight="900" fill="#1e293b" font-family="Tajawal, sans-serif">طبقات الغلاف الجوي</text>
+
+      <!-- الارتفاعات - على اليسار -->
+      <text x="68" y="80" text-anchor="end" font-size="12" font-weight="600" fill="#94a3b8" font-family="Tajawal, sans-serif">+500 كم</text>
+      <text x="68" y="155" text-anchor="end" font-size="12" font-weight="600" fill="#94a3b8" font-family="Tajawal, sans-serif">85 كم</text>
+      <text x="68" y="235" text-anchor="end" font-size="12" font-weight="600" fill="#94a3b8" font-family="Tajawal, sans-serif">50 كم</text>
+      <text x="68" y="310" text-anchor="end" font-size="12" font-weight="600" fill="#94a3b8" font-family="Tajawal, sans-serif">10 كم</text>
+      <text x="68" y="400" text-anchor="end" font-size="12" font-weight="600" fill="#94a3b8" font-family="Tajawal, sans-serif">0 كم</text>
+
+      <!-- الإكسوسفير -->
+      <rect x="85" y="55" width="500" height="55" rx="8" fill="#1e1b4b" opacity="0.10"/>
+      <text x="335" y="88" text-anchor="middle" font-size="16" font-weight="800" fill="#312e81" font-family="Tajawal, sans-serif">الإكسوسفير</text>
+
+      <!-- الثيرموسفير -->
+      <rect x="85" y="120" width="500" height="70" rx="8" fill="#312e81" opacity="0.10"/>
+      <text x="335" y="150" text-anchor="middle" font-size="16" font-weight="800" fill="#312e81" font-family="Tajawal, sans-serif">الثيرموسفير</text>
+      <text x="335" y="172" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">85 – 500 كم (حرارة أكثر من 1700°س)</text>
+
+      <!-- الميزوسفير -->
+      <rect x="85" y="200" width="500" height="70" rx="8" fill="#3730a3" opacity="0.08"/>
+      <text x="335" y="230" text-anchor="middle" font-size="16" font-weight="800" fill="#3730a3" font-family="Tajawal, sans-serif">الميزوسفير</text>
+      <text x="335" y="252" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">50 – 85 كم (أبرد طبقة)</text>
+
+      <!-- الستراتوسفير -->
+      <rect x="85" y="280" width="500" height="70" rx="8" fill="#2563eb" opacity="0.08"/>
+      <text x="335" y="305" text-anchor="middle" font-size="16" font-weight="800" fill="#1e40af" font-family="Tajawal, sans-serif">الستراتوسفير</text>
+      <text x="335" y="327" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">10 – 50 كم (طبقة الأوزون)</text>
+
+      <!-- شريط الأوزون -->
+      <rect x="160" y="338" width="350" height="24" rx="12" fill="#fbbf24" opacity="0.25"/>
+      <text x="335" y="355" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">🛡️ طبقة الأوزون – تحمي من الأشعة فوق البنفسجية</text>
+
+      <!-- التروبوسفير -->
+      <rect x="85" y="370" width="500" height="70" rx="8" fill="#60a5fa" opacity="0.10"/>
+      <text x="335" y="395" text-anchor="middle" font-size="16" font-weight="800" fill="#1e3a8a" font-family="Tajawal, sans-serif">التروبوسفير (الطبقة المتقلّبة)</text>
+      <text x="335" y="417" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">0 – 10 كم (الطقس والغيوم)</text>
+
+      <!-- سطح الأرض -->
+      <rect x="85" y="448" width="500" height="24" rx="6" fill="#16a34a" opacity="0.25"/>
+      <text x="335" y="465" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d" font-family="Tajawal, sans-serif">🌍 سطح الأرض</text>
+    </svg>
+  </div>
+
+  <div class="example-box type-1">
+    <p><strong>التروبوسفير:</strong> أقرب طبقة لسطح الأرض (0–10 كم). تحتوي على معظم الغيوم والتغيرات الطقسية. تقل درجة الحرارة مع الارتفاع بمعدل 6.5°س/كم تقريبًا.</p>
+  </div>
+  <div class="example-box type-2">
+    <p><strong>الستراتوسفير:</strong> تمتد من 10 إلى 50 كم. تحتوي على طبقة الأوزون التي تمتص الأشعة فوق البنفسجية. تزداد الحرارة كلما ارتفعنا فيها.</p>
+  </div>
+  <div class="example-box type-3">
+    <p><strong>الميزوسفير:</strong> من 50 إلى 85 كم. أكثر طبقات الغلاف الجوي برودة لقلة الأوزون فيها.</p>
+  </div>
+  <div class="example-box type-4">
+    <p><strong>الثيرموسفير والإكسوسفير:</strong> الثيرموسفير من 85 إلى 500 كم (درجة حرارة أكثر من 1700°س). وتحتوي على طبقة الأيونوسفير التي تعكس أمواج الراديو AM. أما الإكسوسفير فهي الطبقة الأخيرة وتتلاشى عند حدود الفضاء.</p>
+  </div>
+</div>
+
+<!-- ===== القسم 4: مياه الأرض ودورة الماء ===== -->
+<div class="content-box">
+  <h3>💧 مياه الأرض ودورة الماء</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    تُسمى الأرض بالكوكب المائي لأن الماء يغطي 70% من سطحها. يتوزع الماء في ثلاث حالات: الصلبة (ثلج وجليد)، والسائلة (محيطات وأنهار)، والغازية (بخار ماء في الغلاف الجوي).
+  </p>
+
+  <!-- جدول نسب توزيع المياه -->
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>المكان</th>
+        <th>نسبة الماء %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>المحيطات</td><td>97.2</td></tr>
+      <tr><td>الغطاء الجليدي والجليديات</td><td>2.05</td></tr>
+      <tr><td>المياه الجوفية</td><td>0.62</td></tr>
+      <tr><td>الأنهار والبحيرات</td><td>0.009</td></tr>
+      <tr><td>الغلاف الجوي</td><td>0.001</td></tr>
+    </tbody>
+  </table>
+
+  <!-- رسم دورة الماء -->
+  <div class="svg-container">
+    <svg viewBox="0 0 620 400" width="620" height="400">
+      <text x="310" y="30" text-anchor="middle" font-size="18" font-weight="900" fill="#1e293b">دورة الماء في الطبيعة</text>
+
+      <!-- السماء -->
+      <rect x="40" y="50" width="540" height="140" rx="12" fill="#e0f2fe" opacity="0.4"/>
+      <!-- الأرض والبحر -->
+      <rect x="40" y="280" width="270" height="80" rx="10" fill="#bfdbfe" opacity="0.35"/>
+      <text x="175" y="325" text-anchor="middle" font-size="14" font-weight="700" fill="#1d4ed8">المحيط / البحيرة</text>
+      <rect x="320" y="280" width="260" height="80" rx="10" fill="#bbf7d0" opacity="0.35"/>
+      <text x="450" y="325" text-anchor="middle" font-size="14" font-weight="700" fill="#15803d">اليابسة / النباتات</text>
+
+      <!-- غيمة -->
+      <ellipse cx="310" cy="100" rx="100" ry="40" fill="#94a3b8" opacity="0.25"/>
+      <ellipse cx="275" cy="90" rx="60" ry="35" fill="#94a3b8" opacity="0.25"/>
+      <ellipse cx="355" cy="90" rx="55" ry="30" fill="#94a3b8" opacity="0.25"/>
+      <text x="310" y="105" text-anchor="middle" font-size="14" font-weight="800" fill="#475569">الغيوم (التكثف)</text>
+
+      <!-- الشمس -->
+      <circle cx="545" cy="68" r="24" fill="#fbbf24" opacity="0.7"/>
+      <text x="545" y="74" text-anchor="middle" font-size="18">☀️</text>
+
+      <!-- سهم التبخر -->
+      <line x1="155" y1="275" x2="225" y2="155" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="6,4"/>
+      <polygon points="225,150 217,160 229,162" fill="#3b82f6"/>
+      <text x="125" y="220" text-anchor="middle" font-size="13" font-weight="700" fill="#2563eb">التبخر ☀️</text>
+
+      <!-- سهم النتح -->
+      <line x1="465" y1="275" x2="405" y2="155" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="6,4"/>
+      <polygon points="405,150 397,160 409,162" fill="#16a34a"/>
+      <text x="490" y="220" text-anchor="middle" font-size="13" font-weight="700" fill="#16a34a">النتح 🌿</text>
+
+      <!-- سهم الهطول -->
+      <line x1="310" y1="145" x2="310" y2="265" stroke="#6366f1" stroke-width="2.5"/>
+      <polygon points="310,270 303,258 317,258" fill="#6366f1"/>
+      <text x="310" y="213" text-anchor="middle" font-size="13" font-weight="700" fill="#4f46e5">الهطول 🌧️</text>
+
+      <!-- سهم الجريان -->
+      <line x1="385" y1="342" x2="312" y2="342" stroke="#0ea5e9" stroke-width="2.5"/>
+      <polygon points="310,342 322,336 322,348" fill="#0ea5e9"/>
+      <text x="350" y="375" text-anchor="middle" font-size="13" font-weight="700" fill="#0284c7">الجريان السطحي</text>
+    </svg>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">💡</span>
+      <h4 class="rule-title">مراحل دورة الماء</h4>
+    </div>
+    <div class="rule-explanation">
+      <strong>1. التبخر:</strong> تسخّن الشمس مياه المحيطات فتتحول إلى بخار ماء يدخل الغلاف الجوي. كما يدخل بخار الماء عن طريق النتح من النباتات.<br>
+      <strong>2. التكثف:</strong> يصعد البخار إلى أعلى فيبرد ويتحول مرة أخرى إلى قطيرات ماء صغيرة مكوّنة الغيوم.<br>
+      <strong>3. الهطول:</strong> تتحد القطيرات حتى تصبح ثقيلة فتسقط على شكل أمطار أو ثلوج.<br>
+      <strong>4. الجريان:</strong> يجري الماء على السطح ويعود إلى المحيطات والبحيرات، ثم تتكرر الدورة.
+    </div>
+  </div>
+</div>
+
+<!-- ===== القسم 5: طقس الأرض ونقل الطاقة ===== -->
+<div class="content-box">
+  <h3>🌡️ طقس الأرض ونقل الطاقة</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    يصف <strong>الطقس</strong> الحالة السائدة في الغلاف الجوي، ويتضمن: درجة الحرارة، والغيوم، وسرعة الرياح واتجاهها، والرطوبة، والضغط الجوي.
+  </p>
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    الشمس هي مصدر معظم الطاقة الموجودة على كوكبنا. وتنتقل الطاقة الحرارية على الأرض بطريقتين رئيسيتين: <strong>التوصيل</strong> و<strong>الحمل</strong>.
+  </p>
+
+  <!-- رسم نقل الطاقة -->
+  <div class="svg-container">
+    <svg viewBox="0 0 620 320" width="620" height="320">
+      <text x="310" y="28" text-anchor="middle" font-size="18" font-weight="900" fill="#1e293b">انتقال الحرارة: التوصيل والحمل</text>
+
+      <!-- التوصيل - الجهة اليمنى (RTL) -->
+      <rect x="325" y="50" width="260" height="250" rx="14" fill="#fef3c7" opacity="0.35" stroke="#fbbf24" stroke-width="1.5"/>
+      <text x="455" y="78" text-anchor="middle" font-size="17" font-weight="800" fill="#92400e">التوصيل</text>
+      
+      <text x="455" y="110" text-anchor="middle" font-size="12" fill="#64748b">
+        <tspan x="455" dy="0">الحرارة تنتقل بالتلامس</tspan>
+        <tspan x="455" dy="18">من الجزيئات الساخنة</tspan>
+        <tspan x="455" dy="18">إلى البطيئة المجاورة</tspan>
+      </text>
+
+      <!-- أسهم تصاعد -->
+      <line x1="405" y1="195" x2="405" y2="165" stroke="#ef4444" stroke-width="2"/>
+      <polygon points="405,160 399,170 411,170" fill="#ef4444"/>
+      <line x1="455" y1="195" x2="455" y2="165" stroke="#ef4444" stroke-width="2"/>
+      <polygon points="455,160 449,170 461,170" fill="#ef4444"/>
+      <line x1="505" y1="195" x2="505" y2="165" stroke="#ef4444" stroke-width="2"/>
+      <polygon points="505,160 499,170 511,170" fill="#ef4444"/>
+
+      <!-- طبقة هواء -->
+      <rect x="355" y="200" width="200" height="30" rx="5" fill="#fde68a" opacity="0.4"/>
+      <text x="455" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">هواء ملامس (يسخن)</text>
+      <!-- سطح الأرض -->
+      <rect x="355" y="240" width="200" height="25" rx="5" fill="#92400e" opacity="0.3"/>
+      <text x="455" y="257" text-anchor="middle" font-size="12" font-weight="700" fill="#78350f">سطح الأرض (ساخن)</text>
+
+      <!-- الحمل - الجهة اليسرى -->
+      <rect x="35" y="50" width="260" height="250" rx="14" fill="#dbeafe" opacity="0.35" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="165" y="78" text-anchor="middle" font-size="17" font-weight="800" fill="#1e40af">الحمل</text>
+
+      <!-- تيار حمل دائري -->
+      <!-- سهم صاعد (ساخن) -->
+      <line x1="115" y1="265" x2="115" y2="115" stroke="#ef4444" stroke-width="2.5"/>
+      <polygon points="115,110 109,120 121,120" fill="#ef4444"/>
+      <text x="100" y="190" text-anchor="end" font-size="12" font-weight="700" fill="#ef4444">هواء ساخن ↑</text>
+
+      <!-- سهم هابط (بارد) -->
+      <line x1="215" y1="115" x2="215" y2="265" stroke="#3b82f6" stroke-width="2.5"/>
+      <polygon points="215,270 209,260 221,260" fill="#3b82f6"/>
+      <text x="230" y="190" text-anchor="start" font-size="12" font-weight="700" fill="#3b82f6">هواء بارد ↓</text>
+
+      <!-- أسهم أفقية -->
+      <line x1="120" y1="110" x2="210" y2="110" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <line x1="210" y1="270" x2="120" y2="270" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+      <text x="165" y="285" text-anchor="middle" font-size="11" fill="#64748b">سطح الأرض</text>
+      <rect x="85" y="290" width="160" height="8" rx="4" fill="#92400e" opacity="0.2"/>
+    </svg>
+  </div>
+
+  <div class="example-box type-1">
+    <p><strong>التوصيل:</strong> انتقال الحرارة بتصادم الجزيئات المتحركة بسرعة عالية (الساخنة) مع الجزيئات البطيئة المجاورة. هكذا يسخن الهواء الملامس لسطح الأرض.</p>
+  </div>
+  <div class="example-box type-2">
+    <p><strong>الحمل:</strong> صعود الهواء الساخن (لأنه أقل كثافة) وهبوط الهواء البارد (لأنه أكبر كثافة). هذه هي الطريقة الرئيسية لانتقال الحرارة في الغلاف الجوي.</p>
+  </div>
+</div>
+
+<!-- ===== القسم 6: الضغط الجوي والرطوبة ===== -->
+<div class="content-box">
+  <h3>📊 الضغط الجوي والرطوبة</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    <strong>الضغط الجوي:</strong> بسبب جذب الأرض للهواء يولَّد وزن الهواء ضغطًا. يتناقص الضغط كلما ارتفعنا بسبب تناقص وزن الهواء فوقنا. وهناك علاقة بين الضغط ودرجة الحرارة: الهواء الساخن يصعد (ضغط منخفض)، والهواء البارد ينزل (ضغط مرتفع).
+  </p>
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    <strong>الرطوبة:</strong> مقدار بخار الماء في الغلاف الجوي. كلما زادت درجة الحرارة، زاد التبخر وزادت كمية بخار الماء التي يستطيع الهواء حملها.
+  </p>
+
+  <!-- رسم العلاقة بين الضغط والحرارة -->
+  <div class="svg-container">
+    <svg viewBox="0 0 620 290" width="620" height="290">
+      <text x="310" y="28" text-anchor="middle" font-size="18" font-weight="900" fill="#1e293b">العلاقة بين الحرارة والضغط الجوي</text>
+
+      <!-- الهواء الساخن - يمين (RTL) -->
+      <rect x="335" y="50" width="240" height="220" rx="14" fill="#fef2f2" opacity="0.35" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="455" y="78" text-anchor="middle" font-size="16" font-weight="800" fill="#dc2626">هواء ساخن ☀️</text>
+      <text x="455" y="105" text-anchor="middle" font-size="13" fill="#64748b">الجزيئات تتحرك بسرعة</text>
+      <text x="455" y="125" text-anchor="middle" font-size="13" fill="#64748b">تتباعد ← كثافة أقل</text>
+      <!-- سهم صاعد -->
+      <line x1="455" y1="172" x2="455" y2="148" stroke="#ef4444" stroke-width="3"/>
+      <polygon points="455,143 447,156 463,156" fill="#ef4444"/>
+      <text x="455" y="197" text-anchor="middle" font-size="15" font-weight="800" fill="#dc2626">يصعد لأعلى</text>
+      <text x="455" y="220" text-anchor="middle" font-size="15" font-weight="800" fill="#dc2626">⬇</text>
+      <text x="455" y="248" text-anchor="middle" font-size="16" font-weight="900" fill="#dc2626">ضغط منخفض</text>
+
+      <!-- الهواء البارد - يسار -->
+      <rect x="45" y="50" width="240" height="220" rx="14" fill="#eff6ff" opacity="0.35" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="165" y="78" text-anchor="middle" font-size="16" font-weight="800" fill="#2563eb">هواء بارد ❄️</text>
+      <text x="165" y="105" text-anchor="middle" font-size="13" fill="#64748b">الجزيئات تتحرك ببطء</text>
+      <text x="165" y="125" text-anchor="middle" font-size="13" fill="#64748b">تتقارب ← كثافة أكبر</text>
+      <!-- سهم هابط -->
+      <line x1="165" y1="148" x2="165" y2="172" stroke="#3b82f6" stroke-width="3"/>
+      <polygon points="165,177 157,165 173,165" fill="#3b82f6"/>
+      <text x="165" y="197" text-anchor="middle" font-size="15" font-weight="800" fill="#2563eb">ينزل لأسفل</text>
+      <text x="165" y="220" text-anchor="middle" font-size="15" font-weight="800" fill="#2563eb">⬇</text>
+      <text x="165" y="248" text-anchor="middle" font-size="16" font-weight="900" fill="#2563eb">ضغط مرتفع</text>
+    </svg>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">💡</span>
+      <h4 class="rule-title">درجة الندى والرطوبة النسبية</h4>
+    </div>
+    <div class="rule-explanation">
+      <strong>درجة الندى:</strong> درجة الحرارة التي يصل عندها الهواء إلى حالة الإشباع ويبدأ التكثف.<br>
+      <strong>الرطوبة النسبية:</strong> كمية بخار الماء الموجودة في الهواء مقارنة بالكمية التي يستطيع حملها عند درجة حرارة معينة. عندما تحتوي على الحد الأقصى تكون الرطوبة النسبية = 100%.
+    </div>
+  </div>
+</div>
+
+<!-- ===== القسم 7: الغيوم ===== -->
+<div class="content-box">
+  <h3>☁️ الغيوم</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    تُعد الغيوم من أفضل الأدلة على حركة الغلاف الجوي. تتكون عندما يرتفع الهواء ويبرد إلى درجة الندى فيصبح مشبعًا ويتكثف بخار الماء فوق جسيمات صغيرة في الغلاف الجوي. وتُصنّف الغيوم حسب ارتفاعها عن سطح الأرض.
+  </p>
+
+  <!-- رسم أنواع الغيوم -->
+  <div class="svg-container">
+    <svg viewBox="0 0 620 420" width="620" height="420">
+      <text x="310" y="30" text-anchor="middle" font-size="18" font-weight="900" fill="#1e293b" font-family="Tajawal, sans-serif">تصنيف الغيوم حسب الارتفاع</text>
+
+      <!-- خط الارتفاع - على اليسار -->
+      <line x1="55" y1="55" x2="55" y2="390" stroke="#cbd5e1" stroke-width="2"/>
+
+      <!-- المرتفعة -->
+      <text x="42" y="80" text-anchor="end" font-size="11" font-weight="600" fill="#94a3b8">8000 م</text>
+      <line x1="55" y1="80" x2="590" y2="80" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="5,5"/>
+      <rect x="65" y="55" width="520" height="80" rx="10" fill="#eff6ff" opacity="0.25"/>
+      <text x="320" y="78" text-anchor="middle" font-size="14" font-weight="800" fill="#1e40af" font-family="Tajawal, sans-serif">الغيوم المرتفعة (أعلى من 8000 م)</text>
+      <ellipse cx="170" cy="110" rx="58" ry="16" fill="#bfdbfe" opacity="0.5"/>
+      <text x="170" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">الريشية</text>
+      <rect x="280" y="100" width="110" height="24" rx="8" fill="#bfdbfe" opacity="0.5"/>
+      <text x="335" y="116" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">الريشية الطبقية</text>
+      <ellipse cx="475" cy="110" rx="55" ry="18" fill="#bfdbfe" opacity="0.5"/>
+      <text x="475" y="115" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">الريشية الركامية</text>
+
+      <!-- المتوسطة -->
+      <text x="42" y="190" text-anchor="end" font-size="11" font-weight="600" fill="#94a3b8">2000 م</text>
+      <line x1="55" y1="190" x2="590" y2="190" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="5,5"/>
+      <rect x="65" y="150" width="520" height="80" rx="10" fill="#f0fdf4" opacity="0.25"/>
+      <text x="320" y="172" text-anchor="middle" font-size="14" font-weight="800" fill="#15803d" font-family="Tajawal, sans-serif">الغيوم المتوسطة (2000 – 8000 م)</text>
+      <ellipse cx="190" cy="210" rx="68" ry="18" fill="#bbf7d0" opacity="0.5"/>
+      <text x="190" y="215" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d" font-family="Tajawal, sans-serif">الركامية المتوسطة</text>
+      <rect x="355" y="198" width="140" height="24" rx="8" fill="#bbf7d0" opacity="0.5"/>
+      <text x="425" y="215" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d" font-family="Tajawal, sans-serif">الطبقية المتوسطة</text>
+
+      <!-- المنخفضة -->
+      <rect x="65" y="248" width="520" height="125" rx="10" fill="#fef3c7" opacity="0.25"/>
+      <text x="320" y="270" text-anchor="middle" font-size="14" font-weight="800" fill="#92400e" font-family="Tajawal, sans-serif">الغيوم المنخفضة (أقل من 2000 م)</text>
+      <ellipse cx="150" cy="315" rx="55" ry="28" fill="#fde68a" opacity="0.5"/>
+      <text x="150" y="320" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">الركامية</text>
+      <rect x="250" y="300" width="120" height="30" rx="8" fill="#fde68a" opacity="0.5"/>
+      <text x="310" y="319" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">الطبقية</text>
+      <ellipse cx="460" cy="315" rx="68" ry="25" fill="#fde68a" opacity="0.5"/>
+      <text x="460" y="320" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">الطبقية الركامية</text>
+
+      <!-- سطح الأرض -->
+      <rect x="55" y="388" width="535" height="20" rx="5" fill="#16a34a" opacity="0.2"/>
+      <text x="320" y="402" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d" font-family="Tajawal, sans-serif">سطح الأرض</text>
+
+      <!-- غيوم المزن الركامية (ممتدة) -->
+      <rect x="552" y="85" width="35" height="290" rx="8" fill="#94a3b8" opacity="0.2"/>
+      <text x="569" y="240" text-anchor="middle" font-size="9" font-weight="700" fill="#475569" transform="rotate(-90,569,240)">المزن الركامية (جميع الارتفاعات)</text>
+    </svg>
+  </div>
+
+  <div class="note-box">
+    <span class="note-icon">⚡</span>
+    <div class="note-content">
+      <strong>الغيوم الركامية:</strong> غيوم سميكة تتشكل عند ارتفاع تيارات هواء رطبة. عندما يزداد سُمكها تُنتج أمطارًا غزيرة وبرقًا ورعدًا. <strong>الضباب</strong> هو غيوم منخفضة جدًّا نشاهده في الشتاء.
+    </div>
+  </div>
+</div>
+
+<!-- ===== القسم 8: الهطول ===== -->
+<div class="content-box">
+  <h3>🌧️ الهطول</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    يحدث الهطول عندما تصبح قطرات الماء أو بلورات الثلج كبيرة لدرجة لا تستطيع الغيوم حملها. ويعتمد نوع الهطول على درجة حرارة الغلاف الجوي.
+  </p>
+
+  <!-- رسم أنواع الهطول -->
+  <div class="svg-container">
+    <svg viewBox="0 0 620 260" width="620" height="260">
+      <text x="310" y="28" text-anchor="middle" font-size="18" font-weight="900" fill="#1e293b">أنواع الهطول</text>
+
+      <!-- المطر - يمين (أول عنصر RTL) -->
+      <rect x="465" y="50" width="130" height="185" rx="14" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+      <text x="530" y="82" text-anchor="middle" font-size="28">🌧️</text>
+      <text x="530" y="112" text-anchor="middle" font-size="16" font-weight="800" fill="#1e40af">المطر</text>
+      <text x="530" y="138" text-anchor="middle" font-size="12" fill="#64748b">
+        <tspan x="530" dy="0">حرارة الهواء</tspan>
+        <tspan x="530" dy="17">أعلى من درجة</tspan>
+        <tspan x="530" dy="17">التجمد</tspan>
+      </text>
+
+      <!-- المطر المتجمد -->
+      <rect x="320" y="50" width="130" height="185" rx="14" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+      <text x="385" y="82" text-anchor="middle" font-size="28">🌨️</text>
+      <text x="385" y="112" text-anchor="middle" font-size="14" font-weight="800" fill="#15803d">المطر المتجمد</text>
+      <text x="385" y="138" text-anchor="middle" font-size="12" fill="#64748b">
+        <tspan x="385" dy="0">هواء علوي دافئ</tspan>
+        <tspan x="385" dy="17">وهواء سطحي</tspan>
+        <tspan x="385" dy="17">تحت التجمد</tspan>
+      </text>
+
+      <!-- الثلج -->
+      <rect x="175" y="50" width="130" height="185" rx="14" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5"/>
+      <text x="240" y="82" text-anchor="middle" font-size="28">❄️</text>
+      <text x="240" y="112" text-anchor="middle" font-size="16" font-weight="800" fill="#7c3aed">الثلج</text>
+      <text x="240" y="138" text-anchor="middle" font-size="12" fill="#64748b">
+        <tspan x="240" dy="0">بلورات ثلجية</tspan>
+        <tspan x="240" dy="17">حرارة كل الطبقات</tspan>
+        <tspan x="240" dy="17">تحت التجمد</tspan>
+      </text>
+
+      <!-- البَرَد - يسار (آخر عنصر RTL) -->
+      <rect x="25" y="50" width="135" height="185" rx="14" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+      <text x="92" y="82" text-anchor="middle" font-size="28">🧊</text>
+      <text x="92" y="112" text-anchor="middle" font-size="16" font-weight="800" fill="#92400e">البَرَد</text>
+      <text x="92" y="138" text-anchor="middle" font-size="12" fill="#64748b">
+        <tspan x="92" dy="0">يتكون في غيوم</tspan>
+        <tspan x="92" dy="17">المزن الركامية</tspan>
+        <tspan x="92" dy="17">بفعل رياح قوية</tspan>
+        <tspan x="92" dy="17">تصعد البلورات</tspan>
+        <tspan x="92" dy="17">وتهبط مرارًا</tspan>
+      </text>
+    </svg>
+  </div>
+</div>
+
+<!-- ===== القسم 9: الرياح ===== -->
+<div class="content-box">
+  <h3>💨 الرياح</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    الرياح هي حركة الهواء من مناطق الضغط المرتفع إلى مناطق الضغط المنخفض. وبسبب العلاقة المباشرة بين الضغط ودرجة الحرارة، فإن الرياح تنشأ بسبب اختلاف درجات الحرارة بين المناطق. وكلما زاد الفرق في الضغط والحرارة بين منطقتين، زادت سرعة الرياح وقوتها.
+  </p>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">📐</span>
+      <h4 class="rule-title">حساب سرعة الرياح</h4>
+    </div>
+    <div class="rule-formula">
+      السرعة (ع) = المسافة (ف) ÷ الزمن (ز)
+    </div>
+    <div class="rule-explanation">
+      تُقاس سرعة الرياح بجهاز يُسمى <strong>الأنيموميتر</strong>.
+    </div>
+  </div>
+
+  <div style="margin-top: 30px;">
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; margin-bottom: 18px;">
+      <h5 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0;">🔢 أمثلة محلولة</h5>
+    </div>
+
+    <div class="example-box type-1">
+      <p><strong>مثال 1:</strong> تحرّكت الرياح مسافة 14 كم خلال ساعتين. ما سرعتها؟</p>
+      <p><strong>الحل:</strong> ع = ف ÷ ز = 14 ÷ 2 = <strong>7 كم/ساعة</strong></p>
+    </div>
+    <div class="example-box type-2">
+      <p><strong>مثال 2:</strong> يتحرك الهواء من المناطق الباردة إلى الحارة مسافة 20 كم في ساعتين. ما سرعته؟</p>
+      <p><strong>الحل:</strong> ع = 20 ÷ 2 = <strong>10 كم/ساعة</strong></p>
+    </div>
+    <div class="example-box type-3">
+      <p><strong>مثال 3:</strong> تتحرك الرياح من مناطق الضغط المرتفع إلى المنخفض، فإذا قطعت 69 كم في 3 ساعات. ما سرعتها؟</p>
+      <p><strong>الحل:</strong> ع = 69 ÷ 3 = <strong>23 كم/ساعة</strong></p>
+    </div>
+  </div>
+
+  <div class="rule-box" style="margin-top:25px;">
+    <div class="rule-header">
+      <span class="rule-icon">🌍</span>
+      <h4 class="rule-title">تيارات الهواء العالمية وأثر قوة كوريولوس</h4>
+    </div>
+    <div class="rule-explanation">
+      أشعة الشمس تسقط عموديًّا على المنطقة الاستوائية، مما يؤدي إلى تسخين أكبر مقارنة بالمناطق القطبية. ونتيجة لذلك يتحرك الهواء الساخن من خط الاستواء نحو القطبين، بينما يتحرك الهواء البارد بالعكس. ونتيجة لدوران الأرض حول نفسها، ينحرف الهواء نحو اليمين في النصف الشمالي ونحو اليسار في النصف الجنوبي، وتُسمى هذه الظاهرة <strong>أثر قوة كوريولوس</strong>.
+    </div>
+  <div class="rule-box" style="margin-top:25px;">
+    <div class="rule-header">
+      <span class="rule-icon">🌊</span>
+      <h4 class="rule-title">الرياح الموسمية</h4>
+    </div>
+    <div class="rule-explanation">
+      تُعرَّف الرياح الموسمية بأنها تغيُّر في اتجاه الرياح خلال فصول محددة. وتُعد الهند من أكثر الدول تأثرًا بها. خلال شهري يونيو ويوليو يتكون ضغط منخفض فوق مناطق اليابسة في الهند، فتهب رياح رطبة قادمة من المحيط مسببة هطول أمطار غزيرة مهمة للزراعة. وخلال فصل الشتاء تتكون فوق اليابسة مناطق ضغط مرتفع فتهب رياح جافة من اليابسة على المحيط.<br><br>
+      كما تتأثر مرتفعات شبه الجزيرة العربية – ومنها مرتفعات المملكة العربية السعودية وجبال ظفار في سلطنة عمان – بالرياح الموسمية في فصل الصيف.
+    </div>
+  </div>
+</div>
+<section class="checklist-section">
+  <h2 class="checklist-title">✅ قائمة الإنجاز</h2>
+
+  <div class="checklist-container">
+    <div class="checklist-item">
+      <input type="checkbox" id="check1" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check1">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أستطيع توضيح سبب وجود ضغط للهواء</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check2" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check2">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف مكوّنات الغلاف الجوي ونسبها</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check3" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check3">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أستطيع تسمية طبقات الغلاف الجوي الخمس</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check4" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check4">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أفهم مراحل دورة الماء في الطبيعة</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check5" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check5">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أقارن بين التوصيل والحمل في نقل الطاقة</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check6" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check6">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أفهم العلاقة بين الحرارة والضغط الجوي</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check7" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check7">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف أنواع الغيوم وتصنيفها حسب الارتفاع</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check8" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check8">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف أنواع الهطول الأربعة</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check9" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check9">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أفهم كيف تنشأ الرياح وأستطيع حساب سرعتها</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check10" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check10">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف ما هي الرياح الموسمية وتأثيرها</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-text">
+      <span>نسبة الإنجاز:</span>
+      <span id="progressPercent" class="progress-number">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+    <div class="progress-message" id="progressMessage">
+      ابدأ بوضع علامة ✔ على ما أتقنته!
+    </div>
+  </div>
+</section>
+
+<!-- ===== التمارين ===== -->
+<section class="exercises-section">
+  <h2 class="exercises-title">📝 تمارين واختبارات</h2>
+
+  <div id="exercisesContainer">
+    <!-- السؤال 1 -->
+    <div class="exercise-item" data-exercise="1">
+      <div class="exercise-question">
+        <span class="exercise-number">1</span>
+        <span>ما الغاز الأكثر نسبةً في الغلاف الجوي؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(1, true)">النيتروجين</button>
+        <button class="answer-btn" onclick="checkTrueFalse(1, false)">الأكسجين</button>
+        <button class="answer-btn" onclick="checkTrueFalse(1, false)">ثاني أكسيد الكربون</button>
+        <button class="answer-btn" onclick="checkTrueFalse(1, false)">بخار الماء</button>
+      </div>
+      <div class="explanation" id="exp-1"></div>
+    </div>
+
+    <!-- السؤال 2 -->
+    <div class="exercise-item" data-exercise="2" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">2</span>
+        <span>ما اسم طبقة الغلاف الجوي التي تحتوي على معظم الغيوم والتغيرات الطقسية؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(2, false)">الستراتوسفير</button>
+        <button class="answer-btn" onclick="checkTrueFalse(2, true)">التروبوسفير</button>
+        <button class="answer-btn" onclick="checkTrueFalse(2, false)">الميزوسفير</button>
+        <button class="answer-btn" onclick="checkTrueFalse(2, false)">الثيرموسفير</button>
+      </div>
+      <div class="explanation" id="exp-2"></div>
+    </div>
+
+    <!-- السؤال 3 -->
+    <div class="exercise-item" data-exercise="3" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">3</span>
+        <span>ما الطبقة التي تحتوي على الأوزون الذي يحمينا من الأشعة فوق البنفسجية؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(3, false)">التروبوسفير</button>
+        <button class="answer-btn" onclick="checkTrueFalse(3, true)">الستراتوسفير</button>
+        <button class="answer-btn" onclick="checkTrueFalse(3, false)">الإكسوسفير</button>
+        <button class="answer-btn" onclick="checkTrueFalse(3, false)">الميزوسفير</button>
+      </div>
+      <div class="explanation" id="exp-3"></div>
+    </div>
+
+    <!-- السؤال 4 -->
+    <div class="exercise-item" data-exercise="4" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">4</span>
+        <span>ما العملية التي يتحول فيها الماء السائل إلى بخار ماء؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(4, false)">التكثف</button>
+        <button class="answer-btn" onclick="checkTrueFalse(4, false)">الهطول</button>
+        <button class="answer-btn" onclick="checkTrueFalse(4, true)">التبخر</button>
+        <button class="answer-btn" onclick="checkTrueFalse(4, false)">النتح</button>
+      </div>
+      <div class="explanation" id="exp-4"></div>
+    </div>
+
+    <!-- السؤال 5 -->
+    <div class="exercise-item" data-exercise="5" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">5</span>
+        <span>كيف تنتقل الحرارة من سطح الأرض إلى الهواء الملامس له مباشرة؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(5, true)">التوصيل</button>
+        <button class="answer-btn" onclick="checkTrueFalse(5, false)">الحمل</button>
+        <button class="answer-btn" onclick="checkTrueFalse(5, false)">الإشعاع</button>
+        <button class="answer-btn" onclick="checkTrueFalse(5, false)">التبخر</button>
+      </div>
+      <div class="explanation" id="exp-5"></div>
+    </div>
+
+    <!-- السؤال 6 -->
+    <div class="exercise-item" data-exercise="6" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">6</span>
+        <span>ماذا يحدث للضغط الجوي عندما يسخن الهواء؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(6, false)">يرتفع الضغط</button>
+        <button class="answer-btn" onclick="checkTrueFalse(6, true)">ينخفض الضغط</button>
+        <button class="answer-btn" onclick="checkTrueFalse(6, false)">لا يتغير</button>
+        <button class="answer-btn" onclick="checkTrueFalse(6, false)">يتضاعف</button>
+      </div>
+      <div class="explanation" id="exp-6"></div>
+    </div>
+
+    <!-- السؤال 7 -->
+    <div class="exercise-item" data-exercise="7" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">7</span>
+        <span>الرياح تتحرك من مناطق الضغط _____ إلى مناطق الضغط _____</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(7, true)">المرتفع → المنخفض</button>
+        <button class="answer-btn" onclick="checkTrueFalse(7, false)">المنخفض → المرتفع</button>
+        <button class="answer-btn" onclick="checkTrueFalse(7, false)">المتساوي → المنخفض</button>
+        <button class="answer-btn" onclick="checkTrueFalse(7, false)">المرتفع → المتساوي</button>
+      </div>
+      <div class="explanation" id="exp-7"></div>
+    </div>
+
+    <!-- السؤال 8 -->
+    <div class="exercise-item" data-exercise="8" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">8</span>
+        <span>إذا تحركت الرياح مسافة 60 كم في 3 ساعات، فما سرعتها؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(8, false)">30 كم/ساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(8, true)">20 كم/ساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(8, false)">15 كم/ساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(8, false)">10 كم/ساعة</button>
+      </div>
+      <div class="explanation" id="exp-8"></div>
+    </div>
+
+    <!-- السؤال 9 -->
+    <div class="exercise-item" data-exercise="9" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">9</span>
+        <span>ما نوع الهطول الذي يتكوّن في غيوم المزن الركامية بسبب رياح قوية تصعد بالبلورات الثلجية وتهبط مرارًا؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(9, false)">الثلج</button>
+        <button class="answer-btn" onclick="checkTrueFalse(9, false)">المطر المتجمد</button>
+        <button class="answer-btn" onclick="checkTrueFalse(9, true)">البَرَد</button>
+        <button class="answer-btn" onclick="checkTrueFalse(9, false)">المطر</button>
+      </div>
+      <div class="explanation" id="exp-9"></div>
+    </div>
+
+    <!-- السؤال 10 -->
+    <div class="exercise-item" data-exercise="10" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">10</span>
+        <span>ما سبب انحراف الرياح العالمية عن مسارها المستقيم؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(10, false)">جاذبية القمر</button>
+        <button class="answer-btn" onclick="checkTrueFalse(10, false)">ارتفاع الجبال</button>
+        <button class="answer-btn" onclick="checkTrueFalse(10, true)">دوران الأرض (قوة كوريولوس)</button>
+        <button class="answer-btn" onclick="checkTrueFalse(10, false)">حركة المحيطات</button>
+      </div>
+      <div class="explanation" id="exp-10"></div>
+    </div>
+  </div>
+
+  <!-- زر التالي -->
+  <div style="text-align: center; margin-top: 30px;">
+    <button id="nextExerciseBtn" style="display: none; padding: 18px 50px; background: linear-gradient(135deg, #2563eb, #1e40af); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: 800; cursor: pointer; font-family: 'Tajawal', sans-serif;" onclick="nextExercise()">
+      السؤال التالي ⬅️
+    </button>
+  </div>
+
+  <!-- صفحة النتائج -->
+  <div id="resultsPage" style="display: none;">
+    <div class="results-card">
+      <div class="results-emoji" id="resultEmoji">🎉</div>
+      <div class="results-score">
+        <div id="scorePercentage" class="score-big">0%</div>
+        <div class="score-details">
+          <span class="score-correct"><span id="correctCount">0</span> ✔</span>
+          <span class="score-wrong"><span id="wrongCount">0</span> ✗</span>
+        </div>
+      </div>
+      <div class="results-message" id="resultMessage"></div>
+      <button class="restart-btn" onclick="restartQuiz()">
+        🔄 إعادة المحاولة
+      </button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom: 8px;">تم تطوير هذا المحتوى التعليمي بالذكاء الاصطناعي ليكون مساعدًا تفاعليًا ولا يُغني عن الكتاب المدرسي</p>
+  <p><strong>منصة شارف التعليمية</strong> 📚</p>
+</footer>
+
+<script>
+// قائمة الإنجاز
+function updateProgress() {
+  const checkboxes = document.querySelectorAll('.checklist-checkbox');
+  const total = checkboxes.length;
+  let checked = 0;
+  checkboxes.forEach(cb => { if (cb.checked) checked++; });
+  const percentage = Math.round((checked / total) * 100);
+  document.getElementById('progressPercent').textContent = percentage + '%';
+  document.getElementById('progressFill').style.width = percentage + '%';
+  const msg = document.getElementById('progressMessage');
+  if (percentage === 0) msg.textContent = 'ابدأ بوضع علامة ✔ على ما أتقنته!';
+  else if (percentage < 50) msg.textContent = '💪 استمر! أنت في البداية...';
+  else if (percentage < 100) msg.textContent = '👍 ممتاز! أنت على الطريق الصحيح!';
+  else msg.textContent = '🎉 رائع! أنت مستعد للاختبار الآن!';
+}
+
+// التمارين
+let currentExercise = 1;
+const totalExercises = 10;
+let answered = false;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+
+const explanations = {
+  1: { correct: '✅ صحيح! النيتروجين N₂ يشكّل نحو 78% من الغلاف الجوي، وهو الغاز الأكثر نسبة.', wrong: '❌ خطأ. الإجابة الصحيحة هي النيتروجين، فهو يشكل 78% من الغلاف الجوي، يليه الأكسجين بنسبة 21%.' },
+  2: { correct: '✅ صحيح! التروبوسفير هي أقرب طبقة لسطح الأرض (0-10 كم) وتحتوي على معظم الغيوم والتغيرات الطقسية.', wrong: '❌ خطأ. الطبقة الصحيحة هي التروبوسفير، وهي أقرب طبقة لسطح الأرض وتمتد حتى 10 كم وتحتوي على جميع الظواهر الطقسية.' },
+  3: { correct: '✅ صحيح! الستراتوسفير (10-50 كم) تحتوي على طبقة الأوزون التي تمتص الأشعة فوق البنفسجية الضارة.', wrong: '❌ خطأ. الإجابة الصحيحة هي الستراتوسفير التي تقع بين 10 و50 كم وتحتوي على أعلى تركيز للأوزون.' },
+  4: { correct: '✅ صحيح! التبخر هو تحوّل الماء من الحالة السائلة إلى الحالة الغازية (بخار ماء) بفعل حرارة الشمس.', wrong: '❌ خطأ. العملية الصحيحة هي التبخر. التكثف هو العكس (من غاز لسائل)، والهطول هو سقوط الماء من الغيوم، والنتح هو خروج بخار الماء من النباتات.' },
+  5: { correct: '✅ صحيح! التوصيل هو انتقال الحرارة بتصادم الجزيئات المتجاورة. تسخّن الشمس سطح الأرض، ثم ينتقل الحرارة بالتوصيل إلى طبقة رقيقة من الهواء الملامس.', wrong: '❌ خطأ. الإجابة الصحيحة هي التوصيل. الحمل يحدث بعد ذلك عندما يصعد الهواء الساخن ويهبط الهواء البارد.' },
+  6: { correct: '✅ صحيح! عند تسخين الهواء تتسارع جزيئاته وتتباعد فتقل كثافته ويصعد لأعلى، مكوّنًا منطقة ضغط منخفض.', wrong: '❌ خطأ. عندما يسخن الهواء ينخفض ضغطه لأن جزيئاته تتباعد وتقل كثافته فيصعد لأعلى مكوّنًا منطقة ذات ضغط منخفض.' },
+  7: { correct: '✅ صحيح! الرياح تتحرك دائمًا من مناطق الضغط المرتفع (هواء بارد كثيف) إلى مناطق الضغط المنخفض (هواء ساخن خفيف).', wrong: '❌ خطأ. الرياح تتحرك من مناطق الضغط المرتفع إلى المنخفض، تمامًا كما ينتقل الماء من الأعلى إلى الأسفل.' },
+  8: { correct: '✅ صحيح! السرعة = المسافة ÷ الزمن = 60 ÷ 3 = 20 كم/ساعة.', wrong: '❌ خطأ. الحل: السرعة = المسافة ÷ الزمن = 60 ÷ 3 = 20 كم/ساعة.' },
+  9: { correct: '✅ صحيح! البَرَد يتكوّن في غيوم المزن الركامية حيث تعمل الرياح القوية على رفع البلورات الثلجية وإسقاطها مرارًا حتى تصبح كرات ثلجية كبيرة.', wrong: '❌ خطأ. الإجابة الصحيحة هي البَرَد، الذي يتكوّن بسبب صعود البلورات الثلجية وهبوطها المتكرر في غيوم المزن الركامية.' },
+  10: { correct: '✅ صحيح! دوران الأرض حول نفسها يسبب انحراف الرياح، وتسمى هذه الظاهرة أثر قوة كوريولوس. ينحرف الهواء يمينًا في النصف الشمالي ويسارًا في الجنوبي.', wrong: '❌ خطأ. السبب هو دوران الأرض حول نفسها (قوة كوريولوس) التي تحرف الرياح يمينًا في النصف الشمالي ويسارًا في النصف الجنوبي.' }
+};
+
+function checkTrueFalse(exerciseNum, isCorrect) {
+  if (answered) return;
+  answered = true;
+  const buttons = document.querySelectorAll(`[data-exercise="${exerciseNum}"] .answer-btn`);
+  const expDiv = document.getElementById(`exp-${exerciseNum}`);
+  buttons.forEach(btn => { btn.style.pointerEvents = 'none'; });
+
+  if (isCorrect) {
+    event.target.classList.add('correct');
+    correctAnswers++;
+    expDiv.textContent = explanations[exerciseNum].correct;
+    expDiv.classList.add('show', 'correct-exp');
+  } else {
+    event.target.classList.add('wrong');
+    wrongAnswers++;
+    // إظهار الإجابة الصحيحة فقط باللون الأخضر
+    buttons.forEach(btn => {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('true)')) {
+        btn.classList.add('correct');
+      }
+    });
+    expDiv.textContent = explanations[exerciseNum].wrong;
+    expDiv.classList.add('show', 'wrong-exp');
+  }
+
+  if (currentExercise < totalExercises) {
+    document.getElementById('nextExerciseBtn').style.display = 'inline-block';
+  } else {
+    setTimeout(showResults, 1000);
+  }
+}
+
+function nextExercise() {
+  document.querySelector(`[data-exercise="${currentExercise}"]`).style.display = 'none';
+  currentExercise++;
+  document.querySelector(`[data-exercise="${currentExercise}"]`).style.display = 'block';
+  answered = false;
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  window.scrollTo({ top: document.querySelector('.exercises-section').offsetTop - 20, behavior: 'smooth' });
+}
+
+function showResults() {
+  document.getElementById('exercisesContainer').style.display = 'none';
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  const percentage = Math.round((correctAnswers / totalExercises) * 100);
+  let emoji, message;
+  if (percentage === 100) { emoji = '🏆'; message = 'ممتاز! أتقنت الدرس بشكل كامل!'; }
+  else if (percentage >= 80) { emoji = '🎉'; message = 'رائع! أداء متميز!'; }
+  else if (percentage >= 60) { emoji = '👍'; message = 'جيد - راجع بعض النقاط وحاول مرة أخرى.'; }
+  else if (percentage >= 40) { emoji = '📚'; message = 'مقبول - راجع الدرس وحاول مرة أخرى.'; }
+  else { emoji = '💪'; message = 'يحتاج لمزيد من المراجعة - لا تستسلم!'; }
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('scorePercentage').textContent = percentage + '%';
+  document.getElementById('correctCount').textContent = correctAnswers;
+  document.getElementById('wrongCount').textContent = wrongAnswers;
+  document.getElementById('resultMessage').textContent = message;
+  document.getElementById('resultsPage').style.display = 'block';
+}
+
+function restartQuiz() {
+  currentExercise = 1; answered = false; correctAnswers = 0; wrongAnswers = 0;
+  document.getElementById('resultsPage').style.display = 'none';
+  document.getElementById('exercisesContainer').style.display = 'block';
+  for (let i = 1; i <= totalExercises; i++) {
+    const item = document.querySelector(`[data-exercise="${i}"]`);
+    if (item) {
+      item.style.display = i === 1 ? 'block' : 'none';
+      item.querySelectorAll('.answer-btn').forEach(btn => { btn.classList.remove('correct', 'wrong'); btn.style.pointerEvents = 'auto'; });
+      const exp = document.getElementById(`exp-${i}`);
+      if (exp) { exp.textContent = ''; exp.classList.remove('show', 'correct-exp', 'wrong-exp'); }
+    }
+  }
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  window.scrollTo({ top: document.querySelector('.exercises-section').offsetTop - 20, behavior: 'smooth' });
+}
+</script>
+
+</div><!-- /.container -->
+</body>
+</html>

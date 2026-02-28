@@ -1,0 +1,1468 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الكتل والجبهات الهوائية - العلوم - منصة شارف التعليمية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --blue: #3b82f6;
+  --blue-dark: #1e40af;
+  --green: #10b981;
+  --green-dark: #065f46;
+  --orange: #f59e0b;
+  --orange-dark: #92400e;
+  --purple: #a855f7;
+  --red: #ef4444;
+  --bg: #f8fafc;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: #1e293b;
+  line-height: 1.8;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+  padding: 40px 20px;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.hero-deco {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.1;
+}
+
+.ds {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: float 20s infinite ease-in-out;
+}
+
+.ds:nth-child(1) { width: 200px; height: 200px; top: -100px; left: -100px; }
+.ds:nth-child(2) { width: 150px; height: 150px; top: 50%; right: -75px; animation-delay: -5s; }
+.ds:nth-child(3) { width: 100px; height: 100px; bottom: -50px; left: 30%; animation-delay: -10s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.hero-card {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: white;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.hsub {
+  font-size: clamp(16px, 3vw, 20px);
+  opacity: 0.95;
+  margin-bottom: 25px;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: 700;
+  border: 2px solid rgba(255,255,255,0.3);
+  margin-top: 20px;
+}
+
+/* المقدمة */
+.intro-box {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  margin: 30px 0;
+  box-shadow: var(--shadow);
+  border-right: 6px solid var(--blue);
+}
+
+.intro-box h2 {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--blue-dark);
+  margin-bottom: 20px;
+}
+
+.intro-box p {
+  font-size: 18px;
+  line-height: 2;
+  color: #475569;
+  margin-bottom: 15px;
+}
+
+/* صناديق المحتوى */
+.content-box {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 35px 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.content-box h3 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/* صندوق القاعدة */
+.rule-box {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 1px solid #bae6fd;
+  border-radius: 16px;
+  padding: 25px;
+  margin: 25px 0;
+}
+
+.rule-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.rule-icon {
+  background: #2563eb;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.rule-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0c4a6e;
+  margin: 0;
+}
+
+.rule-formula {
+  background: white;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin: 15px 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.rule-explanation {
+  font-size: 17px;
+  line-height: 1.9;
+  color: #334155;
+  margin-top: 15px;
+}
+
+/* صناديق الأمثلة */
+.example-box {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-right: 4px solid var(--example-color);
+}
+
+.example-box.type-1 { --example-color: #3b82f6; background: #f0f9ff; }
+.example-box.type-2 { --example-color: #10b981; background: #f0fdf4; }
+.example-box.type-3 { --example-color: #f59e0b; background: #fffbeb; }
+.example-box.type-4 { --example-color: #a855f7; background: #faf5ff; }
+.example-box.type-5 { --example-color: #ef4444; background: #fef2f2; }
+
+/* الجداول */
+.styled-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.styled-table thead tr {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+}
+
+.styled-table th {
+  padding: 18px;
+  font-weight: 800;
+  text-align: center;
+  font-size: 17px;
+}
+
+.styled-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
+  text-align: center;
+  font-size: 16px;
+}
+
+.styled-table tbody tr:hover { background: #f8fafc; }
+.styled-table tbody tr:last-child td { border-bottom: none; }
+
+/* صندوق الملاحظة */
+.note-box {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  padding: 18px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: start;
+}
+
+.note-icon { font-size: 24px; flex-shrink: 0; }
+
+.note-content {
+  font-size: 16px;
+  color: #78350f;
+  line-height: 1.8;
+}
+
+/* SVG container */
+.svg-container {
+  display: flex;
+  justify-content: center;
+  margin: 30px auto;
+  overflow-x: auto;
+  max-width: 620px;
+  width: 100%;
+}
+
+.svg-container svg {
+  width: 100%;
+  max-width: 620px;
+  height: auto;
+  display: block;
+}
+
+/* قائمة الإنجاز */
+.checklist-section {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  box-shadow: var(--shadow);
+}
+
+.checklist-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--blue-dark);
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.checklist-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.checklist-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.checklist-checkbox { display: none; }
+
+.checklist-item label {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+}
+
+.checklist-item label:hover { background: #f1f5f9; border-color: var(--blue); }
+
+.check-mark {
+  width: 30px; height: 30px;
+  border: 3px solid #cbd5e1;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-left: 15px;
+  font-size: 18px;
+  color: transparent;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.checklist-checkbox:checked + label .check-mark {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
+.checklist-checkbox:checked + label {
+  background: #f0fdf4;
+  border-color: var(--green);
+}
+
+.check-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.progress-container {
+  margin-top: 35px;
+  padding-top: 30px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.progress-number {
+  font-size: 32px;
+  color: var(--blue);
+  font-weight: 900;
+}
+
+.progress-bar {
+  height: 25px;
+  background: #e2e8f0;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  border-radius: 50px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.progress-message {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* التمارين */
+.exercises-section {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  box-shadow: var(--shadow);
+}
+
+.exercises-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--blue-dark);
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.exercise-item {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+}
+
+.exercise-question {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: start;
+  gap: 15px;
+}
+
+.exercise-number {
+  background: var(--blue);
+  color: white;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.answer-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.answer-btn {
+  padding: 18px;
+  font-size: 18px;
+  font-weight: 700;
+  border: 3px solid #cbd5e1;
+  background: white;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.answer-btn:hover {
+  background: #f1f5f9;
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.answer-btn.correct { background: var(--green); border-color: var(--green); color: white; }
+.answer-btn.wrong { background: var(--red); border-color: var(--red); color: white; }
+
+.explanation {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 17px;
+  line-height: 1.8;
+  display: none;
+  font-weight: 600;
+}
+
+.explanation.show { display: block; }
+.explanation.correct-exp { background: #f0fdf4; border: 2px solid var(--green); color: var(--green-dark); }
+.explanation.wrong-exp { background: #fef2f2; border: 2px solid var(--red); color: #991b1b; }
+
+/* صفحة النتائج */
+.results-card { text-align: center; padding: 50px 30px; }
+.results-emoji { font-size: 120px; margin-bottom: 25px; }
+.score-big { font-size: 72px; font-weight: 900; color: var(--blue); margin-bottom: 20px; }
+.score-details { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; font-size: 24px; font-weight: 700; }
+.score-correct { color: var(--green); }
+.score-wrong { color: var(--red); }
+.results-message { font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 35px; }
+
+.restart-btn {
+  padding: 18px 50px;
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.restart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3); }
+
+/* FOOTER */
+footer {
+  background: #fafafa;
+  color: #757575;
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 60px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+footer p { margin: 5px 0; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero { padding: 30px 20px; min-height: 220px; }
+  .content-box, .checklist-section, .exercises-section { padding: 25px; }
+  .answer-buttons { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-deco">
+    <div class="ds"></div>
+    <div class="ds"></div>
+    <div class="ds"></div>
+  </div>
+  <div class="hero-card">
+    <h1>الكتل والجبهات الهوائية</h1>
+    <div class="hero-badge">📚 منصة شارف التعليمية</div>
+  </div>
+</section>
+
+<!-- المقدمة -->
+<section class="intro-box">
+  <h2>📖 مقدمة الدرس</h2>
+  <p>
+    قد يتغير الطقس بشكل سريع؛ فيكون مشمسًا وهادئًا في الصباح، ثم يتحول إلى عاصف في المساء. يتغير الطقس عندما تدخل كتلة هوائية مختلفة إلى المنطقة. في هذا الدرس سنتعرف على الكتل الهوائية والجبهات الهوائية والأحوال الجوية القاسية مثل العواصف الرعدية والأعاصير القمعية والبحرية.
+  </p>
+  <p>
+    ✔ توضح طرائق تشكُّل الكتل الهوائية والجبهات الهوائية<br>
+    ✔ تناقش أسباب الأحوال الجوية القاسية<br>
+    ✔ توضح كيف تُستخدم التقنية لمراقبة الطقس وتوقعه
+  </p>
+</section>
+
+<!-- ===== القسم 1: الكتل الهوائية ===== -->
+<div class="content-box">
+  <h3>🌬️ الكتل الهوائية</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    تُعرَّف <strong>الكتلة الهوائية</strong> بأنها كمية ضخمة من الهواء تتشكّل عادة فوق مناطق محددة من سطح الأرض. تكتسب الكتلة الهوائية خصائص المنطقة التي تبقى فوقها عدة أيام، فإذا بقيت كتلة هوائية مثلًا فوق منطقة استوائية فإنها تصبح حارة ورطبة.
+  </p>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">💡</span>
+      <h4 class="rule-title">أنواع الكتل الهوائية</h4>
+    </div>
+    <div class="rule-explanation">
+      تُصنّف الكتل الهوائية حسب درجة حرارتها ورطوبتها. فالكتل التي تتكوّن فوق المحيطات تكون رطبة، والتي تتكوّن فوق اليابسة تكون جافة. والكتل التي تتكوّن قرب القطبين تكون باردة، بينما التي تتكوّن قرب خط الاستواء تكون حارة.
+    </div>
+  </div>
+
+  <!-- رسم SVG: أنواع الكتل الهوائية الأربعة -->
+  <h4 style="text-align:center; font-size:18px; font-weight:900; color:#1e293b; margin:25px 0 10px;">الكتل الهوائية المؤثرة في الجزيرة العربية</h4>
+  <div class="svg-container">
+    <svg viewBox="0 0 560 420" width="560" height="420">
+      <!-- المركز - خريطة مبسطة -->
+      <rect x="160" y="120" width="240" height="180" rx="16" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="280" y="220" text-anchor="middle" font-size="16" font-weight="800" fill="#92400e" font-family="Tajawal, sans-serif">الجزيرة العربية</text>
+
+      <!-- كتلة 1: هواء بارد جاف (أعلى يمين) -->
+      <rect x="380" y="20" width="160" height="70" rx="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+      <text x="460" y="50" text-anchor="middle" font-size="14" font-weight="800" fill="#1e40af" font-family="Tajawal, sans-serif">هواء بارد جاف</text>
+      <text x="460" y="72" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">من المناطق القطبية</text>
+      <line x1="400" y1="90" x2="360" y2="130" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+      <!-- كتلة 2: هواء بارد رطب (أعلى يسار) -->
+      <rect x="20" y="20" width="160" height="70" rx="12" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="100" y="50" text-anchor="middle" font-size="14" font-weight="800" fill="#0369a1" font-family="Tajawal, sans-serif">هواء بارد رطب</text>
+      <text x="100" y="72" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">من المحيطات الباردة</text>
+      <line x1="140" y1="90" x2="190" y2="130" stroke="#0ea5e9" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+
+      <!-- كتلة 3: هواء ساخن جاف (أسفل يسار) -->
+      <rect x="20" y="330" width="160" height="70" rx="12" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+      <text x="100" y="360" text-anchor="middle" font-size="14" font-weight="800" fill="#991b1b" font-family="Tajawal, sans-serif">هواء ساخن جاف</text>
+      <text x="100" y="382" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">من الصحاري الحارة</text>
+      <line x1="140" y1="330" x2="190" y2="295" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+
+      <!-- كتلة 4: هواء دافئ رطب (أسفل يمين) -->
+      <rect x="380" y="330" width="160" height="70" rx="12" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+      <text x="460" y="360" text-anchor="middle" font-size="14" font-weight="800" fill="#065f46" font-family="Tajawal, sans-serif">هواء دافئ رطب</text>
+      <text x="460" y="382" text-anchor="middle" font-size="12" fill="#64748b" font-family="Tajawal, sans-serif">من المحيطات الدافئة</text>
+      <line x1="400" y1="330" x2="360" y2="295" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+      <defs>
+        <marker id="arrowBlue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/></marker>
+        <marker id="arrowCyan" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9"/></marker>
+        <marker id="arrowRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/></marker>
+        <marker id="arrowGreen" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/></marker>
+      </defs>
+    </svg>
+  </div>
+  <p style="font-size:14px; text-align:center; color:#64748b; margin-top:-10px;">الشكل 11: تؤثر أربع كتل هوائية رئيسة في الجزيرة العربية</p>
+</div>
+
+<!-- ===== القسم 2: الجبهات الهوائية ===== -->
+<div class="content-box">
+  <h3>⚡ الجبهات الهوائية</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    عندما تلتقي كتل هوائية مختلفة في درجة حرارتها تتكون <strong>جبهة هوائية</strong>. لا يختلط الهواء على طول منطقة الجبهة الهوائية، ويعود السبب إلى أن الهواء البارد الأكثر كثافة ينتقل إلى أسفل الهواء الدافئ الأقل كثافة، ويدفعه ليرتفع إلى أعلى، فتتكون الرياح. وهناك أنواع من الجبهات الهوائية.
+  </p>
+
+  <!-- الجبهة الباردة -->
+  <div class="example-box type-1">
+    <h4 style="font-size:20px; font-weight:800; color:#1e40af; margin-bottom:15px;">❄️ الجبهات الباردة</h4>
+    <p style="font-size:17px; line-height:2; color:#334155;">
+      عندما تتقدم كتلة هوائية باردة وتندفع إلى أسفل كتلة دافئة تُرغَم الأخيرة على الارتفاع إلى أعلى. ويُسمّى الحد الفاصل بين الكتلتين <strong>جبهة باردة</strong>. ومع ارتفاع الهواء الدافئ الرطب فإنه يبرد فيتكثّف بخار الماء الموجود فيه وتسقط الأمطار. وقد يصاحب الجبهات الباردة عواصف شديدة وغيوم ركامية مع انخفاض في درجات الحرارة.
+    </p>
+  </div>
+
+  <!-- رسم SVG: الجبهة الباردة -->
+  <div class="svg-container">
+    <svg viewBox="0 0 560 300" width="560" height="300">
+      <text x="280" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="#1e293b" font-family="Tajawal, sans-serif">الجبهة الباردة</text>
+
+      <!-- الأرض -->
+      <rect x="30" y="240" width="500" height="40" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+      <text x="280" y="265" text-anchor="middle" font-size="13" fill="#065f46" font-family="Tajawal, sans-serif">سطح الأرض</text>
+
+      <!-- كتلة باردة (يمين - تتقدم) -->
+      <path d="M350,240 L350,100 L520,240 Z" fill="#bfdbfe" opacity="0.7" stroke="#3b82f6" stroke-width="2"/>
+      <text x="420" y="200" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">كتلة هوائية</text>
+      <text x="420" y="220" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">باردة</text>
+
+      <!-- كتلة دافئة (يسار - ترتفع) -->
+      <path d="M40,240 L350,240 L350,100 Q300,60 200,80 Q100,100 40,200 Z" fill="#fed7aa" opacity="0.5" stroke="#f59e0b" stroke-width="2"/>
+      <text x="180" y="190" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">كتلة هوائية</text>
+      <text x="180" y="210" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">دافئة</text>
+
+      <!-- سهم الحركة -->
+      <line x1="470" y1="170" x2="380" y2="170" stroke="#3b82f6" stroke-width="3" marker-end="url(#arrowBlue)"/>
+
+      <!-- غيوم -->
+      <ellipse cx="280" cy="65" rx="50" ry="20" fill="#94a3b8" opacity="0.4"/>
+      <ellipse cx="320" cy="55" rx="40" ry="18" fill="#94a3b8" opacity="0.3"/>
+
+      <!-- أمطار -->
+      <line x1="270" y1="85" x2="265" y2="110" stroke="#3b82f6" stroke-width="1.5" opacity="0.6"/>
+      <line x1="290" y1="85" x2="285" y2="110" stroke="#3b82f6" stroke-width="1.5" opacity="0.6"/>
+      <line x1="310" y1="75" x2="305" y2="100" stroke="#3b82f6" stroke-width="1.5" opacity="0.6"/>
+    </svg>
+  </div>
+
+  <!-- الجبهة الدافئة -->
+  <div class="example-box type-3">
+    <h4 style="font-size:20px; font-weight:800; color:#92400e; margin-bottom:15px;">☀️ الجبهات الدافئة</h4>
+    <p style="font-size:17px; line-height:2; color:#334155;">
+      عندما تندفع كتلة هوائية دافئة إلى منطقة أكثر برودة، تتكوّن <strong>جبهة دافئة</strong>. تتجه الكتلة الدافئة الأقل كثافة إلى أعلى منزلقة فوق الكتلة الباردة. ومع ارتفاع الكتلة الدافئة فإنها تبرد ويتكثّف بخار الماء فيها وتسقط الأمطار. ويصاحب الجبهات الدافئة غيوم ريشية عالية وتنخفض الغيوم تدريجيًّا كلما اقتربت من الجبهة.
+    </p>
+    <!-- الآية القرآنية -->
+    <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #86efac; border-radius: 16px; padding: 25px; margin-top: 20px; text-align: center;">
+      <p style="font-size: 20px; line-height: 2.2; color: #14532d; font-weight: 700;">
+        ﴿ ٱللَّهُ ٱلَّذِى يُرْسِلُ ٱلرِّيَـٰحَ فَتُثِيرُ سَحَابًا فَيَبْسُطُهُۥ فِى ٱلسَّمَآءِ كَيْفَ يَشَآءُ وَيَجْعَلُهُۥ كِسَفًا فَتَرَى ٱلْوَدْقَ يَخْرُجُ مِنْ خِلَـٰلِهِۦ فَإِذَآ أَصَابَ بِهِۦ مَن يَشَآءُ مِنْ عِبَادِهِۦٓ إِذَا هُمْ يَسْتَبْشِرُونَ ﴾
+      </p>
+      <p style="font-size: 16px; color: #166534; font-weight: 800; margin-top: 10px;">📖 سورة الروم: 48</p>
+    </div>
+  </div>
+
+  <!-- رسم SVG: الجبهة الدافئة -->
+  <div class="svg-container">
+    <svg viewBox="0 0 560 300" width="560" height="300">
+      <text x="280" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="#1e293b" font-family="Tajawal, sans-serif">الجبهة الدافئة</text>
+
+      <!-- الأرض -->
+      <rect x="30" y="240" width="500" height="40" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+      <text x="280" y="265" text-anchor="middle" font-size="13" fill="#065f46" font-family="Tajawal, sans-serif">سطح الأرض</text>
+
+      <!-- كتلة باردة (يمين - ثابتة) -->
+      <path d="M300,240 L530,240 L530,120 L300,240 Z" fill="#bfdbfe" opacity="0.5" stroke="#3b82f6" stroke-width="2"/>
+      <text x="440" y="210" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">كتلة هوائية</text>
+      <text x="440" y="230" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">باردة</text>
+
+      <!-- كتلة دافئة (يسار - تصعد فوق الباردة) -->
+      <path d="M40,240 L300,240 L530,120 Q430,50 280,70 Q130,90 40,180 Z" fill="#fed7aa" opacity="0.5" stroke="#f59e0b" stroke-width="2"/>
+      <text x="160" y="200" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">كتلة هوائية</text>
+      <text x="160" y="220" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">دافئة</text>
+
+      <!-- سهم الحركة -->
+      <line x1="100" y1="170" x2="200" y2="140" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrowOrange)"/>
+
+      <!-- غيوم ريشية -->
+      <ellipse cx="350" cy="70" rx="60" ry="15" fill="#94a3b8" opacity="0.25"/>
+      <ellipse cx="430" cy="60" rx="50" ry="12" fill="#94a3b8" opacity="0.2"/>
+      <ellipse cx="300" cy="85" rx="45" ry="14" fill="#94a3b8" opacity="0.3"/>
+
+      <!-- أمطار خفيفة -->
+      <line x1="320" y1="100" x2="318" y2="130" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+      <line x1="360" y1="90" x2="358" y2="120" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+
+      <defs>
+        <marker id="arrowOrange" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <!-- الجبهة الثابتة -->
+  <div class="example-box type-4">
+    <h4 style="font-size:20px; font-weight:800; color:#7c3aed; margin-bottom:15px;">🔄 الجبهات الثابتة (الرابضة)</h4>
+    <p style="font-size:17px; line-height:2; color:#334155;">
+      تتكون <strong>الجبهات الثابتة</strong> عندما تلتقي كتلة هوائية دافئة مع أخرى باردة، دون أن تتقدم إحداهما على الأخرى. ويمكن أن يبقى هذا النوع من الجبهات في المكان نفسه عدة أيام. وفي هذه الحالة تتشكّل الغيوم وتهطل الأمطار على طول الجبهة، وفي بعض الأحيان يكون الهطول غزيرًا بسبب بطء حركة الجبهة.
+    </p>
+  </div>
+
+  <!-- رسم SVG: الجبهة الثابتة -->
+  <div class="svg-container">
+    <svg viewBox="0 0 560 280" width="560" height="280">
+      <text x="280" y="25" text-anchor="middle" font-size="16" font-weight="800" fill="#1e293b" font-family="Tajawal, sans-serif">الجبهة الثابتة (الرابضة)</text>
+
+      <!-- الأرض -->
+      <rect x="30" y="220" width="500" height="40" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+
+      <!-- كتلة باردة (يمين) -->
+      <rect x="280" y="80" width="230" height="140" rx="12" fill="#dbeafe" opacity="0.5" stroke="#3b82f6" stroke-width="2"/>
+      <text x="395" y="155" text-anchor="middle" font-size="15" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">كتلة هوائية باردة</text>
+
+      <!-- كتلة دافئة (يسار) -->
+      <rect x="50" y="80" width="230" height="140" rx="12" fill="#fef3c7" opacity="0.5" stroke="#f59e0b" stroke-width="2"/>
+      <text x="165" y="155" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e" font-family="Tajawal, sans-serif">كتلة هوائية دافئة</text>
+
+      <!-- خط الجبهة (في المنتصف) -->
+      <line x1="280" y1="60" x2="280" y2="220" stroke="#7c3aed" stroke-width="3" stroke-dasharray="8,4"/>
+      <text x="280" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#7c3aed" font-family="Tajawal, sans-serif">خط الجبهة الثابتة</text>
+
+      <!-- غيوم فوق خط الجبهة -->
+      <ellipse cx="280" cy="70" rx="45" ry="15" fill="#94a3b8" opacity="0.35"/>
+
+      <!-- أمطار -->
+      <line x1="270" y1="85" x2="268" y2="108" stroke="#3b82f6" stroke-width="1.5" opacity="0.5"/>
+      <line x1="290" y1="85" x2="288" y2="108" stroke="#3b82f6" stroke-width="1.5" opacity="0.5"/>
+    </svg>
+  </div>
+
+  <!-- جدول مقارنة الجبهات -->
+  <h4 style="text-align:center; font-size:18px; font-weight:900; color:#1e293b; margin:30px 0 15px;">مقارنة بين أنواع الجبهات الهوائية</h4>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>نوع الجبهة</th>
+        <th>ما يحدث</th>
+        <th>الطقس المصاحب</th>
+        <th>بعد المرور</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight:700; color:#1e40af;">❄️ الباردة</td>
+        <td>كتلة باردة تندفع أسفل دافئة</td>
+        <td>عواصف شديدة وأمطار غزيرة</td>
+        <td>تصفو السماء وتقل الحرارة</td>
+      </tr>
+      <tr style="background:#f8fafc;">
+        <td style="font-weight:700; color:#92400e;">☀️ الدافئة</td>
+        <td>كتلة دافئة تنزلق فوق باردة</td>
+        <td>أمطار منتظمة لفترة طويلة</td>
+        <td>تصفو السماء وترتفع الحرارة</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700; color:#7c3aed;">🔄 الثابتة</td>
+        <td>التقاء الكتلتين بدون تقدم</td>
+        <td>أمطار قد تكون غزيرة</td>
+        <td>تبقى عدة أيام في مكانها</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== القسم 3: مراكز الضغط المرتفع والمنخفض ===== -->
+<div class="content-box">
+  <h3>📊 مراكز الضغط المرتفع والمنخفض</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    تتكون المرتفعات الجوية (H) والمنخفضات الجوية (L) في مراكز الضغطين: المرتفع والمنخفض.
+  </p>
+
+  <!-- رسم SVG: مقارنة الضغط -->
+  <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin:25px 0;">
+    <!-- الضغط المرتفع -->
+    <div style="flex:1; min-width:260px; max-width:360px;">
+      <div class="example-box type-1" style="text-align:center;">
+        <h4 style="font-size:18px; font-weight:800; color:#1e40af; margin-bottom:10px;">مراكز الضغط المرتفع (H)</h4>
+        <svg viewBox="0 0 280 200" width="260" height="190">
+          <circle cx="140" cy="90" r="55" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5"/>
+          <text x="140" y="80" text-anchor="middle" font-size="40" font-weight="900" fill="#1e40af" font-family="Tajawal, sans-serif">H</text>
+          <text x="140" y="105" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af" font-family="Tajawal, sans-serif">ضغط مرتفع</text>
+          <!-- أسهم هابطة ومنتشرة -->
+          <line x1="140" y1="40" x2="140" y2="60" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+          <line x1="200" y1="90" x2="220" y2="90" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+          <line x1="80" y1="90" x2="60" y2="90" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+          <line x1="140" y1="145" x2="140" y2="165" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+          <text x="140" y="190" text-anchor="middle" font-size="11" fill="#64748b" font-family="Tajawal, sans-serif">تيارات هابطة → صافي مشمس</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- الضغط المنخفض -->
+    <div style="flex:1; min-width:260px; max-width:360px;">
+      <div class="example-box type-5" style="text-align:center;">
+        <h4 style="font-size:18px; font-weight:800; color:#991b1b; margin-bottom:10px;">مراكز الضغط المنخفض (L)</h4>
+        <svg viewBox="0 0 280 200" width="260" height="190">
+          <circle cx="140" cy="90" r="55" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5"/>
+          <text x="140" y="80" text-anchor="middle" font-size="40" font-weight="900" fill="#991b1b" font-family="Tajawal, sans-serif">L</text>
+          <text x="140" y="105" text-anchor="middle" font-size="12" font-weight="700" fill="#991b1b" font-family="Tajawal, sans-serif">ضغط منخفض</text>
+          <!-- أسهم صاعدة ومتجمعة -->
+          <line x1="140" y1="165" x2="140" y2="148" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+          <line x1="220" y1="90" x2="200" y2="90" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+          <line x1="60" y1="90" x2="80" y2="90" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+          <line x1="140" y1="60" x2="140" y2="40" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+          <text x="140" y="190" text-anchor="middle" font-size="11" fill="#64748b" font-family="Tajawal, sans-serif">تيارات صاعدة → غائم ماطر</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    في مراكز الضغط المرتفع تتميّز تلك المناطق بضغط جوي أعلى من المناطق المجاورة لها؛ فتتشكّل تيارات هوائية هابطة وتنتشر مبتعدة عن مركز الضغط. وتدور هذه التيارات في اتجاه عقارب الساعة في المناطق الواقعة في النصف الشمالي من الأرض؛ بسبب تأثير قوة كوريولوس. مما يؤدي إلى سخونة الهواء وجفافه ويكون الجوّ في تلك المناطق صافيًا مشمسًا.
+  </p>
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:15px;">
+    وفي مراكز الضغط المنخفض تتميّز تلك المناطق بضغط جوي أخفض من المناطق المجاورة لها؛ فتتشكّل تيارات هوائية صاعدة إلى أعلى، مما يؤدي إلى برودة الهواء ووصوله إلى درجة الندى فيتكثّف وتهطل الأمطار. وتدور هذه التيارات نحو مركز الضغط في عكس اتجاه عقارب الساعة في النصف الشمالي من الأرض؛ بسبب تأثير قوة كوريولوس، ويكون الجو في تلك المناطق غائمًا ماطرًا.
+  </p>
+</div>
+
+<!-- ===== القسم 4: الأحوال الجوية القاسية ===== -->
+<div class="content-box">
+  <h3>⛈️ الأحوال الجوية القاسية</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    تؤدي الأحوال الجوية القاسية إلى حدوث رياح قوية وأمطار غزيرة، مع إمكانية إصابة البشر وتدمير المنشآت. ولكي تعرف كيف يمكنك الاستعداد لمواجهة هذه الأحوال يجب أن تتعرّفها وتفهمها أولًا.
+  </p>
+
+  <!-- العواصف الرعدية -->
+  <div class="example-box type-1">
+    <h4 style="font-size:20px; font-weight:800; color:#1e40af; margin-bottom:15px;">⚡ العواصف الرعدية</h4>
+    <p style="font-size:17px; line-height:2; color:#334155;">
+      تتكون العواصف الرعدية من غيوم المزن الركامية ذات النمو الرأسي، والتي تنشأ عادة في مناطق الجبهات الباردة. فعندما يُرغم الهواء على الصعود بسرعة إلى أعلى يبرد، وتتشكّل قطرات الماء الصغيرة، فتتحد في أثناء سقوطها بقطرات أخرى وتصبح أكبر. وعندما تسقط حبات المطر الكبيرة مكوّنة تيارات هوائية نازلة تنتشر فوق السطح على شكل رياح عنيفة تلازم العواصف الرعدية عادة. وقد يتكوّن في أثناء هذه العواصف بَرَد كبير الحجم تنشأ عنه أضرار أو مخاطر.
+    </p>
+  </div>
+
+  <!-- البرق والرعد -->
+  <div class="example-box type-3" style="margin-top:20px;">
+    <h4 style="font-size:20px; font-weight:800; color:#92400e; margin-bottom:15px;">🌩️ البرق والرعد</h4>
+    <p style="font-size:17px; line-height:2; color:#334155;">
+      يتكون البرق والرعد أيضًا في غيوم المُزن الركامية؛ فعندما يرتفع الهواء بسرعة إلى أعلى تتكوّن الشحنات الكهربائية. ويتكون البرق نتيجة التدفق السريع للطاقة الكهربائية بين المناطق المختلفة الشحنة (بين الوجه السفلي للغيوم ذي الشحنة السالبة وسطح الأرض ذي الشحنة الموجبة). وقد تكون درجة حرارة البرق أعلى خمس مرات من درجة حرارة سطح الشمس، مما يؤدي إلى تسخين سريع للهواء وتمدده بسرعة أكبر من سرعة الصوت، وينجم عن ذلك انفجار صوتي وهذا هو صوت الرعد الذي يتبع البرق.
+    </p>
+  </div>
+
+  <!-- رسم SVG: تكون البرق والرعد -->
+  <h4 style="text-align:center; font-size:18px; font-weight:900; color:#1e293b; margin:25px 0 10px;">تكوّن البرق والرعد</h4>
+  <div class="svg-container">
+    <svg viewBox="0 0 500 360" width="500" height="360">
+      <!-- الغيمة -->
+      <ellipse cx="250" cy="80" rx="140" ry="55" fill="#64748b" opacity="0.3"/>
+      <ellipse cx="220" cy="70" rx="100" ry="45" fill="#64748b" opacity="0.4"/>
+      <ellipse cx="280" cy="75" rx="110" ry="40" fill="#64748b" opacity="0.35"/>
+
+      <!-- الشحنات السالبة (أسفل الغيمة) -->
+      <text x="180" y="105" text-anchor="middle" font-size="20" font-weight="900" fill="#1e40af" font-family="Tajawal, sans-serif">− − −</text>
+      <text x="280" y="105" text-anchor="middle" font-size="20" font-weight="900" fill="#1e40af" font-family="Tajawal, sans-serif">− − −</text>
+
+      <!-- الشحنات الموجبة (أعلى الغيمة) -->
+      <text x="230" y="50" text-anchor="middle" font-size="18" font-weight="900" fill="#ef4444" font-family="Tajawal, sans-serif">+ + +</text>
+      <text x="270" y="50" text-anchor="middle" font-size="18" font-weight="900" fill="#ef4444" font-family="Tajawal, sans-serif">+ +</text>
+
+      <!-- البرق -->
+      <polyline points="250,115 240,160 260,170 235,230 255,240 230,290" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linejoin="round"/>
+      <polyline points="250,115 240,160 260,170 235,230 255,240 230,290" fill="none" stroke="#fef3c7" stroke-width="2" stroke-linejoin="round"/>
+
+      <!-- الأرض -->
+      <rect x="50" y="300" width="400" height="40" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+
+      <!-- الشحنات الموجبة على الأرض -->
+      <text x="250" y="325" text-anchor="middle" font-size="18" font-weight="900" fill="#ef4444" font-family="Tajawal, sans-serif">+ + + + + + +</text>
+
+      <!-- التسميات -->
+      <text x="430" y="85" text-anchor="middle" font-size="13" font-weight="700" fill="#334155" font-family="Tajawal, sans-serif">غيوم المزن</text>
+      <text x="430" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#334155" font-family="Tajawal, sans-serif">الركامية</text>
+      <text x="100" y="200" text-anchor="middle" font-size="14" font-weight="800" fill="#f59e0b" font-family="Tajawal, sans-serif">البرق ⚡</text>
+      <text x="430" y="320" text-anchor="middle" font-size="13" font-weight="700" fill="#065f46" font-family="Tajawal, sans-serif">سطح الأرض (+)</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ===== القسم 5: الأعاصير القمعية ===== -->
+<div class="content-box">
+  <h3>🌪️ الأعاصير القمعية (تورنادو)</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    تتكوّن في بعض مناطق الجبهات تيارات هوائية صاعدة تأخذ في الدوران على شكل دوامة مكوّنة غيمة تشبه القمع، وتُعرف <strong>بالأعاصير القمعية (تورنادو)</strong>. وعلى الرغم من أن قطر التورنادو لا يتجاوز 200 م ونادرًا ما يتحرك مسافة أكثر من 10 كم ويستمر أقل من 15 دقيقة، فإنه مدمر جدًّا؛ حيث يعمل كمكنسة هوائية ضخمة تحمل كل ما في طريقها.
+  </p>
+
+  <!-- رسم SVG: تكون التورنادو -->
+  <div class="svg-container">
+    <svg viewBox="0 0 460 350" width="460" height="350">
+      <!-- الغيمة -->
+      <ellipse cx="230" cy="50" rx="160" ry="40" fill="#475569" opacity="0.4"/>
+      <ellipse cx="200" cy="45" rx="120" ry="35" fill="#475569" opacity="0.5"/>
+      <ellipse cx="260" cy="48" rx="130" ry="32" fill="#475569" opacity="0.45"/>
+
+      <!-- القمع -->
+      <path d="M210,80 Q220,160 200,300 L260,300 Q240,160 250,80 Z" fill="#94a3b8" opacity="0.4" stroke="#64748b" stroke-width="1.5"/>
+
+      <!-- خطوط الدوران -->
+      <path d="M195,120 Q170,130 190,145" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <path d="M265,130 Q290,140 270,155" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <path d="M200,180 Q180,190 195,205" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <path d="M260,185 Q280,195 265,210" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+      <!-- الأرض -->
+      <rect x="50" y="300" width="360" height="35" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+
+      <!-- التسميات -->
+      <text x="365" y="48" text-anchor="start" font-size="13" font-weight="700" fill="#334155" font-family="Tajawal, sans-serif">غيمة ركامية</text>
+      <text x="310" y="200" text-anchor="start" font-size="13" font-weight="700" fill="#64748b" font-family="Tajawal, sans-serif">القمع الدوّار</text>
+
+      <!-- سهم -->
+      <line x1="305" y1="200" x2="265" y2="200" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+
+      <defs>
+        <marker id="arrowGray" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">📏</span>
+      <h4 class="rule-title">حقائق عن التورنادو</h4>
+    </div>
+    <div class="rule-explanation">
+      قد تصل سرعة رياح الأعاصير القمعية إلى <strong>500 كم/ساعة</strong>، وتتحرك على الأرض بسرعة تتجاوز <strong>100 كم/ساعة</strong>. قطرها لا يتجاوز 200 م، ومسافة تحركها أقل من 10 كم، ومدتها أقل من 15 دقيقة.
+    </div>
+  </div>
+</div>
+
+<!-- ===== القسم 6: الأعاصير البحرية ===== -->
+<div class="content-box">
+  <h3>🌊 الأعاصير البحرية (هوريكان)</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    تختلف <strong>الأعاصير البحرية</strong> عن الأعاصير القمعية في أنها تستمر أسابيع، وتسير آلاف الكيلومترات. وقد يصل قطر الهوريكان إلى 1000 كم. تبدأ الأعاصير في التشكّل في مناطق الضغط المنخفض في المحيطات الاستوائية. ونتيجة لتأثير كوريولوس فإن الرياح تأخذ في الدوران عكس عقارب الساعة حول مركز العاصفة.
+  </p>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    وقد تستمر العواصف الرعدية في البحار فقط، مما يؤدي إلى تدمير السفن. وعندما تصل هذه الأعاصير البحرية إلى اليابسة فإنها تؤدي إلى حدوث عواصف شديدة وأعاصير قمعية وأمطار غزيرة، مما يسبب تدمير المحاصيل الزراعية وحدوث الفيضانات وإصابة الإنسان والحيوان وربما قتلهما. وبعد أن تعبر العاصفة اليابسة تفقد طاقتها لاختفاء الهواء الدافئ الرطب، فتقل سرعة الرياح تدريجيًّا وتتلاشى العاصفة.
+  </p>
+
+  <!-- رسم SVG: الإعصار البحري -->
+  <div class="svg-container">
+    <svg viewBox="0 0 480 350" width="480" height="350">
+      <!-- العين -->
+      <circle cx="240" cy="160" r="25" fill="white" stroke="#64748b" stroke-width="2"/>
+      <text x="240" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#334155" font-family="Tajawal, sans-serif">العين</text>
+
+      <!-- الحلقات الدوّارة -->
+      <circle cx="240" cy="160" r="60" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.5"/>
+      <circle cx="240" cy="160" r="90" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="240" cy="160" r="120" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.2"/>
+
+      <!-- غيوم ركامية حول العين -->
+      <ellipse cx="180" cy="120" rx="40" ry="18" fill="#94a3b8" opacity="0.4"/>
+      <ellipse cx="300" cy="130" rx="45" ry="20" fill="#94a3b8" opacity="0.35"/>
+      <ellipse cx="240" cy="90" rx="50" ry="15" fill="#94a3b8" opacity="0.3"/>
+      <ellipse cx="200" cy="210" rx="40" ry="16" fill="#94a3b8" opacity="0.4"/>
+      <ellipse cx="290" cy="200" rx="45" ry="18" fill="#94a3b8" opacity="0.35"/>
+
+      <!-- أسهم الدوران (عكس عقارب الساعة) -->
+      <path d="M300,100 Q340,130 310,170" fill="none" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+      <path d="M310,200 Q330,230 280,250" fill="none" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+      <path d="M190,240 Q150,220 160,180" fill="none" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+      <path d="M170,140 Q150,110 190,90" fill="none" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+
+      <!-- التسميات -->
+      <text x="240" y="310" text-anchor="middle" font-size="15" font-weight="800" fill="#1e293b" font-family="Tajawal, sans-serif">الإعصار البحري (هوريكان)</text>
+      <text x="240" y="335" text-anchor="middle" font-size="13" fill="#64748b" font-family="Tajawal, sans-serif">دوران عكس عقارب الساعة في النصف الشمالي</text>
+      <text x="400" y="160" text-anchor="start" font-size="12" fill="#ef4444" font-weight="700" font-family="Tajawal, sans-serif">اتجاه الرياح</text>
+    </svg>
+  </div>
+
+  <!-- مقارنة بين التورنادو والهوريكان -->
+  <h4 style="text-align:center; font-size:18px; font-weight:900; color:#1e293b; margin:30px 0 15px;">مقارنة بين التورنادو والهوريكان</h4>
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>الخاصية</th>
+        <th>🌪️ التورنادو</th>
+        <th>🌊 الهوريكان</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight:700;">القطر</td>
+        <td>أقل من 200 م</td>
+        <td>حتى 1000 كم</td>
+      </tr>
+      <tr style="background:#f8fafc;">
+        <td style="font-weight:700;">المدة</td>
+        <td>أقل من 15 دقيقة</td>
+        <td>أسابيع</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;">سرعة الرياح</td>
+        <td>حتى 500 كم/ساعة</td>
+        <td>أقل من التورنادو</td>
+      </tr>
+      <tr style="background:#f8fafc;">
+        <td style="font-weight:700;">مكان التشكّل</td>
+        <td>مناطق الجبهات البرية</td>
+        <td>المحيطات الاستوائية</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700;">المسافة</td>
+        <td>أقل من 10 كم</td>
+        <td>آلاف الكيلومترات</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== القسم 7: السلامة والطقس ===== -->
+<div class="content-box">
+  <h3>🛡️ السلامة والطقس</h3>
+
+  <p style="font-size:18px; line-height:2; color:#475569; margin-bottom:20px;">
+    هناك مؤسسات عالمية متخصصة في مراقبة الأعاصير والظروف الجوية القاسية باستخدام أجهزة الرادار والأقمار الاصطناعية والحواسيب. حيث يتم التنبؤ بموقع الأعاصير وتحديد الأماكن التي قد تصل إليها، ومن ثم تحذير الناس من أخطارها المحتملة.
+  </p>
+
+  <div class="note-box">
+    <span class="note-icon">⚠️</span>
+    <div class="note-content">
+      تقوم الهيئة العامة للأرصاد وحماية البيئة في المملكة العربية السعودية بتوقع الحالة الجوية في المدن السعودية والمناطق البحرية، وتطلق إنذارات مبكرة في الحالات الجوية الطارئة التي قد تؤثر في سلامة السكان والممتلكات العامة.
+    </div>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-header">
+      <span class="rule-icon">🛡️</span>
+      <h4 class="rule-title">نصيحة مهمة</h4>
+    </div>
+    <div class="rule-explanation">
+      إذا صدر تحذير عن قرب حدوث أحوال جوية قاسية، فاتخذ الإجراءات الضرورية لحماية نفسك. ابتعد عن النوافذ، والجأ إلى مكان آمن داخل مبنى متين.
+    </div>
+  </div>
+</div>
+
+<!-- ===== قائمة الإنجاز ===== -->
+<section class="checklist-section">
+  <h2 class="checklist-title">✅ قائمة الإنجاز</h2>
+
+  <div class="checklist-container">
+    <div class="checklist-item">
+      <input type="checkbox" id="check1" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check1">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف تعريف الكتلة الهوائية وكيف تكتسب خصائصها</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check2" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check2">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أستطيع تمييز أنواع الكتل الهوائية (باردة/دافئة - جافة/رطبة)</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check3" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check3">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف تعريف الجبهة الهوائية وسبب تكونها</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check4" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check4">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أميّز بين الجبهة الباردة والدافئة والثابتة</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check5" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check5">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أفهم الفرق بين مراكز الضغط المرتفع والمنخفض</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check6" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check6">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف كيف تتكون العواصف الرعدية والبرق والرعد</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check7" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check7">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أقارن بين الأعاصير القمعية (تورنادو) والأعاصير البحرية (هوريكان)</span>
+      </label>
+    </div>
+    <div class="checklist-item">
+      <input type="checkbox" id="check8" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check8">
+        <span class="check-mark">✔</span>
+        <span class="check-text">أعرف أهمية التقنية في مراقبة الطقس والسلامة</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-text">
+      <span>نسبة الإنجاز:</span>
+      <span id="progressPercent" class="progress-number">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+    <div class="progress-message" id="progressMessage">
+      ابدأ بوضع علامة ✔ على ما أتقنته!
+    </div>
+  </div>
+</section>
+
+<!-- ===== التمارين ===== -->
+<section class="exercises-section">
+  <h2 class="exercises-title">📝 تمارين واختبارات</h2>
+
+  <div id="exercisesContainer">
+    <!-- السؤال 1 -->
+    <div class="exercise-item" data-exercise="1">
+      <div class="exercise-question">
+        <span class="exercise-number">1</span>
+        <span>ما تعريف الكتلة الهوائية؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(1, true)">كمية ضخمة من الهواء تتشكّل فوق مناطق محددة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(1, false)">رياح قوية تهب من المحيطات</button>
+        <button class="answer-btn" onclick="checkTrueFalse(1, false)">تيارات هوائية صاعدة إلى أعلى</button>
+        <button class="answer-btn" onclick="checkTrueFalse(1, false)">غيوم كثيفة تحمل الأمطار</button>
+      </div>
+      <div class="explanation" id="exp-1"></div>
+    </div>
+
+    <!-- السؤال 2 -->
+    <div class="exercise-item" data-exercise="2" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">2</span>
+        <span>ماذا يحدث عند تقدم كتلة هوائية باردة نحو كتلة دافئة؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(2, false)">تختلط الكتلتان معًا</button>
+        <button class="answer-btn" onclick="checkTrueFalse(2, true)">تندفع الباردة أسفل الدافئة وتُرغمها على الارتفاع</button>
+        <button class="answer-btn" onclick="checkTrueFalse(2, false)">تتوقف الكتلتان عن الحركة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(2, false)">تنحرف الكتلة الباردة بعيدًا</button>
+      </div>
+      <div class="explanation" id="exp-2"></div>
+    </div>
+
+    <!-- السؤال 3 -->
+    <div class="exercise-item" data-exercise="3" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">3</span>
+        <span>ما نوع الجبهة التي تتكون عندما تلتقي كتلتان هوائيتان دون أن تتقدم إحداهما على الأخرى؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(3, false)">الجبهة الباردة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(3, false)">الجبهة الدافئة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(3, true)">الجبهة الثابتة (الرابضة)</button>
+        <button class="answer-btn" onclick="checkTrueFalse(3, false)">الجبهة المنخفضة</button>
+      </div>
+      <div class="explanation" id="exp-3"></div>
+    </div>
+
+    <!-- السؤال 4 -->
+    <div class="exercise-item" data-exercise="4" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">4</span>
+        <span>كيف يكون الطقس في مراكز الضغط المرتفع؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(4, true)">صافيًا مشمسًا</button>
+        <button class="answer-btn" onclick="checkTrueFalse(4, false)">غائمًا ماطرًا</button>
+        <button class="answer-btn" onclick="checkTrueFalse(4, false)">عاصفًا شديدًا</button>
+        <button class="answer-btn" onclick="checkTrueFalse(4, false)">باردًا ومثلجًا</button>
+      </div>
+      <div class="explanation" id="exp-4"></div>
+    </div>
+
+    <!-- السؤال 5 -->
+    <div class="exercise-item" data-exercise="5" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">5</span>
+        <span>في أي نوع من الغيوم تتكون العواصف الرعدية؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(5, false)">الغيوم الريشية</button>
+        <button class="answer-btn" onclick="checkTrueFalse(5, true)">غيوم المزن الركامية</button>
+        <button class="answer-btn" onclick="checkTrueFalse(5, false)">الغيوم الطبقية</button>
+        <button class="answer-btn" onclick="checkTrueFalse(5, false)">الغيوم السمحاقية</button>
+      </div>
+      <div class="explanation" id="exp-5"></div>
+    </div>
+
+    <!-- السؤال 6 -->
+    <div class="exercise-item" data-exercise="6" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">6</span>
+        <span>ما سبب حدوث الرعد؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(6, false)">اصطدام الغيوم ببعضها</button>
+        <button class="answer-btn" onclick="checkTrueFalse(6, false)">اصطدام الرياح بالجبال</button>
+        <button class="answer-btn" onclick="checkTrueFalse(6, true)">تمدد الهواء بسرعة حول البرق بسبب الحرارة العالية</button>
+        <button class="answer-btn" onclick="checkTrueFalse(6, false)">سقوط الأمطار بقوة</button>
+      </div>
+      <div class="explanation" id="exp-6"></div>
+    </div>
+
+    <!-- السؤال 7 -->
+    <div class="exercise-item" data-exercise="7" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">7</span>
+        <span>كم تبلغ سرعة رياح الأعاصير القمعية (تورنادو)؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(7, false)">حتى 100 كم/ساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(7, false)">حتى 200 كم/ساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(7, true)">حتى 500 كم/ساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(7, false)">حتى 1000 كم/ساعة</button>
+      </div>
+      <div class="explanation" id="exp-7"></div>
+    </div>
+
+    <!-- السؤال 8 -->
+    <div class="exercise-item" data-exercise="8" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">8</span>
+        <span>أين تتشكّل الأعاصير البحرية (هوريكان)؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(8, false)">في المناطق القطبية</button>
+        <button class="answer-btn" onclick="checkTrueFalse(8, true)">في مناطق الضغط المنخفض في المحيطات الاستوائية</button>
+        <button class="answer-btn" onclick="checkTrueFalse(8, false)">فوق الصحاري الحارة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(8, false)">في مناطق الضغط المرتفع</button>
+      </div>
+      <div class="explanation" id="exp-8"></div>
+    </div>
+
+    <!-- السؤال 9 -->
+    <div class="exercise-item" data-exercise="9" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">9</span>
+        <span>لماذا تتلاشى الأعاصير البحرية بعد عبور اليابسة؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(9, false)">بسبب الجبال العالية</button>
+        <button class="answer-btn" onclick="checkTrueFalse(9, false)">بسبب انخفاض الحرارة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(9, true)">بسبب اختفاء الهواء الدافئ الرطب الذي يمدها بالطاقة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(9, false)">بسبب قوة كوريولوس</button>
+      </div>
+      <div class="explanation" id="exp-9"></div>
+    </div>
+
+    <!-- السؤال 10 -->
+    <div class="exercise-item" data-exercise="10" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">10</span>
+        <span>في أي اتجاه تدور الرياح حول مركز الضغط المنخفض في النصف الشمالي من الأرض؟</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(10, false)">في اتجاه عقارب الساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(10, true)">في عكس اتجاه عقارب الساعة</button>
+        <button class="answer-btn" onclick="checkTrueFalse(10, false)">في خط مستقيم</button>
+        <button class="answer-btn" onclick="checkTrueFalse(10, false)">لا تدور بل تصعد فقط</button>
+      </div>
+      <div class="explanation" id="exp-10"></div>
+    </div>
+  </div>
+
+  <!-- زر التالي -->
+  <div style="text-align: center; margin-top: 30px;">
+    <button id="nextExerciseBtn" style="display: none; padding: 18px 50px; background: linear-gradient(135deg, #2563eb, #1e40af); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: 800; cursor: pointer; font-family: 'Tajawal', sans-serif;" onclick="nextExercise()">
+      السؤال التالي ⬅️
+    </button>
+  </div>
+
+  <!-- صفحة النتائج -->
+  <div id="resultsPage" style="display: none;">
+    <div class="results-card">
+      <div class="results-emoji" id="resultEmoji">🎉</div>
+      <div class="results-score">
+        <div id="scorePercentage" class="score-big">0%</div>
+        <div class="score-details">
+          <span class="score-correct"><span id="correctCount">0</span> ✓</span>
+          <span class="score-wrong"><span id="wrongCount">0</span> ✗</span>
+        </div>
+      </div>
+      <div class="results-message" id="resultMessage"></div>
+      <button class="restart-btn" onclick="restartQuiz()">
+        🔄 إعادة المحاولة
+      </button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom: 8px;">تم تطوير هذا المحتوى التعليمي بالذكاء الاصطناعي ليكون مساعدًا تفاعليًا ولا يُغني عن الكتاب المدرسي</p>
+  <p><strong>منصة شارف التعليمية</strong> 📚</p>
+</footer>
+
+<script>
+// قائمة الإنجاز
+function updateProgress() {
+  const checkboxes = document.querySelectorAll('.checklist-checkbox');
+  const total = checkboxes.length;
+  let checked = 0;
+  checkboxes.forEach(cb => { if (cb.checked) checked++; });
+  const percentage = Math.round((checked / total) * 100);
+  document.getElementById('progressPercent').textContent = percentage + '%';
+  document.getElementById('progressFill').style.width = percentage + '%';
+  const msg = document.getElementById('progressMessage');
+  if (percentage === 0) msg.textContent = 'ابدأ بوضع علامة ✔ على ما أتقنته!';
+  else if (percentage < 50) msg.textContent = '💪 استمر! أنت في البداية...';
+  else if (percentage < 100) msg.textContent = '👍 ممتاز! أنت على الطريق الصحيح!';
+  else msg.textContent = '🎉 رائع! أنت مستعد للاختبار الآن!';
+}
+
+// التمارين
+let currentExercise = 1;
+const totalExercises = 10;
+let answered = false;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+
+const explanations = {
+  1: { correct: '✅ صحيح! الكتلة الهوائية هي كمية ضخمة من الهواء تتشكّل عادة فوق مناطق محددة من سطح الأرض، وتكتسب خصائص تلك المنطقة من حرارة ورطوبة.', wrong: '❌ خطأ. الكتلة الهوائية هي كمية ضخمة من الهواء تتشكّل فوق مناطق محددة وتكتسب خصائصها (حرارة ورطوبة).' },
+  2: { correct: '✅ صحيح! عند تقدم كتلة باردة (أكثر كثافة) فإنها تندفع أسفل الكتلة الدافئة وتُرغمها على الارتفاع، مما يؤدي لتكون الغيوم والأمطار.', wrong: '❌ خطأ. الكتلة الباردة الأكثر كثافة تندفع أسفل الكتلة الدافئة الأقل كثافة وتُرغمها على الارتفاع، فتتكون جبهة باردة مصحوبة بعواصف وأمطار.' },
+  3: { correct: '✅ صحيح! الجبهة الثابتة (الرابضة) تتكون عندما تلتقي كتلتان هوائيتان دون أن تتقدم إحداهما على الأخرى، وقد تبقى عدة أيام.', wrong: '❌ خطأ. الجبهة التي تتكون بدون تقدم أي من الكتلتين تسمى الجبهة الثابتة (الرابضة)، وقد تبقى في المكان نفسه عدة أيام مسببة أمطارًا غزيرة.' },
+  4: { correct: '✅ صحيح! في مراكز الضغط المرتفع تتكون تيارات هابطة تؤدي إلى سخونة الهواء وجفافه، فيكون الجو صافيًا مشمسًا.', wrong: '❌ خطأ. مراكز الضغط المرتفع يكون فيها الجو صافيًا مشمسًا بسبب التيارات الهابطة. أما الغائم الماطر فيكون في مراكز الضغط المنخفض.' },
+  5: { correct: '✅ صحيح! تتكون العواصف الرعدية من غيوم المزن الركامية ذات النمو الرأسي، والتي تنشأ عادة في مناطق الجبهات الباردة.', wrong: '❌ خطأ. العواصف الرعدية تتكون من غيوم المزن الركامية ذات النمو الرأسي، وليس من أنواع الغيوم الأخرى.' },
+  6: { correct: '✅ صحيح! الرعد ينتج عن تمدد الهواء بسرعة كبيرة (أكبر من سرعة الصوت) حول البرق بسبب حرارته العالية جدًّا، مما يسبب انفجارًا صوتيًا.', wrong: '❌ خطأ. الرعد يحدث بسبب التسخين السريع للهواء المحيط بالبرق (حرارته أعلى 5 مرات من سطح الشمس)، مما يسبب تمدد الهواء بسرعة أكبر من الصوت فيحدث انفجار صوتي.' },
+  7: { correct: '✅ صحيح! قد تصل سرعة رياح الأعاصير القمعية (تورنادو) إلى 500 كم/ساعة، وهي من أعنف الظواهر الجوية.', wrong: '❌ خطأ. سرعة رياح التورنادو قد تصل حتى 500 كم/ساعة، وتتحرك على الأرض بسرعة تتجاوز 100 كم/ساعة.' },
+  8: { correct: '✅ صحيح! تبدأ الأعاصير البحرية في التشكّل في مناطق الضغط المنخفض في المحيطات الاستوائية، وتستمد طاقتها من الهواء الدافئ الرطب.', wrong: '❌ خطأ. الأعاصير البحرية (هوريكان) تتشكل في مناطق الضغط المنخفض في المحيطات الاستوائية حيث تتوفر الحرارة والرطوبة اللازمة لتغذيتها.' },
+  9: { correct: '✅ صحيح! عندما تعبر الأعاصير البحرية اليابسة تفقد طاقتها لأن الهواء الدافئ الرطب (مصدر طاقتها) يختفي، فتقل سرعة الرياح وتتلاشى.', wrong: '❌ خطأ. السبب الرئيسي لتلاشي الأعاصير البحرية بعد عبور اليابسة هو اختفاء الهواء الدافئ الرطب الذي يمدها بالطاقة.' },
+  10: { correct: '✅ صحيح! بسبب تأثير قوة كوريولوس، تدور الرياح في عكس اتجاه عقارب الساعة حول مركز الضغط المنخفض في النصف الشمالي من الأرض.', wrong: '❌ خطأ. في النصف الشمالي تدور الرياح عكس عقارب الساعة حول مركز الضغط المنخفض (وفي اتجاه عقارب الساعة حول الضغط المرتفع) بسبب تأثير قوة كوريولوس.' }
+};
+
+function checkTrueFalse(exerciseNum, isCorrect) {
+  if (answered) return;
+  answered = true;
+  const buttons = document.querySelectorAll(`[data-exercise="${exerciseNum}"] .answer-btn`);
+  const expDiv = document.getElementById(`exp-${exerciseNum}`);
+  buttons.forEach(btn => { btn.style.pointerEvents = 'none'; });
+
+  if (isCorrect) {
+    event.target.classList.add('correct');
+    correctAnswers++;
+    expDiv.textContent = explanations[exerciseNum].correct;
+    expDiv.classList.add('show', 'correct-exp');
+  } else {
+    event.target.classList.add('wrong');
+    wrongAnswers++;
+    // إظهار الإجابة الصحيحة باللون الأخضر
+    buttons.forEach(btn => {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('true)')) {
+        btn.classList.add('correct');
+      }
+    });
+    expDiv.textContent = explanations[exerciseNum].wrong;
+    expDiv.classList.add('show', 'wrong-exp');
+  }
+
+  if (currentExercise < totalExercises) {
+    document.getElementById('nextExerciseBtn').style.display = 'inline-block';
+  } else {
+    setTimeout(showResults, 1000);
+  }
+}
+
+function nextExercise() {
+  document.querySelector(`[data-exercise="${currentExercise}"]`).style.display = 'none';
+  currentExercise++;
+  document.querySelector(`[data-exercise="${currentExercise}"]`).style.display = 'block';
+  answered = false;
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  window.scrollTo({ top: document.querySelector('.exercises-section').offsetTop - 20, behavior: 'smooth' });
+}
+
+function showResults() {
+  document.getElementById('exercisesContainer').style.display = 'none';
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  const percentage = Math.round((correctAnswers / totalExercises) * 100);
+  let emoji, message;
+  if (percentage === 100) { emoji = '🏆'; message = 'ممتاز! أتقنت الدرس بشكل كامل!'; }
+  else if (percentage >= 80) { emoji = '🎉'; message = 'رائع! أداء متميز!'; }
+  else if (percentage >= 60) { emoji = '👍'; message = 'جيد - راجع بعض النقاط وحاول مرة أخرى.'; }
+  else if (percentage >= 40) { emoji = '📚'; message = 'مقبول - راجع الدرس وحاول مرة أخرى.'; }
+  else { emoji = '💪'; message = 'يحتاج لمزيد من المراجعة - لا تستسلم!'; }
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('scorePercentage').textContent = percentage + '%';
+  document.getElementById('correctCount').textContent = correctAnswers;
+  document.getElementById('wrongCount').textContent = wrongAnswers;
+  document.getElementById('resultMessage').textContent = message;
+  document.getElementById('resultsPage').style.display = 'block';
+}
+
+function restartQuiz() {
+  currentExercise = 1; answered = false; correctAnswers = 0; wrongAnswers = 0;
+  document.getElementById('resultsPage').style.display = 'none';
+  document.getElementById('exercisesContainer').style.display = 'block';
+  for (let i = 1; i <= totalExercises; i++) {
+    const item = document.querySelector(`[data-exercise="${i}"]`);
+    if (item) {
+      item.style.display = i === 1 ? 'block' : 'none';
+      item.querySelectorAll('.answer-btn').forEach(btn => { btn.classList.remove('correct', 'wrong'); btn.style.pointerEvents = 'auto'; });
+      const exp = document.getElementById(`exp-${i}`);
+      if (exp) { exp.textContent = ''; exp.classList.remove('show', 'correct-exp', 'wrong-exp'); }
+    }
+  }
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  window.scrollTo({ top: document.querySelector('.exercises-section').offsetTop - 20, behavior: 'smooth' });
+}
+</script>
+
+</div><!-- /.container -->
+</body>
+</html>

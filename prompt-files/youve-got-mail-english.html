@@ -1,0 +1,2091 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You've Got Mail - اللغة الإنجليزية - منصة شارف التعليمية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --blue: #3b82f6;
+  --blue-dark: #1e40af;
+  --green: #10b981;
+  --green-dark: #065f46;
+  --orange: #f59e0b;
+  --orange-dark: #92400e;
+  --purple: #a855f7;
+  --red: #ef4444;
+  --bg: #f8fafc;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: #1e293b;
+  line-height: 1.8;
+  font-size: 17px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.hero-deco {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ds {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  animation: float 20s infinite ease-in-out;
+}
+
+.ds:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  top: -150px;
+  right: -100px;
+}
+
+.ds:nth-child(2) {
+  width: 200px;
+  height: 200px;
+  bottom: -100px;
+  left: -50px;
+  animation-delay: 7s;
+}
+
+.ds:nth-child(3) {
+  width: 150px;
+  height: 150px;
+  top: 50%;
+  left: 10%;
+  animation-delay: 14s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
+
+.hero-card {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: white;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  padding: 12px 32px;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.hero h1 {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.hsub {
+  font-size: 17px;
+  opacity: 0.95;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* المقدمة */
+.intro-box {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  margin: 30px 0;
+  box-shadow: var(--shadow-lg);
+  border-right: 6px solid var(--blue);
+}
+
+.intro-box h2 {
+  color: var(--blue-dark);
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.intro-box p {
+  font-size: 18px;
+  line-height: 2;
+  color: #334155;
+  margin-bottom: 15px;
+}
+
+
+/* صناديق المحتوى */
+.content-box {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 35px 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.content-box h3 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/* صندوق القانون */
+.law-box {
+  background: linear-gradient(135deg, var(--law-color-light), var(--law-color-main));
+  border: 5px solid var(--law-color-dark);
+  border-radius: 20px;
+  padding: 35px;
+  margin: 30px 0;
+  box-shadow: var(--shadow-lg);
+}
+
+.law-box.blue {
+  --law-color-light: #dbeafe;
+  --law-color-main: #93c5fd;
+  --law-color-dark: #1e40af;
+}
+
+.law-box.green {
+  --law-color-light: #d1fae5;
+  --law-color-main: #6ee7b7;
+  --law-color-dark: #065f46;
+}
+
+.law-box.orange {
+  --law-color-light: #fed7aa;
+  --law-color-main: #fdba74;
+  --law-color-dark: #92400e;
+}
+
+.law-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--law-color-dark);
+  margin-bottom: 25px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.law-formula {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--law-color-dark);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  direction: ltr;
+}
+
+.law-explanation {
+  background: rgba(255,255,255,0.7);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  font-size: 17px;
+  line-height: 2;
+  color: #1e293b;
+}
+
+/* جدول المضلعات */
+.polygon-table {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 30px 0;
+  box-shadow: var(--shadow-lg);
+  overflow-x: auto;
+}
+
+.polygon-table h2 {
+  text-align: center;
+  font-size: 32px;
+  color: #1e293b;
+  margin-bottom: 30px;
+  font-weight: 900;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+thead {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+}
+
+thead th {
+  padding: 22px;
+  font-size: 19px;
+  font-weight: 900;
+  text-align: center;
+  border: none;
+}
+
+tbody tr {
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  transform: scale(1.01);
+}
+
+tbody td {
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 18px;
+  text-align: center;
+  font-weight: 600;
+  background: white;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody td:first-child {
+  background: linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%);
+  color: var(--blue-dark);
+  font-weight: 900;
+  font-size: 19px;
+}
+
+/* مثال محلول */
+.example-box {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  margin: 30px 0;
+  box-shadow: var(--shadow-lg);
+  border-right: 6px solid var(--example-color);
+}
+
+.example-box.type-1 {
+  --example-color: #3b82f6;
+}
+
+.example-box.type-2 {
+  --example-color: #10b981;
+}
+
+.example-box.type-3 {
+  --example-color: #f59e0b;
+}
+
+.example-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.example-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--example-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+  font-weight: 900;
+}
+
+.example-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--example-color);
+}
+
+.example-question {
+  background: linear-gradient(to left, #f8fafc, white);
+  padding: 20px;
+  border-radius: 12px;
+  border-right: 4px solid var(--example-color);
+  font-size: 19px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.solution-steps {
+  margin-top: 20px;
+}
+
+.step {
+  background: linear-gradient(135deg, #f8fafc, white);
+  padding: 18px 25px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border-right: 4px solid var(--example-color);
+  display: flex;
+  align-items: start;
+  gap: 15px;
+}
+
+.step-number {
+  width: 35px;
+  height: 35px;
+  background: var(--example-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+  font-size: 18px;
+  line-height: 2;
+}
+
+.step-formula {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--example-color);
+  direction: ltr;
+  text-align: center;
+}
+
+.final-answer {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 900;
+  margin-top: 20px;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* ملخص القوانين */
+.summary-box {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 5px solid var(--orange);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 40px 0;
+  box-shadow: var(--shadow-lg);
+}
+
+.summary-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--orange-dark);
+  text-align: center;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.summary-item {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.summary-item h3 {
+  color: var(--orange-dark);
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.summary-formula {
+  background: linear-gradient(to left, #fef3c7, white);
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--orange-dark);
+  text-align: center;
+  direction: ltr;
+}
+
+/* الأشكال الهندسية */
+.shapes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+  margin: 30px 0;
+}
+
+.shape-card {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border: 3px solid var(--shape-color);
+}
+
+.shape-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+}
+
+.shape-container {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shape-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--shape-color);
+  margin-bottom: 8px;
+}
+
+.shape-info {
+  font-size: 15px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.polygon-illustration {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin: 30px 0;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.illustration-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--blue-dark);
+  margin-bottom: 30px;
+}
+
+.diagram-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ملاحظة */
+.note-box {
+  background: #e0f2fe;
+  border-right: 5px solid #0284c7;
+  border-radius: 12px;
+  padding: 20px 25px;
+  margin: 25px 0;
+  display: flex;
+  gap: 15px;
+  align-items: start;
+}
+
+.note-icon {
+  width: 40px;
+  height: 40px;
+  background: #0284c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  color: white;
+}
+
+.note-content {
+  flex: 1;
+  font-size: 17px;
+  line-height: 2;
+  color: #0c4a6e;
+  font-weight: 600;
+}
+
+/* قائمة الإنجاز */
+.checklist-section {
+  background: white;
+  border-radius: 24px;
+  padding: 50px 40px;
+  margin: 50px 0;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.checklist-title {
+  color: #1e293b;
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 40px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.checklist-container {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.checklist-item {
+  position: relative;
+}
+
+.checklist-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  margin: 0;
+}
+
+.checklist-item label {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 26px;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 17px;
+  line-height: 1.7;
+  color: #334155;
+  font-weight: 600;
+  position: relative;
+}
+
+.checklist-item label:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.check-mark {
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid #cbd5e1;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: transparent;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+}
+
+.checklist-checkbox:checked ~ label .check-mark {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+  color: white;
+  transform: scale(1.1);
+}
+
+.checklist-checkbox:checked ~ label {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-color: #86efac;
+}
+
+.checklist-checkbox:checked ~ label .check-text {
+  color: #059669;
+  font-weight: 700;
+}
+
+.progress-container {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 20px;
+  padding: 32px;
+  border: 2px solid #bae6fd;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0c4a6e;
+}
+
+.progress-number {
+  font-size: 42px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #e0f2fe;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+  width: 0%;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-message {
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0c4a6e;
+  padding: 14px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* التمارين */
+.exercises-section {
+  background: white;
+  border-radius: 24px;
+  padding: 50px 40px;
+  margin: 50px 0;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.exercises-title {
+  color: #1e293b;
+  font-size: 36px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.exercise-item {
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 35px;
+  margin-bottom: 25px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.exercise-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.exercise-question {
+  font-size: 19px;
+  line-height: 2;
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: start;
+  gap: 15px;
+}
+
+.exercise-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  background: #1e293b;
+  color: white;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.answer-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.answer-btn {
+  padding: 18px 30px;
+  border: 2px solid #cbd5e1;
+  background: white;
+  border-radius: 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #475569;
+}
+
+.answer-btn:hover {
+  background: #f8fafc;
+  border-color: #1e293b;
+  transform: translateY(-2px);
+}
+
+.answer-btn.correct {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.answer-btn.wrong {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: white;
+}
+
+.exercise-options {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.exercise-option {
+  background: white;
+  padding: 18px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid #cbd5e1;
+  font-size: 18px;
+  text-align: right;
+  font-weight: 600;
+  color: #475569;
+}
+
+.exercise-option:hover {
+  background: #f8fafc;
+  border-color: #1e293b;
+  transform: translateX(-5px);
+}
+
+.exercise-option.correct-choice {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+  font-weight: 800;
+}
+
+.exercise-option.wrong-choice {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: white;
+  font-weight: 800;
+}
+
+.exercise-option.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.explanation {
+  display: none;
+  margin-top: 20px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  font-size: 17px;
+  line-height: 2;
+  font-weight: 600;
+  border-right: 5px solid;
+}
+
+.explanation.show {
+  display: block;
+}
+
+.explanation.correct-exp {
+  background: #d1fae5;
+  border-right-color: #10b981;
+  color: #065f46;
+}
+
+.explanation.wrong-exp {
+  background: #fee2e2;
+  border-right-color: #ef4444;
+  color: #991b1b;
+}
+
+.next-exercise-btn {
+  background: #1e293b;
+  color: white;
+  border: none;
+  padding: 18px 50px;
+  border-radius: 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  margin: 40px auto 0;
+}
+
+.next-exercise-btn:hover {
+  background: #334155;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* FOOTER */
+footer {
+  background: #fafafa;
+  border-top: 1px solid #e0e0e0;
+  padding: 35px 40px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+footer p {
+  font-size: 15px;
+  color: #757575;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+
+footer strong {
+  color: #424242;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    padding: 30px 20px;
+    min-height: 220px;
+  }
+  
+  .hero h1 {
+    font-size: 24px;
+  }
+  
+  .intro-box,
+  .law-box,
+  .polygon-table,
+  .example-box,
+  .summary-box,
+  .exercises-section {
+    padding: 25px 20px;
+  }
+  
+  .law-formula {
+    font-size: 24px;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    min-width: 600px;
+  }
+  
+  .answer-buttons {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-deco">
+    <div class="ds"></div>
+    <div class="ds"></div>
+    <div class="ds"></div>
+  </div>
+  
+  <div class="hero-card">
+    <h1>You've Got Mail</h1>
+    <div class="hero-badge">📚 منصة شارف التعليمية</div>
+  </div>
+</section>
+
+<!-- المقدمة -->
+<section class="intro-box">
+  <h2>📖 مقدمة الدرس</h2>
+  <p>
+    في هذا الدرس ستتعلم كيفية <strong>التواصل بالبريد الإلكتروني</strong> باللغة الإنجليزية، وستتقن <strong>7 قواعد نحوية مهمة</strong> تساعدك على الكتابة والتحدث بثقة.
+  </p>
+  <p>
+    ✓ مفردات البريد الإلكتروني والرسائل<br>
+    ✓ قواعد Preposition + Gerund<br>
+    ✓ Although, Even Though, In Spite Of<br>
+    ✓ As Soon As / When<br>
+    ✓ So ... (that)<br>
+    ✓ Used to للعادات الماضية<br>
+    ✓ There is / There are والجمع
+  </p>
+</section>
+
+<!-- المفردات -->
+<div class="content-box">
+  <h3>📬 مفردات البريد الإلكتروني</h3>
+  <p style="font-size: 19px; color: #64748b; line-height: 1.8; margin-bottom: 30px;">
+    في هذا القسم، ستتعلم جميع الكلمات المهمة المتعلقة بالبريد الإلكتروني والرسائل.
+  </p>
+
+  <div style="margin: 25px 0;">
+    <h4 style="font-size:20px; font-weight:800; color:#1e40af; margin-bottom:15px;">📧 أجزاء البريد الإلكتروني</h3>
+    
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>English</th>
+          <th>العربي</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>From</strong></td><td>من</td><td>المرسِل</td></tr>
+        <tr><td><strong>To</strong></td><td>إلى</td><td>المستقبِل</td></tr>
+        <tr><td><strong>Subject</strong></td><td>الموضوع</td><td>عنوان الرسالة</td></tr>
+        <tr><td><strong>Reply</strong></td><td>رد</td><td>الرد على الرسالة</td></tr>
+        <tr><td><strong>Forward</strong></td><td>إعادة توجيه</td><td>إرسال الرسالة لشخص آخر</td></tr>
+        <tr><td><strong>Delete</strong></td><td>حذف</td><td>مسح الرسالة</td></tr>
+        <tr><td><strong>Attachment</strong></td><td>مرفق</td><td>ملف مرفق مع الرسالة</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin: 25px 0;">
+    <h4 style="font-size:20px; font-weight:800; color:#1e40af; margin-bottom:15px;">✉️ كلمات الرسائل والتواصل</h3>
+    
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>English</th>
+          <th>العربي</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Email</strong></td><td>بريد إلكتروني</td></tr>
+        <tr><td><strong>Apologize</strong></td><td>يعتذر</td></tr>
+        <tr><td><strong>Congratulations</strong></td><td>تهانينا / مبروك</td></tr>
+        <tr><td><strong>Best wishes</strong></td><td>أطيب الأمنيات</td></tr>
+        <tr><td><strong>Sincerely</strong></td><td>بإخلاص</td></tr>
+        <tr><td><strong>Best regards</strong></td><td>أطيب التحيات</td></tr>
+        <tr><td><strong>Looking forward to</strong></td><td>أتطلع إلى</td></tr>
+        <tr><td><strong>Out of office</strong></td><td>خارج المكتب</td></tr>
+        <tr><td><strong>Urgent</strong></td><td>عاجل</td></tr>
+        <tr><td><strong>Inconvenience</strong></td><td>إزعاج / مشكلة</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- القواعد النحوية -->
+<!-- عنوان قسم القواعد -->
+<div style="text-align:center; margin: 50px 0 10px;">
+  <h2 style="font-size:32px; font-weight:900; color:#1e3a8a;">📖 القواعد النحوية</h2>
+</div>
+
+  <!-- القاعدة 1 -->
+  <div class="content-box">
+    
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3>1️⃣ Preposition + Gerund</h3>
+      <p style="font-size: 18px; color: #64748b; margin: 0;">حرف الجر + الفعل بصيغة ing</p>
+    </div>
+    
+    <!-- القاعدة -->
+    <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 1px solid #bae6fd; border-radius: 16px; padding: 25px; margin: 25px 0;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <span style="background: #2563eb; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0;">💡</span>
+        <h4 style="font-size: 20px; font-weight: 800; color: #0c4a6e; margin: 0;">القاعدة</h4>
+      </div>
+      <div style="background: white; border: 1px solid #e0f2fe; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 18px;">
+        <p style="font-size: 26px; font-weight: 800; color: #1e293b; margin: 0; font-family: 'Courier New', monospace;">
+          Preposition + Verb<strong style="color: #dc2626; background: #fef2f2; padding: 4px 10px; border-radius: 6px;">ing</strong>
+        </p>
+      </div>
+      <p style="font-size: 17px; line-height: 1.9; color: #334155; margin: 0;">
+        عندما يأتي <strong>فعل</strong> بعد <strong style="color: #dc2626;">حرف جر</strong> (for, to, of, in, about, on)، نضيف <strong style="color: #dc2626;">ing</strong> للفعل.
+      </p>
+    </div>
+    
+    <!-- مقارنة خطأ/صح -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0;">
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px; text-align: center;">
+        <div style="font-size: 32px; margin-bottom: 12px;">❌</div>
+        <p style="font-size: 16px; font-weight: 700; color: #991b1b; margin: 0;">I apologize for<br><span style="text-decoration: line-through;">not answer</span></p>
+        <p style="font-size: 14px; color: #dc2626; margin-top: 8px; font-weight: 600;">خطأ</p>
+      </div>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; text-align: center;">
+        <div style="font-size: 32px; margin-bottom: 12px;">✅</div>
+        <p style="font-size: 16px; font-weight: 700; color: #065f46; margin: 0;">I apologize for<br>not answer<strong style="color: #dc2626;">ing</strong></p>
+        <p style="font-size: 14px; color: #10b981; margin-top: 8px; font-weight: 600;">صح</p>
+      </div>
+    </div>
+    
+    <!-- الأمثلة -->
+    <div style="margin-top: 30px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; margin-bottom: 18px;">
+        <h5 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0;">📝 أمثلة محلولة</h5>
+      </div>
+      
+      <div style="background: #f0f9ff; border-right: 4px solid #3b82f6; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">📧</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #1e40af; margin: 0 0 6px 0;">
+              I apologize <strong style="color: #dc2626; background: #fef2f2; padding: 2px 6px; border-radius: 4px;">for not answering</strong> your email
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">أعتذر عن عدم الإجابة على بريدك</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #f0fdf4; border-right: 4px solid #10b981; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">🎓</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #065f46; margin: 0 0 6px 0;">
+              Thank you <strong style="color: #dc2626; background: #fef2f2; padding: 2px 6px; border-radius: 4px;">for coming</strong> to my graduation
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">شكراً لك على حضورك لتخرجي</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #fffbeb; border-right: 4px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">🏠</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #92400e; margin: 0 0 6px 0;">
+              I'm thinking <strong style="color: #dc2626; background: #fef2f2; padding: 2px 6px; border-radius: 4px;">of moving</strong> to a new house
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">أفكر في الانتقال إلى منزل جديد</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #f0f9ff; border-right: 4px solid #3b82f6; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">👋</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #1e40af; margin: 0 0 6px 0;">
+              I'm looking forward <strong style="color: #dc2626; background: #fef2f2; padding: 2px 6px; border-radius: 4px;">to meeting</strong> you
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">أتطلع لمقابلتك</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #f0fdf4; border-right: 4px solid #10b981; border-radius: 10px; padding: 18px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">💰</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #065f46; margin: 0 0 6px 0;">
+              She insists <strong style="color: #dc2626; background: #fef2f2; padding: 2px 6px; border-radius: 4px;">on paying</strong> for lunch
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">هي تصر على الدفع لوجبة الغداء</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- القاعدة 2 -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="content-box">
+    
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3>2️⃣ Although / Even Though / In Spite Of</h3>
+      <p style="font-size: 18px; color: #64748b; margin: 0;">على الرغم من</p>
+    </div>
+    
+    <!-- القاعدة -->
+    <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); border: 1px solid #e9d5ff; border-radius: 16px; padding: 25px; margin: 25px 0;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <span style="background: #7c3aed; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0;">💡</span>
+        <h4 style="font-size: 20px; font-weight: 800; color: #6b21a8; margin: 0;">القاعدة</h4>
+      </div>
+      <p style="font-size: 17px; line-height: 1.9; color: #334155; margin-bottom: 18px;">
+        هذه الكلمات الثلاث لها نفس المعنى: <strong>"على الرغم من"</strong> - لكن هناك فرق في الاستخدام:
+      </p>
+      
+      <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px;">
+        <thead>
+          <tr style="background: #f8fafc;">
+            <th style="padding: 14px; text-align: right; border: 1px solid #e2e8f0; border-radius: 8px 0 0 0; font-size: 16px; font-weight: 800; color: #1e293b;">الكلمة</th>
+            <th style="padding: 14px; text-align: right; border: 1px solid #e2e8f0; border-right: none; font-size: 16px; font-weight: 800; color: #1e293b;">يأتي بعدها</th>
+            <th style="padding: 14px; text-align: right; border: 1px solid #e2e8f0; border-right: none; border-radius: 0 8px 0 0; font-size: 16px; font-weight: 800; color: #1e293b;">مثال</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: 16px; border: 1px solid #e2e8f0; border-top: none; background: #eff6ff;">
+              <strong style="color: #2563eb; font-size: 17px;">Although</strong><br>
+              <strong style="color: #2563eb; font-size: 17px;">Even though</strong>
+            </td>
+            <td style="padding: 16px; border: 1px solid #e2e8f0; border-right: none; border-top: none; font-size: 15px; color: #475569;">
+              جملة كاملة<br>(فاعل + فعل)
+            </td>
+            <td style="padding: 16px; border: 1px solid #e2e8f0; border-right: none; border-top: none; font-style: italic; color: #64748b; font-size: 15px;">
+              Although it rained
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 16px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 0 8px; background: #fef2f2;">
+              <strong style="color: #dc2626; font-size: 17px;">In spite of</strong>
+            </td>
+            <td style="padding: 16px; border: 1px solid #e2e8f0; border-right: none; border-top: none; font-size: 15px; color: #475569;">
+              اسم أو Gerund (ing)
+            </td>
+            <td style="padding: 16px; border: 1px solid #e2e8f0; border-right: none; border-top: none; border-radius: 0 0 8px 0; font-style: italic; color: #64748b; font-size: 15px;">
+              In spite of the rain<br>In spite of being sick
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- الأمثلة -->
+    <div style="margin-top: 30px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; margin-bottom: 18px;">
+        <h5 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0;">📝 أمثلة محلولة</h5>
+      </div>
+      
+      <div style="background: #f0f9ff; border-right: 4px solid #3b82f6; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">☔</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #1e40af; margin: 0 0 6px 0;">
+              <strong style="color: #7c3aed; background: #faf5ff; padding: 2px 6px; border-radius: 4px;">Although it rained</strong>, we enjoyed the vacation
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">على الرغم من أنه أمطر، استمتعنا بالعطلة</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #fffbeb; border-right: 4px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">🚗</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #92400e; margin: 0 0 6px 0;">
+              <strong style="color: #7c3aed; background: #faf5ff; padding: 2px 6px; border-radius: 4px;">In spite of the traffic</strong>, I arrived on time
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">على الرغم من الزحام، وصلت في الوقت</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #f0fdf4; border-right: 4px solid #10b981; border-radius: 10px; padding: 18px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">🤒</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #065f46; margin: 0 0 6px 0;">
+              <strong style="color: #7c3aed; background: #faf5ff; padding: 2px 6px; border-radius: 4px;">In spite of being sick</strong>, he went to school
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">على الرغم من كونه مريضاً، ذهب للمدرسة</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- القاعدة 3 -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="content-box">
+    
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3>3️⃣ As Soon As / When</h3>
+      <p style="font-size: 18px; color: #64748b; margin: 0;">بمجرد أن / عندما</p>
+    </div>
+    
+    <!-- القاعدة -->
+    <div style="background: linear-gradient(135deg, #f0fdfa, #ccfbf1); border: 1px solid #99f6e4; border-radius: 16px; padding: 25px; margin: 25px 0;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <span style="background: #14b8a6; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0;">💡</span>
+        <h4 style="font-size: 20px; font-weight: 800; color: #134e4a; margin: 0;">القاعدة المهمة</h4>
+      </div>
+      <div style="background: white; border: 1px solid #ccfbf1; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 18px;">
+        <p style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 0;">
+          I'll call you <strong style="color: #14b8a6; background: #f0fdfa; padding: 4px 10px; border-radius: 6px;">when</strong> I <strong style="color: #14b8a6; background: #f0fdfa; padding: 4px 10px; border-radius: 6px;">arrive</strong>
+        </p>
+      </div>
+      <p style="font-size: 17px; line-height: 1.9; color: #334155; margin: 0;">
+        نستخدم <strong style="color: #10b981;">المضارع البسيط</strong> بعد when/as soon as - <strong style="color: #dc2626;">لا نستخدم will</strong>
+      </p>
+    </div>
+    
+    <!-- مقارنة -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0;">
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px; text-align: center;">
+        <div style="font-size: 32px; margin-bottom: 12px;">❌</div>
+        <p style="font-size: 16px; font-weight: 700; color: #991b1b; margin: 0;">when I<br><span style="text-decoration: line-through;">will arrive</span></p>
+        <p style="font-size: 14px; color: #dc2626; margin-top: 8px; font-weight: 600;">خطأ</p>
+      </div>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; text-align: center;">
+        <div style="font-size: 32px; margin-bottom: 12px;">✅</div>
+        <p style="font-size: 16px; font-weight: 700; color: #065f46; margin: 0;">when I<br><strong style="color: #10b981;">arrive</strong></p>
+        <p style="font-size: 14px; color: #10b981; margin-top: 8px; font-weight: 600;">صح</p>
+      </div>
+    </div>
+    
+    <!-- الأمثلة -->
+    <div style="margin-top: 30px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; margin-bottom: 18px;">
+        <h5 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0;">📝 أمثلة محلولة</h5>
+      </div>
+      
+      <div style="background: #f0f9ff; border-right: 4px solid #3b82f6; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">💡</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #1e40af; margin: 0 0 6px 0;">
+              I'll tell you <strong style="color: #0891b2; background: #ecfeff; padding: 2px 6px; border-radius: 4px;">as soon as I know</strong>
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">سأخبرك بمجرد أن أعرف</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #f0fdf4; border-right: 4px solid #10b981; border-radius: 10px; padding: 18px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">📞</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #065f46; margin: 0 0 6px 0;">
+              I'll call you <strong style="color: #0891b2; background: #ecfeff; padding: 2px 6px; border-radius: 4px;">when I arrive</strong>
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">سأتصل بك عندما أصل</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- القاعدة 4 -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="content-box">
+    
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3>4️⃣ So ... (that)</h3>
+      <p style="font-size: 18px; color: #64748b; margin: 0;">لدرجة أن</p>
+    </div>
+    
+    <!-- القاعدة -->
+    <div style="background: linear-gradient(135deg, #fff7ed, #ffedd5); border: 1px solid #fed7aa; border-radius: 16px; padding: 25px; margin: 25px 0;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <span style="background: #f97316; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0;">💡</span>
+        <h4 style="font-size: 20px; font-weight: 800; color: #9a3412; margin: 0;">القاعدة</h4>
+      </div>
+      <div style="background: white; border: 1px solid #fed7aa; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 18px;">
+        <p style="font-size: 22px; font-weight: 800; color: #1e293b; margin: 0;">
+          so + <strong style="color: #f97316; background: #fff7ed; padding: 4px 10px; border-radius: 6px;">صفة/many/much</strong> + (that) + نتيجة
+        </p>
+      </div>
+      <p style="font-size: 17px; line-height: 1.9; color: #334155; margin: 0;">
+        نستخدم <strong>so</strong> مع صفة أو <strong>many/much/few/little</strong> للتعبير عن نتيجة أو درجة.
+      </p>
+      <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; margin-top: 15px;">
+        <p style="font-size: 15px; color: #78350f; margin: 0;">
+          💡 <strong>ملاحظة:</strong> كلمة (that) اختيارية - يمكن حذفها
+        </p>
+      </div>
+    </div>
+    
+    <!-- الأمثلة -->
+    <div style="margin-top: 30px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; margin-bottom: 18px;">
+        <h5 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0;">📝 أمثلة محلولة</h5>
+      </div>
+      
+      <div style="background: #fffbeb; border-right: 4px solid #f59e0b; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">🔊</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #92400e; margin: 0 0 6px 0;">
+              The noise was <strong style="color: #ea580c; background: #fff7ed; padding: 2px 6px; border-radius: 4px;">so loud</strong> that we could hardly hear ourselves
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">كان الضجيج عالياً لدرجة أننا بالكاد نسمع أنفسنا</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #f0f9ff; border-right: 4px solid #3b82f6; border-radius: 10px; padding: 18px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">🚙</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #1e40af; margin: 0 0 6px 0;">
+              There were <strong style="color: #ea580c; background: #fff7ed; padding: 2px 6px; border-radius: 4px;">so many cars</strong> that we couldn't find a place to park
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">كان هناك الكثير من السيارات لدرجة أننا لم نستطع إيجاد مكان للوقوف</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- القاعدة 5 -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="content-box">
+    
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3>5️⃣ Used to</h3>
+      <p style="font-size: 18px; color: #64748b; margin: 0;">العادات في الماضي</p>
+    </div>
+    
+    <!-- القاعدة -->
+    <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); border: 1px solid #e9d5ff; border-radius: 16px; padding: 25px; margin: 25px 0;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <span style="background: #7c3aed; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0;">💡</span>
+        <h4 style="font-size: 20px; font-weight: 800; color: #6b21a8; margin: 0;">القاعدة</h4>
+      </div>
+      <div style="background: white; border: 1px solid #e9d5ff; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 18px;">
+        <p style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 0;">
+          <strong style="color: #7c3aed; background: #faf5ff; padding: 4px 10px; border-radius: 6px;">used to</strong> + فعل (المصدر)
+        </p>
+      </div>
+      <p style="font-size: 17px; line-height: 1.9; color: #334155; margin: 0 0 12px 0;">
+        نستخدم <strong>used to</strong> للتحدث عن:
+      </p>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="background: #f0f9ff; border-right: 3px solid #3b82f6; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+          ✅ عادات كانت موجودة في الماضي لكنها غير موجودة الآن
+        </li>
+        <li style="background: #f0fdf4; border-right: 3px solid #10b981; padding: 12px; border-radius: 8px;">
+          ✅ حالات كانت صحيحة في الماضي لكنها ليست صحيحة الآن
+        </li>
+      </ul>
+    </div>
+    
+    <!-- الأمثلة -->
+    <div style="margin-top: 30px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; margin-bottom: 18px;">
+        <h5 style="font-size: 18px; font-weight: 800; color: #1e293b; margin: 0;">📝 أمثلة محلولة</h5>
+      </div>
+      
+      <div style="background: #f0fdf4; border-right: 4px solid #10b981; border-radius: 10px; padding: 18px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">👨‍🏫</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #065f46; margin: 0 0 6px 0;">
+              Morse <strong style="color: #059669; background: #f0fdfa; padding: 2px 6px; border-radius: 4px;">used to be</strong> a professor
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">كان مورس أستاذاً (لكن الآن لا)</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="background: #f0f9ff; border-right: 4px solid #3b82f6; border-radius: 10px; padding: 18px;">
+        <div style="display: flex; gap: 12px; align-items: start;">
+          <span style="font-size: 24px; flex-shrink: 0;">📡</span>
+          <div>
+            <p style="font-size: 17px; font-weight: 700; color: #1e40af; margin: 0 0 6px 0;">
+              People <strong style="color: #059669; background: #f0fdfa; padding: 2px 6px; border-radius: 4px;">used to communicate</strong> by telegraph
+            </p>
+            <p style="font-size: 15px; color: #64748b; margin: 0;">كان الناس يتواصلون عبر التلغراف (لكن الآن لا)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- القاعدة 6 -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="content-box">
+    
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3>6️⃣ There is / There are</h3>
+      <p style="font-size: 18px; color: #64748b; margin: 0;">يوجد / هناك</p>
+    </div>
+    
+    <!-- القاعدة -->
+    <div style="background: linear-gradient(135deg, #ecfeff, #cffafe); border: 1px solid #a5f3fc; border-radius: 16px; padding: 25px; margin: 25px 0;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <span style="background: #06b6d4; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0;">💡</span>
+        <h4 style="font-size: 20px; font-weight: 800; color: #164e63; margin: 0;">القاعدة</h4>
+      </div>
+      <p style="font-size: 17px; line-height: 1.9; color: #334155; margin-bottom: 18px;">
+        نستخدم <strong style="color: #2563eb;">There is</strong> مع المفرد • نستخدم <strong style="color: #10b981;">There are</strong> مع الجمع
+      </p>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="background: #eff6ff; border: 1px solid #dbeafe; border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 18px; font-weight: 800; color: #1e40af; margin-bottom: 12px;">مفرد</div>
+          <p style="font-size: 20px; font-weight: 800; color: #2563eb; margin: 0;">There is</p>
+        </div>
+        <div style="background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 12px; padding: 20px; text-align: center;">
+          <div style="font-size: 18px; font-weight: 800; color: #065f46; margin-bottom: 12px;">جمع</div>
+          <p style="font-size: 20px; font-weight: 800; color: #10b981; margin: 0;">There are</p>
+        </div>
+      </div>
+      
+      <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 15px; margin-top: 18px;">
+        <p style="font-size: 16px; font-weight: 700; color: #78350f; margin: 0 0 10px 0;">
+          📌 استخدام (The):
+        </p>
+        <p style="font-size: 15px; color: #78350f; margin: 0;">
+          نستخدم <strong>the</strong> عندما نعرف ما نتحدث عنه، أو للأشياء الفريدة (the internet, the sun)
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- القاعدة 7 -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="content-box">
+    
+    <!-- العنوان -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <h3>7️⃣ الجمع في الإنجليزية (Plurals)</h3>
+      <p style="font-size: 18px; color: #64748b; margin: 0;">كيف نجمع الأسماء</p>
+    </div>
+    
+    <!-- القواعد -->
+    <div style="margin: 25px 0;">
+      
+      <!-- القاعدة 1 -->
+      <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bae6fd; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+        <div style="font-size: 18px; font-weight: 800; color: #1e40af; margin-bottom: 12px;">
+          1. القاعدة العامة: نضيف <strong style="color: #dc2626;">-s</strong>
+        </div>
+        <div style="background: white; border: 1px solid #e0f2fe; border-radius: 8px; padding: 15px; text-align: center;">
+          <p style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">
+            letter → letter<strong style="color: #dc2626; font-size: 20px;">s</strong> &nbsp;|&nbsp; card → card<strong style="color: #dc2626; font-size: 20px;">s</strong>
+          </p>
+        </div>
+      </div>
+      
+      <!-- القاعدة 2 -->
+      <div style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+        <div style="font-size: 18px; font-weight: 800; color: #065f46; margin-bottom: 12px;">
+          2. نهاية -s, -ch, -sh, -x, -o: نضيف <strong style="color: #dc2626;">-es</strong>
+        </div>
+        <div style="background: white; border: 1px solid #dcfce7; border-radius: 8px; padding: 15px; text-align: center;">
+          <p style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">
+            box → box<strong style="color: #dc2626; font-size: 20px;">es</strong> &nbsp;|&nbsp; watch → watch<strong style="color: #dc2626; font-size: 20px;">es</strong>
+          </p>
+        </div>
+      </div>
+      
+      <!-- القاعدة 3 -->
+      <div style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fde68a; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+        <div style="font-size: 18px; font-weight: 800; color: #92400e; margin-bottom: 12px;">
+          3. نهاية -y: نحذف y ونضيف <strong style="color: #dc2626;">-ies</strong> (إذا كان قبلها حرف ساكن)
+        </div>
+        <div style="background: white; border: 1px solid #fef3c7; border-radius: 8px; padding: 15px; text-align: center;">
+          <p style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">
+            cit<span style="text-decoration: line-through;">y</span> → cit<strong style="color: #dc2626; font-size: 20px;">ies</strong> &nbsp;|&nbsp; stor<span style="text-decoration: line-through;">y</span> → stor<strong style="color: #dc2626; font-size: 20px;">ies</strong>
+          </p>
+        </div>
+      </div>
+      
+      <!-- القاعدة 4 -->
+      <div style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); border: 1px solid #f9a8d4; border-radius: 12px; padding: 20px;">
+        <div style="font-size: 18px; font-weight: 800; color: #9f1239; margin-bottom: 12px;">
+          4. الجمع الشاذ (Irregular)
+        </div>
+        <div style="background: white; border: 1px solid #fbcfe8; border-radius: 8px; padding: 15px; text-align: center;">
+          <p style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0; line-height: 1.8;">
+            man → <strong style="color: #10b981;">men</strong> &nbsp;|&nbsp; 
+            woman → <strong style="color: #10b981;">women</strong> &nbsp;|&nbsp; 
+            child → <strong style="color: #10b981;">children</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- قائمة الإنجاز -->
+<section class="checklist-section">
+  <h2 class="checklist-title">✅ قائمة الإنجاز</h2>
+  
+  <div class="checklist-container">
+    <div class="checklist-item">
+      <input type="checkbox" id="check1" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check1">
+        <span class="check-mark">✓</span>
+        <span class="check-text">حفظت مفردات البريد الإلكتروني الأساسية</span>
+      </label>
+    </div>
+    
+    <div class="checklist-item">
+      <input type="checkbox" id="check2" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check2">
+        <span class="check-mark">✓</span>
+        <span class="check-text">فهمت قاعدة Preposition + Gerund وأستطيع استخدامها</span>
+      </label>
+    </div>
+    
+    <div class="checklist-item">
+      <input type="checkbox" id="check3" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check3">
+        <span class="check-mark">✓</span>
+        <span class="check-text">أعرف الفرق بين Although, Even Though, In Spite Of</span>
+      </label>
+    </div>
+    
+    <div class="checklist-item">
+      <input type="checkbox" id="check4" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check4">
+        <span class="check-mark">✓</span>
+        <span class="check-text">أستطيع استخدام As Soon As و When بشكل صحيح</span>
+      </label>
+    </div>
+    
+    <div class="checklist-item">
+      <input type="checkbox" id="check5" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check5">
+        <span class="check-mark">✓</span>
+        <span class="check-text">فهمت قاعدة So ... (that) وأستطيع تكوين جمل بها</span>
+      </label>
+    </div>
+    
+    <div class="checklist-item">
+      <input type="checkbox" id="check6" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check6">
+        <span class="check-mark">✓</span>
+        <span class="check-text">أعرف كيف أستخدم Used to للتحدث عن العادات الماضية</span>
+      </label>
+    </div>
+    
+    <div class="checklist-item">
+      <input type="checkbox" id="check7" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check7">
+        <span class="check-mark">✓</span>
+        <span class="check-text">أعرف الفرق بين There is و There are</span>
+      </label>
+    </div>
+    
+    <div class="checklist-item">
+      <input type="checkbox" id="check8" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check8">
+        <span class="check-mark">✓</span>
+        <span class="check-text">فهمت قواعد الجمع (Plurals) في الإنجليزية</span>
+      </label>
+    </div>
+
+    <div class="checklist-item">
+      <input type="checkbox" id="check9" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check9">
+        <span class="check-mark">✓</span>
+        <span class="check-text">أستطيع كتابة بريد إلكتروني بسيط بالإنجليزية</span>
+      </label>
+    </div>
+
+    <div class="checklist-item">
+      <input type="checkbox" id="check10" class="checklist-checkbox" onchange="updateProgress()">
+      <label for="check10">
+        <span class="check-mark">✓</span>
+        <span class="check-text">أستطيع الاعتذار وتقديم التهاني بالإنجليزية</span>
+      </label>
+    </div>
+  </div>
+  
+  <div class="progress-container">
+    <div class="progress-text">
+      <span>نسبة الإنجاز:</span>
+      <span id="progressPercent" class="progress-number">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+    <div class="progress-message" id="progressMessage">
+      ابدأ بوضع علامة ✓ على ما أتقنته!
+    </div>
+  </div>
+</section>
+
+<!-- التمارين -->
+<section class="exercises-section">
+  <h2 class="exercises-title">📝 تمارين واختبارات</h2>
+  
+  <div id="exercisesContainer">
+    <!-- السؤال 1 -->
+    <div class="exercise-item" data-exercise="1">
+      <div class="exercise-question">
+        <span class="exercise-number">1</span>
+        <span>I apologize _______ not answering your email sooner.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(1, false)">to</button>
+        <button class="answer-btn" onclick="checkTrueFalse(1, true)">for</button>
+      </div>
+      <div class="explanation" id="exp-1"></div>
+    </div>
+    
+    <!-- السؤال 2 -->
+    <div class="exercise-item" data-exercise="2" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">2</span>
+        <span>Thank you _______ coming to my graduation ceremony.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(2, true)">for</button>
+        <button class="answer-btn" onclick="checkTrueFalse(2, false)">to</button>
+      </div>
+      <div class="explanation" id="exp-2"></div>
+    </div>
+    
+    <!-- السؤال 3 -->
+    <div class="exercise-item" data-exercise="3" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">3</span>
+        <span>_______ it rained, we enjoyed the vacation.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(3, true)">Although</button>
+        <button class="answer-btn" onclick="checkTrueFalse(3, false)">In spite of</button>
+      </div>
+      <div class="explanation" id="exp-3"></div>
+    </div>
+    
+    <!-- السؤال 4 -->
+    <div class="exercise-item" data-exercise="4" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">4</span>
+        <span>I'll call you _______ I arrive.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(4, true)">when</button>
+        <button class="answer-btn" onclick="checkTrueFalse(4, false)">will</button>
+      </div>
+      <div class="explanation" id="exp-4"></div>
+    </div>
+    
+    <!-- السؤال 5 -->
+    <div class="exercise-item" data-exercise="5" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">5</span>
+        <span>There _______ so many cars that we couldn't find a parking spot.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(5, false)">was</button>
+        <button class="answer-btn" onclick="checkTrueFalse(5, true)">were</button>
+      </div>
+      <div class="explanation" id="exp-5"></div>
+    </div>
+    
+    <!-- السؤال 6 -->
+    <div class="exercise-item" data-exercise="6" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">6</span>
+        <span>Morse _______ be a professor at New York University.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(6, true)">used to</button>
+        <button class="answer-btn" onclick="checkTrueFalse(6, false)">use to</button>
+      </div>
+      <div class="explanation" id="exp-6"></div>
+    </div>
+    
+    <!-- السؤال 7 -->
+    <div class="exercise-item" data-exercise="7" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">7</span>
+        <span>The plural of "city" is:</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(7, false)">citys</button>
+        <button class="answer-btn" onclick="checkTrueFalse(7, true)">cities</button>
+      </div>
+      <div class="explanation" id="exp-7"></div>
+    </div>
+    
+    <!-- السؤال 8 -->
+    <div class="exercise-item" data-exercise="8" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">8</span>
+        <span>I'm looking forward _______ meeting you.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(8, true)">to</button>
+        <button class="answer-btn" onclick="checkTrueFalse(8, false)">for</button>
+      </div>
+      <div class="explanation" id="exp-8"></div>
+    </div>
+    
+    <!-- السؤال 9 -->
+    <div class="exercise-item" data-exercise="9" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">9</span>
+        <span>_______ being sick, he went to school.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(9, false)">Although</button>
+        <button class="answer-btn" onclick="checkTrueFalse(9, true)">In spite of</button>
+      </div>
+      <div class="explanation" id="exp-9"></div>
+    </div>
+    
+    <!-- السؤال 10 -->
+    <div class="exercise-item" data-exercise="10" style="display: none;">
+      <div class="exercise-question">
+        <span class="exercise-number">10</span>
+        <span>The noise was _______ loud that I couldn't sleep.</span>
+      </div>
+      <div class="answer-buttons">
+        <button class="answer-btn" onclick="checkTrueFalse(10, true)">so</button>
+        <button class="answer-btn" onclick="checkTrueFalse(10, false)">very</button>
+      </div>
+      <div class="explanation" id="exp-10"></div>
+    </div>
+  </div>
+  
+  <!-- زر التالي -->
+  <div style="text-align: center; margin-top: 30px;">
+    <button id="nextExerciseBtn" style="display: none; padding: 18px 50px; background: linear-gradient(135deg, #2563eb, #1e40af); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: 800; cursor: pointer; font-family: 'Tajawal', sans-serif;" onclick="nextExercise()">
+      السؤال التالي ⬅️
+    </button>
+  </div>
+  
+  <!-- صفحة النتائج -->
+  <div id="resultsPage" style="display: none;">
+    <div class="results-card">
+      <div class="results-emoji" id="resultEmoji">🎉</div>
+      <div class="results-score">
+        <div id="scorePercentage" class="score-big">0%</div>
+        <div class="score-details">
+          <span class="score-correct"><span id="correctCount">0</span> ✓</span>
+          <span class="score-wrong"><span id="wrongCount">0</span> ✗</span>
+        </div>
+      </div>
+      <div class="results-message" id="resultMessage"></div>
+      <button class="restart-btn" onclick="restartQuiz()">
+        🔄 إعادة المحاولة
+      </button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom: 8px;">تم تطوير هذا المحتوى التعليمي بالذكاء الاصطناعي ليكون مساعداً تفاعلياً ولا يُغني عن الكتاب المدرسي</p>
+  <p><strong>منصة شارف التعليمية</strong> 📚</p>
+</footer>
+
+<script>
+// قائمة الإنجاز
+function updateProgress() {
+  const checkboxes = document.querySelectorAll('.checklist-checkbox');
+  const total = checkboxes.length;
+  let checked = 0;
+  
+  checkboxes.forEach(checkbox => {
+    if (checkbox.checked) checked++;
+  });
+  
+  const percentage = Math.round((checked / total) * 100);
+  
+  document.getElementById('progressPercent').textContent = percentage + '%';
+  document.getElementById('progressFill').style.width = percentage + '%';
+  
+  const messageEl = document.getElementById('progressMessage');
+  if (percentage === 0) {
+    messageEl.textContent = 'ابدأ بوضع علامة ✓ على ما أتقنته!';
+  } else if (percentage < 50) {
+    messageEl.textContent = '💪 استمر! أنت في البداية...';
+  } else if (percentage < 100) {
+    messageEl.textContent = '👍 ممتاز! أنت على الطريق الصحيح!';
+  } else {
+    messageEl.textContent = '🎉 رائع! أنت مستعد للاختبار الآن!';
+  }
+}
+
+// التمارين
+let currentExercise = 1;
+const totalExercises = 10;
+let answered = false;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+
+function checkTrueFalse(exerciseNum, isCorrect) {
+  if (answered) return;
+  answered = true;
+  
+  const buttons = document.querySelectorAll(`[data-exercise="${exerciseNum}"] .answer-btn`);
+  const expDiv = document.getElementById(`exp-${exerciseNum}`);
+  
+  buttons.forEach(btn => {
+    btn.style.pointerEvents = 'none';
+  });
+  
+  // التوضيحات التعليمية لكل سؤال
+  const explanations = {
+    1: {
+      correct: '✅ ممتاز! استخدمنا <strong>for</strong> لأن بعد حرف الجر يأتي الفعل بصيغة <strong>Gerund (ing)</strong>.<br>القاعدة: Preposition + Verb<strong style="color: #dc2626;">ing</strong>',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">for</strong><br>📚 <strong>السبب:</strong> بعد حرف الجر (for, to, of...) يأتي الفعل بصيغة <strong>Gerund (ing)</strong> وليس المصدر.<br>✓ I apologize <strong>for</strong> not answer<strong style="color: #dc2626;">ing</strong>'
+    },
+    2: {
+      correct: '✅ ممتاز! استخدمنا <strong>for</strong> لأن بعد حرف الجر يأتي الفعل بصيغة <strong>Gerund (ing)</strong>.<br>Thank you <strong>for</strong> com<strong style="color: #dc2626;">ing</strong>',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">for</strong><br>📚 <strong>السبب:</strong> عند الشكر نستخدم <strong>for + Gerund</strong><br>✓ Thank you <strong>for coming</strong> (وليس Thank you to come)'
+    },
+    3: {
+      correct: '✅ ممتاز! استخدمنا <strong>Although</strong> لأنه يأتي بعدها <strong>جملة كاملة</strong> (فاعل + فعل).<br>Although <strong>it rained</strong> = فاعل (it) + فعل (rained)',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">Although</strong><br>📚 <strong>السبب:</strong> بعد "it rained" جملة كاملة، لذلك نستخدم <strong>Although</strong><br>• <strong>Although</strong> + جملة كاملة<br>• <strong>In spite of</strong> + اسم أو Gerund<br>✓ Although it rained (جملة كاملة)<br>✓ In spite of the rain (اسم)'
+    },
+    4: {
+      correct: '✅ ممتاز! استخدمنا <strong>when</strong> (بدون will) لأننا نستخدم <strong>المضارع البسيط</strong> بعد when/as soon as حتى لو كنا نتحدث عن المستقبل.<br>I will call you <strong>when I arrive</strong> (ليس will arrive)',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">when</strong><br>📚 <strong>السبب:</strong> بعد <strong>when</strong> و <strong>as soon as</strong> نستخدم <strong>المضارع البسيط</strong> وليس المستقبل (will)<br>✓ when I <strong>arrive</strong> ❌ when I <span style="text-decoration: line-through;">will arrive</span>'
+    },
+    5: {
+      correct: '✅ ممتاز! استخدمنا <strong>were</strong> لأن "cars" <strong>جمع</strong>.<br>There <strong>are/were</strong> مع الجمع',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">were</strong><br>📚 <strong>السبب:</strong> كلمة "cars" جمع، لذلك نستخدم <strong>were</strong> وليس was<br>• There <strong>is/was</strong> → مفرد<br>• There <strong>are/were</strong> → جمع<br>✓ There <strong>were</strong> many cars (جمع)'
+    },
+    6: {
+      correct: '✅ ممتاز! استخدمنا <strong>used to</strong> (بـ d) للتحدث عن عادة أو حالة كانت في الماضي.<br>Morse <strong>used to be</strong> a professor (كان أستاذاً لكن الآن لا)',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">used to</strong><br>📚 <strong>السبب:</strong> التعبير الصحيح هو <strong>used to</strong> (بحرف d) وليس "use to"<br>نستخدمه للتحدث عن عادات الماضي التي انتهت.<br>✓ <strong>used to</strong> be (كان)'
+    },
+    7: {
+      correct: '✅ ممتاز! الجمع الصحيح هو <strong>cities</strong> لأن الكلمة تنتهي بـ <strong>y</strong> وقبلها حرف ساكن (t).<br>نحذف الـ y ونضيف <strong>ies</strong>',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">cities</strong><br>📚 <strong>السبب:</strong> عندما تنتهي الكلمة بـ <strong>y</strong> وقبلها حرف ساكن، نحذف y ونضيف <strong>ies</strong><br>cit<span style="text-decoration: line-through;">y</span> → cit<strong style="color: #dc2626;">ies</strong><br>(لأن قبل y حرف ساكن وهو t)'
+    },
+    8: {
+      correct: '✅ ممتاز! استخدمنا <strong>to</strong> لأن "looking forward to" تعبير ثابت يأتي بعده <strong>Gerund (ing)</strong>.<br>looking forward <strong>to meeting</strong>',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">to</strong><br>📚 <strong>السبب:</strong> التعبير الصحيح هو <strong>looking forward to + Gerund</strong><br>✓ looking forward <strong>to meeting</strong> (وليس for meeting)<br>ملاحظة: "to" هنا حرف جر وليس جزء من المصدر'
+    },
+    9: {
+      correct: '✅ ممتاز! استخدمنا <strong>In spite of</strong> لأنه يأتي بعدها <strong>Gerund (being)</strong>.<br>In spite of <strong>being</strong> sick',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">In spite of</strong><br>📚 <strong>السبب:</strong> بعد "being sick" فعل بصيغة Gerund، لذلك نستخدم <strong>In spite of</strong><br>• <strong>Although</strong> + جملة كاملة (فاعل + فعل)<br>• <strong>In spite of</strong> + اسم أو Gerund<br>✓ In spite of <strong>being</strong> sick (Gerund)<br>✓ Although <strong>he was</strong> sick (جملة كاملة)'
+    },
+    10: {
+      correct: '✅ ممتاز! استخدمنا <strong>so</strong> لأننا نستخدم القاعدة <strong>so + صفة + that</strong> للتعبير عن النتيجة.<br>so <strong>loud</strong> that... (لدرجة أن...)',
+      wrong: '❌ الإجابة الصحيحة هي <strong style="color: #10b981;">so</strong><br>📚 <strong>السبب:</strong> عند استخدام <strong>that</strong> للتعبير عن النتيجة، نستخدم <strong>so</strong> وليس very<br>القاعدة: <strong>so + صفة + (that) + نتيجة</strong><br>✓ The noise was <strong>so loud that</strong> I could not sleep<br>✓ The noise was <strong>very loud</strong> (بدون that)'
+    }
+  };
+  
+  if (isCorrect) {
+    event.target.classList.add('correct');
+    correctAnswers++;
+    expDiv.innerHTML = explanations[exerciseNum].correct;
+    expDiv.classList.add('show', 'correct-exp');
+  } else {
+    event.target.classList.add('wrong');
+    wrongAnswers++;
+    // إظهار الإجابة الصحيحة فقط باللون الأخضر
+    buttons.forEach(btn => {
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('true)')) {
+        btn.classList.add('correct');
+      }
+    });
+    expDiv.innerHTML = explanations[exerciseNum].wrong;
+    expDiv.classList.add('show', 'wrong-exp');
+  }
+  
+  if (currentExercise < totalExercises) {
+    document.getElementById('nextExerciseBtn').style.display = 'inline-block';
+  } else {
+    setTimeout(showResults, 1000);
+  }
+}
+
+function nextExercise() {
+  document.querySelector(`[data-exercise="${currentExercise}"]`).style.display = 'none';
+  currentExercise++;
+  document.querySelector(`[data-exercise="${currentExercise}"]`).style.display = 'block';
+  answered = false;
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  window.scrollTo({ top: document.querySelector('.exercises-section').offsetTop - 20, behavior: 'smooth' });
+}
+
+function showResults() {
+  document.getElementById('exercisesContainer').style.display = 'none';
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  
+  const percentage = Math.round((correctAnswers / totalExercises) * 100);
+  let emoji, message;
+  
+  if (percentage === 100) {
+    emoji = '🏆';
+    message = 'ممتاز! أتقنت الدرس بشكل كامل!';
+  } else if (percentage >= 80) {
+    emoji = '🎉';
+    message = 'رائع! أداء متميز!';
+  } else if (percentage >= 60) {
+    emoji = '👍';
+    message = 'جيد - راجع بعض النقاط وحاول مرة أخرى.';
+  } else if (percentage >= 40) {
+    emoji = '📚';
+    message = 'مقبول - راجع الدرس وحاول مرة أخرى.';
+  } else {
+    emoji = '💪';
+    message = 'يحتاج لمزيد من المراجعة - لا تستسلم!';
+  }
+  
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('scorePercentage').textContent = percentage + '%';
+  document.getElementById('correctCount').textContent = correctAnswers;
+  document.getElementById('wrongCount').textContent = wrongAnswers;
+  document.getElementById('resultMessage').textContent = message;
+  
+  document.getElementById('resultsPage').style.display = 'block';
+}
+
+function restartQuiz() {
+  currentExercise = 1;
+  answered = false;
+  correctAnswers = 0;
+  wrongAnswers = 0;
+  
+  document.getElementById('resultsPage').style.display = 'none';
+  document.getElementById('exercisesContainer').style.display = 'block';
+  
+  for (let i = 1; i <= totalExercises; i++) {
+    const item = document.querySelector(`[data-exercise="${i}"]`);
+    if (item) {
+      item.style.display = i === 1 ? 'block' : 'none';
+      
+      const buttons = item.querySelectorAll('.answer-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('correct', 'wrong');
+        btn.style.pointerEvents = 'auto';
+      });
+      
+      const exp = document.getElementById(`exp-${i}`);
+      if (exp) {
+        exp.textContent = '';
+        exp.classList.remove('show', 'correct-exp', 'wrong-exp');
+      }
+    }
+  }
+  
+  document.getElementById('nextExerciseBtn').style.display = 'none';
+  window.scrollTo({ top: document.querySelector('.exercises-section').offsetTop - 20, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>

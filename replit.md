@@ -93,8 +93,22 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 - **Frontend**: شارف AI tab (`Lesson.tsx`) checks if lesson has PDF via `/api/content/lesson/:id/has-pdf`; if no PDF → shows empty state; if generating → shows progress; polls `/api/content/lesson/:id/ssa-status` during generation
 - **Manual regenerate**: `POST /api/admin/cms/content/generate-ssa` with `{ lessonId }` triggers regeneration
 - **Model**: Uses `gemini-2.5-flash` (not 1.5-flash) — older models may return 404
-- **Prompt**: Original innovative design with white background, green (#0c6b58) hero, glassmorphism cards, scroll progress bar, numbered sections, timeline steps. SVGs always full-width (no grid). 9 required sections, 8-10 quiz questions, checklist
+- **Prompt System**: 100% file-based — reads ALL files from `prompt-files/` directory at generation time. No hardcoded prompt. Admin uploads/manages prompt files via "ملفات الأوامر" section in admin dashboard.
+  - MD files → treated as instructions/rules
+  - HTML files → treated as templates/reference examples
+  - Files are dynamically loaded and concatenated into one prompt sent to Gemini
+  - Admin API: GET/POST/DELETE `/api/admin/prompt-files/*`
 - **Regenerate**: Public endpoint `POST /api/content/lesson/:id/regenerate-ssa` triggers regeneration from existing PDF
+
+### Prompt Files Management
+- **Directory**: `prompt-files/` at project root — stores all AI instruction/template/reference files
+- **Admin UI**: "ملفات الأوامر" section in admin dashboard (`/admin`) — upload, view, delete prompt files
+- **API Routes** (in `server/admin/adminRoutes.ts`):
+  - `GET /api/admin/prompt-files` — list all files
+  - `POST /api/admin/prompt-files/upload` — upload files (whitelist: txt, md, json, csv, xml, yaml, html, js, ts, py, prompt, template)
+  - `DELETE /api/admin/prompt-files/:filename` — delete a file
+  - `GET /api/admin/prompt-files/:filename/content` — preview file content
+- **Collision handling**: If file already exists, timestamp is appended to avoid overwrites
 
 ### Inline Admin Editing
 - **InlineAdminToolbar** (`src/components/admin/InlineAdminToolbar.tsx`): Expandable toolbar on Lesson page for managing PDF uploads, YouTube links, HTML content (شارف AI + الملخص). Only visible to admin users.
