@@ -254,9 +254,9 @@ router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
     }
 
     let pdfPath = content.dataValue;
-    if (pdfPath.startsWith("/attached_assets/")) {
-      const { resolve } = await import("path");
-      pdfPath = resolve(process.cwd(), pdfPath.slice(1));
+    if (pdfPath.startsWith("/attached_assets/") || !pdfPath.startsWith("/")) {
+      const { resolveAttachedAssetPath } = await import("../resolve-dir");
+      pdfPath = resolveAttachedAssetPath(pdfPath);
     }
     const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
     

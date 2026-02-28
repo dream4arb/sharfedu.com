@@ -2,7 +2,7 @@ import { getGeminiClient } from "./gemini";
 import * as cmsStorage from "../admin/cmsStorage";
 import { readFile, readdir, stat } from "fs/promises";
 import path from "path";
-import { getDirname } from "../resolve-dir";
+import { getDirname, resolveAttachedAssetPath } from "../resolve-dir";
 
 const generationStatus = new Map<string, { status: "pending" | "generating" | "done" | "error"; message?: string; updatedAt: number }>();
 
@@ -146,10 +146,8 @@ export async function generateLessonHtmlFromPdf(params: { lessonId: string, pdfP
     }
 
     let absolutePath = pdfPath;
-    if (pdfPath.startsWith("/attached_assets/")) {
-      absolutePath = path.resolve(process.cwd(), pdfPath.slice(1));
-    } else if (!path.isAbsolute(pdfPath)) {
-      absolutePath = path.resolve(process.cwd(), pdfPath);
+    if (pdfPath.startsWith("/attached_assets/") || !path.isAbsolute(pdfPath)) {
+      absolutePath = resolveAttachedAssetPath(pdfPath);
     }
 
     const pdfBuffer = await readFile(absolutePath);

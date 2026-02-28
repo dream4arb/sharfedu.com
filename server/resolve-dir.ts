@@ -39,3 +39,29 @@ export function getUploadsDir(): string {
   if (dir.includes("node_app")) return fromOneUp;
   return fromTwoUp;
 }
+
+/**
+ * يحوّل مسار نسبي مخزّن في DB (مثل /attached_assets/uploads/file.pdf)
+ * إلى مسار مطلق موجود فعلاً على القرص بتجربة عدة مواقع محتملة.
+ */
+export function resolveAttachedAssetPath(relativePath: string): string {
+  const dir = getDirname();
+  const fs = require("fs");
+
+  const stripped = relativePath.startsWith("/") ? relativePath.slice(1) : relativePath;
+
+  const candidates = [
+    path.resolve(process.cwd(), stripped),
+    path.resolve(dir, "..", stripped),
+    path.resolve(dir, "..", "..", stripped),
+    path.resolve(dir, stripped),
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      if (fs.existsSync(candidate)) return candidate;
+    } catch {}
+  }
+
+  return candidates[0];
+}

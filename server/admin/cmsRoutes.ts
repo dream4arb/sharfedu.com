@@ -17,7 +17,7 @@ import { saveHierarchyToDb } from "./hierarchyStore";
 import multer from "multer";
 import path from "path";
 import { mkdir } from "fs/promises";
-import { getUploadsDir } from "../resolve-dir";
+import { getUploadsDir, resolveAttachedAssetPath } from "../resolve-dir";
 
 const uploadsDir = getUploadsDir();
 mkdir(uploadsDir, { recursive: true }).catch(() => {});
@@ -262,7 +262,7 @@ router.post("/content/upload", upload.single("file"), async (req: Request & { fi
     if (tabType === "lesson" && file.mimetype === "application/pdf") {
       const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
       const pdfPath = path.resolve(uploadsDir, file.filename);
-      generateLessonHtmlFromPdf(String(lessonId), pdfPath)
+      generateLessonHtmlFromPdf({ lessonId: String(lessonId), pdfPath })
         .then((result) => {
           if (!result.success) {
             console.error(`[شارف AI] فشل التوليد التلقائي للدرس ${lessonId}: ${result.message}`);
@@ -291,13 +291,10 @@ router.post("/content/generate-ssa", async (req, res) => {
     }
 
     const pdfUrl = lessonContent.dataValue;
-    let pdfPath = pdfUrl;
-    if (pdfUrl.startsWith("/attached_assets/")) {
-      pdfPath = path.resolve(process.cwd(), pdfUrl.slice(1));
-    }
+    const pdfPath = resolveAttachedAssetPath(pdfUrl);
 
     const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
-    const result = await generateLessonHtmlFromPdf(String(lessonId), pdfPath);
+    const result = await generateLessonHtmlFromPdf({ lessonId: String(lessonId), pdfPath });
     if (result.success) {
       res.json({ ok: true, message: result.message });
     } else {
