@@ -423,6 +423,19 @@ router.delete("/prompt-files/:filename", async (req, res) => {
   }
 });
 
+router.get("/prompt-files/:filename/download", async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    if (!filename || filename.includes("..") || filename.includes("/")) {
+      return res.status(400).json({ message: "اسم ملف غير صالح" });
+    }
+    const filePath = path.join(promptFilesDir, filename);
+    res.download(filePath, filename);
+  } catch {
+    res.status(404).json({ message: "الملف غير موجود" });
+  }
+});
+
 router.get("/prompt-files/:filename/content", async (req, res) => {
   try {
     const filename = req.params.filename;

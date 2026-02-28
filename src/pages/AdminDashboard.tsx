@@ -86,6 +86,7 @@ import {
   ChevronDown,
   ChevronUp,
   X,
+  Download,
 } from "lucide-react";
 import { StructureManager } from "@/components/admin/StructureManager";
 import { useToast } from "@/hooks/use-toast";
@@ -2204,6 +2205,10 @@ export default function AdminDashboard() {
                                     <Button variant="outline" size="sm" onClick={() => handlePreviewPromptFile(file.name)} data-testid={`btn-preview-${file.name}`}>
                                       <Eye className="w-4 h-4 ml-1" />
                                       عرض
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => { const a = document.createElement("a"); a.href = `/api/admin/prompt-files/${encodeURIComponent(file.name)}/download`; a.download = file.name; a.click(); }} data-testid={`btn-download-${file.name}`}>
+                                      <Download className="w-4 h-4 ml-1" />
+                                      تحميل
                                     </Button>
                                     <AlertDialog>
                                       <AlertDialogTrigger asChild>
