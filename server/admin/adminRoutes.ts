@@ -13,6 +13,9 @@ import { eq } from "drizzle-orm";
 const uploadsDir = getUploadsDir();
 fs.promises.mkdir(uploadsDir, { recursive: true }).catch(() => {});
 
+const promptFilesDir = path.resolve(getDirname(), "..", "prompt-files");
+fs.promises.mkdir(promptFilesDir, { recursive: true }).catch(() => {});
+
 const ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
   "image/png",
@@ -349,6 +352,88 @@ router.put("/seo", async (req, res) => {
   } catch (e) {
     console.error("Admin SEO save:", e);
     res.status(500).json({ message: "خطأ في حفظ السيو." });
+  }
+});
+
+const PROMPT_ALLOWED_EXTENSIONS = new Set([".txt", ".md", ".json", ".csv", ".xml", ".yaml", ".yml", ".html", ".htm", ".js", ".ts", ".py", ".prompt", ".template"]);
+
+const promptUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, promptFilesDir),
+    filename: (_req, file, cb) => {
+      const safeName = file.originalname.replace(/[^a-zA-Z0-9._\-\u0600-\u06FF ]/g, "_");
+      const ext = path.extname(safeName).toLowerCase();
+      if (!PROMPT_ALLOWED_EXTENSIONS.has(ext)) {
+        return cb(new Error(`نوع الملف غير مسموح: ${ext}`), "");
+      }
+      const baseName = path.basename(safeName, ext);
+      const target = path.join(promptFilesDir, safeName);
+      try {
+        if (fs.existsSync(target)) {
+          cb(null, `${baseName}_${Date.now()}${ext}`);
+        } else {
+          cb(null, safeName);
+        }
+      } catch {
+        cb(null, `${baseName}_${Date.now()}${ext}`);
+      }
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
+
+router.get("/prompt-files", async (_req, res) => {
+  try {
+    const files = await fs.promises.readdir(promptFilesDir);
+    const results = [];
+    for (const name of files) {
+      const stat = await fs.promises.stat(path.join(promptFilesDir, name));
+      if (stat.isFile()) {
+        results.push({ name, size: stat.size, modified: stat.mtimeMs });
+      }
+    }
+    results.sort((a, b) => b.modified - a.modified);
+    res.json(results);
+  } catch {
+    res.json([]);
+  }
+});
+
+router.post("/prompt-files/upload", (req, res) => {
+  promptUpload.array("files", 30)(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message || "خطأ في رفع الملفات" });
+    }
+    const uploaded = (req.files as Express.Multer.File[] || []).map(f => f.filename);
+    res.json({ ok: true, uploaded });
+  });
+});
+
+router.delete("/prompt-files/:filename", async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    if (!filename || filename.includes("..") || filename.includes("/")) {
+      return res.status(400).json({ message: "اسم ملف غير صالح" });
+    }
+    const filePath = path.join(promptFilesDir, filename);
+    await fs.promises.unlink(filePath);
+    res.json({ ok: true });
+  } catch {
+    res.status(404).json({ message: "الملف غير موجود" });
+  }
+});
+
+router.get("/prompt-files/:filename/content", async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    if (!filename || filename.includes("..") || filename.includes("/")) {
+      return res.status(400).json({ message: "اسم ملف غير صالح" });
+    }
+    const filePath = path.join(promptFilesDir, filename);
+    const content = await fs.promises.readFile(filePath, "utf-8");
+    res.json({ name: filename, content });
+  } catch {
+    res.status(404).json({ message: "الملف غير موجود" });
   }
 });
 

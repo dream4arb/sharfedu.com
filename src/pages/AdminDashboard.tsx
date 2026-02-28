@@ -84,11 +84,12 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  X,
 } from "lucide-react";
 import { StructureManager } from "@/components/admin/StructureManager";
 import { useToast } from "@/hooks/use-toast";
 
-type AdminSection = "home" | "content" | "users" | "school-year" | "seo" | "structure";
+type AdminSection = "home" | "content" | "users" | "school-year" | "seo" | "structure" | "prompt-files";
 
 interface Stats {
   studentCount: number;
@@ -257,6 +258,12 @@ export default function AdminDashboard() {
   const [seoLoading, setSeoLoading] = useState(false);
   const [seoSaving, setSeoSaving] = useState(false);
   const [seoTab, setSeoTab] = useState("pages");
+
+  const [promptFiles, setPromptFiles] = useState<{ name: string; size: number; modified: number }[]>([]);
+  const [promptFilesLoading, setPromptFilesLoading] = useState(false);
+  const [promptUploading, setPromptUploading] = useState(false);
+  const promptFileInputRef = useRef<HTMLInputElement>(null);
+  const [promptPreview, setPromptPreview] = useState<{ name: string; content: string } | null>(null);
 
   interface SitemapInfo {
     baseUrl: string;
@@ -539,6 +546,72 @@ export default function AdminDashboard() {
       })
       .finally(() => setSeoLoading(false));
   }, [activeSection, user]);
+
+  const loadPromptFiles = async () => {
+    setPromptFilesLoading(true);
+    try {
+      const list = await fetchAdmin<{ name: string; size: number; modified: number }[]>("/api/admin/prompt-files");
+      setPromptFiles(Array.isArray(list) ? list : []);
+    } catch {
+      setPromptFiles([]);
+    } finally {
+      setPromptFilesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSection !== "prompt-files") return;
+    loadPromptFiles();
+  }, [activeSection, user]);
+
+  const handlePromptFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setPromptUploading(true);
+    try {
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
+      const res = await fetch("/api/admin/prompt-files/upload", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      toast({ title: "تم الرفع بنجاح", description: `تم رفع ${files.length} ملف(ات)` });
+      loadPromptFiles();
+    } catch {
+      toast({ title: "خطأ في الرفع", variant: "destructive" });
+    } finally {
+      setPromptUploading(false);
+      if (promptFileInputRef.current) promptFileInputRef.current.value = "";
+    }
+  };
+
+  const handleDeletePromptFile = async (filename: string) => {
+    try {
+      const res = await fetch(`/api/admin/prompt-files/${encodeURIComponent(filename)}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      toast({ title: "تم الحذف", description: `تم حذف ${filename}` });
+      setPromptFiles(prev => prev.filter(f => f.name !== filename));
+      if (promptPreview?.name === filename) setPromptPreview(null);
+    } catch {
+      toast({ title: "خطأ في الحذف", variant: "destructive" });
+    }
+  };
+
+  const handlePreviewPromptFile = async (filename: string) => {
+    try {
+      const data = await fetchAdmin<{ name: string; content: string }>(`/api/admin/prompt-files/${encodeURIComponent(filename)}/content`);
+      setPromptPreview(data);
+    } catch {
+      toast({ title: "خطأ في عرض الملف", variant: "destructive" });
+    }
+  };
 
   const loadSeoForPath = async (path: string) => {
     try {
@@ -855,6 +928,7 @@ export default function AdminDashboard() {
     { id: "users", label: "إدارة الأعضاء", icon: Users },
     { id: "school-year", label: "إعدادات السنة الدراسية", icon: Calendar },
     { id: "seo", label: "إعدادات SEO", icon: Settings },
+    { id: "prompt-files", label: "ملفات الأوامر", icon: FileText },
   ];
 
   return (
@@ -904,6 +978,7 @@ export default function AdminDashboard() {
                   {activeSection === "users" && "إدارة الأعضاء"}
                   {activeSection === "school-year" && "إعدادات السنة الدراسية"}
                   {activeSection === "seo" && "محرك السيو"}
+                  {activeSection === "prompt-files" && "ملفات الأوامر"}
                 </h1>
                 <Link href="/">
                   <Button variant="outline" size="sm">
@@ -2039,6 +2114,148 @@ export default function AdminDashboard() {
                       )}
                     </CardContent>
                   </Card>
+                </div>
+              )}
+
+              {activeSection === "prompt-files" && (
+                <div className="space-y-6 font-['Tajawal']">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Upload className="w-5 h-5" />
+                        رفع ملفات الأوامر
+                      </CardTitle>
+                      <CardDescription>
+                        ارفع ملفات الأوامر والقوالب (txt, md, json, إلخ) ليقرأها الذكاء الاصطناعي عند توليد الدروس
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div
+                        className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                        onClick={() => promptFileInputRef.current?.click()}
+                        data-testid="prompt-files-dropzone"
+                      >
+                        <input
+                          ref={promptFileInputRef}
+                          type="file"
+                          multiple
+                          className="hidden"
+                          onChange={handlePromptFileUpload}
+                          data-testid="prompt-files-input"
+                        />
+                        {promptUploading ? (
+                          <div className="flex flex-col items-center gap-3">
+                            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                            <p className="text-muted-foreground">جاري الرفع...</p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-3">
+                            <Upload className="w-10 h-10 text-muted-foreground/50" />
+                            <p className="text-muted-foreground font-medium">اضغط هنا أو اسحب الملفات لرفعها</p>
+                            <p className="text-xs text-muted-foreground/70">يمكنك رفع عدة ملفات دفعة واحدة (حد أقصى 10 ميجا لكل ملف)</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <FileText className="w-5 h-5" />
+                          الملفات المرفوعة ({promptFiles.length})
+                        </span>
+                        <Button variant="outline" size="sm" onClick={loadPromptFiles} disabled={promptFilesLoading} data-testid="btn-refresh-prompt-files">
+                          <RefreshCw className={`w-4 h-4 ml-1 ${promptFilesLoading ? "animate-spin" : ""}`} />
+                          تحديث
+                        </Button>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {promptFilesLoading ? (
+                        <div className="text-center py-8">
+                          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+                        </div>
+                      ) : promptFiles.length === 0 ? (
+                        <div className="text-center py-12 text-muted-foreground">
+                          <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                          <p>لا توجد ملفات أوامر مرفوعة بعد</p>
+                        </div>
+                      ) : (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="text-right">اسم الملف</TableHead>
+                              <TableHead className="text-right">الحجم</TableHead>
+                              <TableHead className="text-right">آخر تعديل</TableHead>
+                              <TableHead className="text-right">إجراءات</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {promptFiles.map((file) => (
+                              <TableRow key={file.name} data-testid={`prompt-file-row-${file.name}`}>
+                                <TableCell className="font-medium">{file.name}</TableCell>
+                                <TableCell>{file.size < 1024 ? `${file.size} بايت` : `${(file.size / 1024).toFixed(1)} كيلوبايت`}</TableCell>
+                                <TableCell>{new Date(file.modified).toLocaleDateString("ar-SA", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm" onClick={() => handlePreviewPromptFile(file.name)} data-testid={`btn-preview-${file.name}`}>
+                                      <Eye className="w-4 h-4 ml-1" />
+                                      عرض
+                                    </Button>
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button variant="destructive" size="sm" data-testid={`btn-delete-${file.name}`}>
+                                          <Trash2 className="w-4 h-4 ml-1" />
+                                          حذف
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent dir="rtl">
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>حذف الملف</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            هل أنت متأكد من حذف "{file.name}"؟ لا يمكن التراجع عن هذا الإجراء.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter className="flex-row-reverse gap-2">
+                                          <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                          <AlertDialogAction onClick={() => handleDeletePromptFile(file.name)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                            حذف
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {promptPreview && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            <Eye className="w-5 h-5" />
+                            معاينة: {promptPreview.name}
+                          </span>
+                          <Button variant="ghost" size="sm" onClick={() => setPromptPreview(null)} data-testid="btn-close-preview">
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap max-h-[500px] overflow-auto font-mono leading-relaxed" dir="ltr" data-testid="prompt-file-preview-content">
+                          {promptPreview.content}
+                        </pre>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               )}
             </div>
