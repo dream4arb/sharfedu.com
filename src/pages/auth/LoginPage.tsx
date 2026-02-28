@@ -33,7 +33,7 @@ export default function LoginPage() {
         return;
       }
       await refetch();
-      setLocation("/dashboard");
+      setLocation("/");
     } catch {
       setError("خطأ في الاتصال.");
       setLoading(false);

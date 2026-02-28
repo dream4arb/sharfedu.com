@@ -287,7 +287,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { session: true, failureRedirect: "/login?error=google" }),
   (req, res) => {
-    res.redirect("/dashboard");
+    res.redirect("/");
   }
 );
 

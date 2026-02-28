@@ -37,7 +37,7 @@ export default function RegisterPage() {
         return;
       }
       await refetch();
-      setLocation("/dashboard");
+      setLocation("/");
     } catch {
       setError("خطأ في الاتصال.");
       setLoading(false);
