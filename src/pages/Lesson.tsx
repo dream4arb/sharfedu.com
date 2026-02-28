@@ -2513,24 +2513,13 @@ export default function Lesson() {
               )}
 
               {currentLesson && lessonIdFromParams && (
-                <div className="space-y-8">
+                <div className="space-y-4">
                   <LessonRatingWidget
                     lessonId={lessonIdFromParams}
                     lessonTitle={currentLesson.title}
                     stage={params.stage || ""}
                     subject={params.subject || ""}
                   />
-
-                  {/* Footer - نفس الجملة لجميع التبويبات */}
-                  <div className="mt-4 mb-6 text-center border-t border-border/40 pt-8 px-4" data-testid="lesson-footer">
-                    <p className="text-[11px] sm:text-xs text-muted-foreground/60 leading-relaxed max-w-lg mx-auto font-medium">
-                      تم تطوير هذا المحتوى التعليمي بالذكاء الاصطناعي ليكون مساعدًا تفاعليًا ولا يُغني عن الكتاب المدرسي
-                    </p>
-                    <div className="flex items-center justify-center gap-1.5 mt-3 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
-                      <span className="text-[10px] font-bold text-muted-foreground">منصة شارف التعليمية</span>
-                      <span className="text-sm">📚</span>
-                    </div>
-                  </div>
                 </div>
               )}
 
