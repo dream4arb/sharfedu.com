@@ -14,8 +14,10 @@ import { Link, useParams, useLocation } from "wouter";
 import { 
   Loader2, Play, FileText, Download, CheckCircle,
   Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
-  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles, LayoutDashboard
+  ClipboardList, BookOpenCheck, ChevronDown, ChevronUp, X, RotateCcw, Paperclip, GraduationCap, HelpCircle, Sparkles, LayoutDashboard,
+  Star, MessageSquare, Send
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -194,6 +196,136 @@ function VideoTabContent({
         </div>
       </div>
     </>
+  );
+}
+
+function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonId: string; lessonTitle: string; stage: string; subject: string }) {
+  const [rating, setRating] = useState(0);
+  const [hoveredStar, setHoveredStar] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(`lesson-rating-${lessonId}`);
+    if (stored) setSubmitted(true);
+  }, [lessonId]);
+
+  const handleSubmit = async () => {
+    if (rating === 0) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/lesson-rating", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lessonId, lessonTitle, rating, comment, stage, subject }),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+        localStorage.setItem(`lesson-rating-${lessonId}`, String(rating));
+      }
+    } catch {}
+    setSubmitting(false);
+  };
+
+  if (submitted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-l from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl p-6 text-center mt-8"
+        data-testid="rating-submitted"
+      >
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <CheckCircle className="w-6 h-6 text-emerald-600" />
+          <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">شكراً لتقييمك!</span>
+        </div>
+        <p className="text-sm text-emerald-600/80 dark:text-emerald-400/70">تقييمك يساعدنا في تحسين المحتوى التعليمي</p>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="bg-white dark:bg-card border border-border/50 rounded-2xl p-6 sm:p-8 shadow-sm mt-8"
+      data-testid="rating-widget"
+    >
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+          <Star className="w-5 h-5 text-amber-500" />
+        </div>
+        <div>
+          <h3 className="font-bold text-base">قيّم هذا الدرس</h3>
+          <p className="text-xs text-muted-foreground">رأيك يساعدنا في تحسين المحتوى</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center gap-2 mb-5" data-testid="rating-stars">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => setRating(star)}
+            onMouseEnter={() => setHoveredStar(star)}
+            onMouseLeave={() => setHoveredStar(0)}
+            className="transition-transform hover:scale-125 focus:outline-none"
+            data-testid={`star-${star}`}
+          >
+            <Star
+              className={`w-9 h-9 sm:w-10 sm:h-10 transition-colors ${
+                star <= (hoveredStar || rating)
+                  ? "fill-amber-400 text-amber-400"
+                  : "fill-none text-gray-300 dark:text-gray-600"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+
+      {rating > 0 && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="space-y-4"
+        >
+          <div className="text-center text-sm font-semibold text-amber-600 dark:text-amber-400 mb-3">
+            {rating === 1 && "😟 سيء جداً"}
+            {rating === 2 && "😕 يحتاج تحسين"}
+            {rating === 3 && "😐 مقبول"}
+            {rating === 4 && "😊 جيد جداً"}
+            {rating === 5 && "🤩 ممتاز!"}
+          </div>
+
+          <div className="relative">
+            <Textarea
+              placeholder="اكتب ملاحظاتك هنا (اختياري)..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="resize-none rounded-xl text-sm min-h-[80px]"
+              maxLength={500}
+              data-testid="rating-comment"
+            />
+            <span className="absolute left-3 bottom-2 text-xs text-muted-foreground">{comment.length}/500</span>
+          </div>
+
+          <Button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="w-full rounded-xl gap-2 h-11"
+            data-testid="button-submit-rating"
+          >
+            {submitting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+            إرسال التقييم
+          </Button>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
 
@@ -2351,6 +2483,15 @@ export default function Lesson() {
                 )}
 
               </AnimatePresence>
+              )}
+
+              {currentLesson && lessonIdFromParams && (
+                <LessonRatingWidget
+                  lessonId={lessonIdFromParams}
+                  lessonTitle={currentLesson.title}
+                  stage={params.stage || ""}
+                  subject={params.subject || ""}
+                />
               )}
 
               {/* Navigation Buttons - نفس التنسيق لجميع التبويبات */}

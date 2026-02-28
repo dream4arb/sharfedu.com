@@ -45,7 +45,7 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 │   ├── auth/                # Authentication (Passport, sessions, Google OAuth)
 │   ├── admin/               # Admin CMS (adminRoutes, cmsRoutes, cmsStorage, contentRoutes, hierarchyStore)
 │   ├── routes/              # AI routes (pdf-extractor, extract-questions)
-│   ├── data/                # cms-hierarchy (curriculum structure)
+│   ├── data/                # cms-hierarchy (curriculum structure), lesson-ratings.json
 │   └── middleware/          # Auth middleware (adminAuth)
 ├── shared/                  # Shared types and schemas
 │   ├── schema.ts            # Drizzle database schema

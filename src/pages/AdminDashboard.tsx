@@ -87,11 +87,15 @@ import {
   ChevronUp,
   X,
   Download,
+  Star,
+  MessageSquare,
+  AlertTriangle,
+  TrendingDown,
 } from "lucide-react";
 import { StructureManager } from "@/components/admin/StructureManager";
 import { useToast } from "@/hooks/use-toast";
 
-type AdminSection = "home" | "content" | "users" | "school-year" | "seo" | "structure" | "prompt-files";
+type AdminSection = "home" | "content" | "users" | "school-year" | "seo" | "structure" | "prompt-files" | "ratings";
 
 interface Stats {
   studentCount: number;
@@ -263,6 +267,15 @@ export default function AdminDashboard() {
 
   const [promptFiles, setPromptFiles] = useState<{ name: string; size: number; modified: number }[]>([]);
   const [promptFilesLoading, setPromptFilesLoading] = useState(false);
+  const [ratingsData, setRatingsData] = useState<{
+    ratings: { lessonId: string; lessonTitle: string; stage: string; subject: string; averageRating: number; totalRatings: number; distribution: number[]; comments: { userName: string; rating: number; comment: string; timestamp: string }[] }[];
+    allRatings: { lessonId: string; lessonTitle: string; stage: string; subject: string; rating: number; comment: string; userName: string; timestamp: string }[];
+    totalReviews: number;
+  } | null>(null);
+  const [ratingsLoading, setRatingsLoading] = useState(false);
+  const [ratingsFilter, setRatingsFilter] = useState<"all" | "low" | "comments">("all");
+  const [ratingsView, setRatingsView] = useState<"summary" | "all">("summary");
+  const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
   const [promptUploading, setPromptUploading] = useState(false);
   const promptFileInputRef = useRef<HTMLInputElement>(null);
   const [promptPreview, setPromptPreview] = useState<{ name: string; content: string } | null>(null);
@@ -564,6 +577,23 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeSection !== "prompt-files") return;
     loadPromptFiles();
+  }, [activeSection, user]);
+
+  const loadRatings = async () => {
+    setRatingsLoading(true);
+    try {
+      const data = await fetchAdmin<typeof ratingsData>("/api/admin/lesson-ratings");
+      setRatingsData(data);
+    } catch {
+      setRatingsData(null);
+    } finally {
+      setRatingsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSection !== "ratings") return;
+    loadRatings();
   }, [activeSection, user]);
 
   const handlePromptFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -931,6 +961,7 @@ export default function AdminDashboard() {
     { id: "school-year", label: "إعدادات السنة الدراسية", icon: Calendar },
     { id: "seo", label: "إعدادات SEO", icon: Settings },
     { id: "prompt-files", label: "ملفات الأوامر", icon: FileText },
+    { id: "ratings", label: "التقييمات", icon: Star },
   ];
 
   return (
@@ -981,6 +1012,7 @@ export default function AdminDashboard() {
                   {activeSection === "school-year" && "إعدادات السنة الدراسية"}
                   {activeSection === "seo" && "محرك السيو"}
                   {activeSection === "prompt-files" && "ملفات الأوامر"}
+                  {activeSection === "ratings" && "التقييمات"}
                 </h1>
                 <Link href="/">
                   <Button variant="outline" size="sm">
@@ -2261,6 +2293,249 @@ export default function AdminDashboard() {
                         </pre>
                       </CardContent>
                     </Card>
+                  )}
+                </div>
+              )}
+
+              {activeSection === "ratings" && (
+                <div className="space-y-6 font-['Tajawal']">
+                  {ratingsLoading ? (
+                    <div className="flex justify-center py-12">
+                      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : !ratingsData || ratingsData.totalReviews === 0 ? (
+                    <Card>
+                      <CardContent className="py-16 text-center">
+                        <Star className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+                        <p className="text-lg font-bold text-muted-foreground mb-2">لا توجد تقييمات بعد</p>
+                        <p className="text-sm text-muted-foreground">ستظهر التقييمات هنا عند تقييم الطلاب للدروس</p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-xl border bg-card p-5 shadow-sm" data-testid="stat-total-reviews">
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-lg bg-primary/10 p-2">
+                              <Star className="h-6 w-6 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">إجمالي التقييمات</p>
+                              <p className="text-2xl font-bold">{ratingsData.totalReviews}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border bg-card p-5 shadow-sm" data-testid="stat-avg-rating">
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-lg bg-amber-100 dark:bg-amber-900/30 p-2">
+                              <Star className="h-6 w-6 text-amber-500" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">المعدل العام</p>
+                              <p className="text-2xl font-bold">
+                                {ratingsData.ratings.length > 0
+                                  ? (ratingsData.ratings.reduce((s, r) => s + r.averageRating * r.totalRatings, 0) / ratingsData.totalReviews).toFixed(1)
+                                  : "—"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border bg-card p-5 shadow-sm" data-testid="stat-low-ratings">
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-lg bg-red-100 dark:bg-red-900/30 p-2">
+                              <TrendingDown className="h-6 w-6 text-red-500" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">دروس بتقييم منخفض</p>
+                              <p className="text-2xl font-bold text-red-600">{ratingsData.ratings.filter(r => r.averageRating < 3).length}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rounded-xl border bg-card p-5 shadow-sm" data-testid="stat-comments">
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-lg bg-blue-100 dark:bg-blue-900/30 p-2">
+                              <MessageSquare className="h-6 w-6 text-blue-500" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">تقييمات بملاحظات</p>
+                              <p className="text-2xl font-bold">{ratingsData.allRatings.filter(r => r.comment).length}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center justify-between">
+                            <span className="flex items-center gap-2">
+                              <Star className="w-5 h-5" />
+                              {ratingsView === "summary" ? "ملخص التقييمات حسب الدرس" : "جميع التقييمات"}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <Button variant={ratingsView === "summary" ? "default" : "outline"} size="sm" onClick={() => setRatingsView("summary")} data-testid="btn-view-summary">
+                                ملخص
+                              </Button>
+                              <Button variant={ratingsView === "all" ? "default" : "outline"} size="sm" onClick={() => setRatingsView("all")} data-testid="btn-view-all">
+                                الكل
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={loadRatings} disabled={ratingsLoading} data-testid="btn-refresh-ratings">
+                                <RefreshCw className={`w-4 h-4 ml-1 ${ratingsLoading ? "animate-spin" : ""}`} />
+                                تحديث
+                              </Button>
+                            </div>
+                          </CardTitle>
+                          <div className="flex gap-2 mt-3">
+                            <Button variant={ratingsFilter === "all" ? "secondary" : "ghost"} size="sm" onClick={() => setRatingsFilter("all")} data-testid="filter-all">
+                              الكل
+                            </Button>
+                            <Button variant={ratingsFilter === "low" ? "secondary" : "ghost"} size="sm" onClick={() => setRatingsFilter("low")} className="gap-1" data-testid="filter-low">
+                              <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                              تقييم منخفض (≤3)
+                            </Button>
+                            <Button variant={ratingsFilter === "comments" ? "secondary" : "ghost"} size="sm" onClick={() => setRatingsFilter("comments")} className="gap-1" data-testid="filter-comments">
+                              <MessageSquare className="w-3.5 h-3.5 text-blue-500" />
+                              بملاحظات فقط
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          {ratingsView === "summary" ? (
+                            <div className="space-y-3">
+                              {(() => {
+                                let filtered = ratingsData.ratings;
+                                if (ratingsFilter === "low") filtered = filtered.filter(r => r.averageRating < 3);
+                                if (ratingsFilter === "comments") filtered = filtered.filter(r => r.comments.length > 0);
+                                if (filtered.length === 0) return (
+                                  <div className="text-center py-8 text-muted-foreground">
+                                    <Star className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                                    <p>لا توجد نتائج لهذا الفلتر</p>
+                                  </div>
+                                );
+                                return filtered.map((lesson) => (
+                                  <div
+                                    key={lesson.lessonId}
+                                    className={`rounded-xl border p-4 transition-colors ${lesson.averageRating < 3 ? "border-red-200 bg-red-50/50 dark:border-red-900/40 dark:bg-red-950/20" : lesson.averageRating < 4 ? "border-amber-200 bg-amber-50/30 dark:border-amber-900/30 dark:bg-amber-950/10" : "bg-card"}`}
+                                    data-testid={`rating-lesson-${lesson.lessonId}`}
+                                  >
+                                    <div className="flex items-center justify-between gap-4 cursor-pointer" onClick={() => setExpandedLesson(expandedLesson === lesson.lessonId ? null : lesson.lessonId)}>
+                                      <div className="flex items-center gap-3 min-w-0">
+                                        {lesson.averageRating < 3 && <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />}
+                                        <div className="min-w-0">
+                                          <p className="font-bold truncate">{lesson.lessonTitle}</p>
+                                          <p className="text-xs text-muted-foreground">{lesson.stage && lesson.subject ? `${lesson.stage} / ${lesson.subject}` : lesson.lessonId}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-4 shrink-0">
+                                        <div className="flex items-center gap-1">
+                                          {[1, 2, 3, 4, 5].map((s) => (
+                                            <Star key={s} className={`w-4 h-4 ${s <= Math.round(lesson.averageRating) ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />
+                                          ))}
+                                          <span className="font-bold text-sm mr-1">{lesson.averageRating}</span>
+                                        </div>
+                                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">{lesson.totalRatings} تقييم</span>
+                                        {expandedLesson === lesson.lessonId ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                      </div>
+                                    </div>
+
+                                    {expandedLesson === lesson.lessonId && (
+                                      <div className="mt-4 pt-4 border-t border-border/50 space-y-3">
+                                        <div className="flex gap-1 items-center text-xs text-muted-foreground mb-3">
+                                          <span>التوزيع:</span>
+                                          {[5, 4, 3, 2, 1].map((v, i) => (
+                                            <div key={v} className="flex items-center gap-1">
+                                              <span>{v}★</span>
+                                              <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                                                <div className="h-full rounded-full" style={{ width: `${lesson.totalRatings > 0 ? (lesson.distribution[v - 1] / lesson.totalRatings) * 100 : 0}%`, backgroundColor: v >= 4 ? "#22c55e" : v === 3 ? "#f59e0b" : "#ef4444" }} />
+                                              </div>
+                                              <span className="w-5 text-left">{lesson.distribution[v - 1]}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                        {lesson.comments.length > 0 ? (
+                                          <div className="space-y-2">
+                                            <p className="text-sm font-semibold flex items-center gap-1">
+                                              <MessageSquare className="w-4 h-4" />
+                                              الملاحظات ({lesson.comments.length})
+                                            </p>
+                                            {lesson.comments.map((c, ci) => (
+                                              <div key={ci} className={`rounded-lg p-3 text-sm ${c.rating <= 2 ? "bg-red-50 dark:bg-red-950/20 border border-red-200/50 dark:border-red-900/30" : "bg-muted/50"}`} data-testid={`comment-${lesson.lessonId}-${ci}`}>
+                                                <div className="flex items-center justify-between mb-1">
+                                                  <span className="font-semibold text-xs">{c.userName}</span>
+                                                  <div className="flex items-center gap-2">
+                                                    <div className="flex">
+                                                      {[1, 2, 3, 4, 5].map((s) => (
+                                                        <Star key={s} className={`w-3 h-3 ${s <= c.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />
+                                                      ))}
+                                                    </div>
+                                                    <span className="text-xs text-muted-foreground">{new Date(c.timestamp).toLocaleDateString("ar-SA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                                                  </div>
+                                                </div>
+                                                {c.comment && <p className="text-muted-foreground">{c.comment}</p>}
+                                                {!c.comment && <p className="text-muted-foreground/50 italic">بدون ملاحظة</p>}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <p className="text-sm text-muted-foreground italic">لا توجد ملاحظات لهذا الدرس</p>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                ));
+                              })()}
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {(() => {
+                                let filtered = ratingsData.allRatings;
+                                if (ratingsFilter === "low") filtered = filtered.filter(r => r.rating <= 3);
+                                if (ratingsFilter === "comments") filtered = filtered.filter(r => r.comment);
+                                if (filtered.length === 0) return (
+                                  <div className="text-center py-8 text-muted-foreground">
+                                    <Star className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                                    <p>لا توجد نتائج لهذا الفلتر</p>
+                                  </div>
+                                );
+                                return (
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead className="text-right">الدرس</TableHead>
+                                        <TableHead className="text-right">الطالب</TableHead>
+                                        <TableHead className="text-right">التقييم</TableHead>
+                                        <TableHead className="text-right">الملاحظة</TableHead>
+                                        <TableHead className="text-right">التاريخ</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {filtered.slice(0, 100).map((r, i) => (
+                                        <TableRow key={i} className={r.rating <= 2 ? "bg-red-50/50 dark:bg-red-950/10" : ""} data-testid={`all-rating-${i}`}>
+                                          <TableCell className="font-medium max-w-[200px] truncate">{r.lessonTitle}</TableCell>
+                                          <TableCell className="text-sm">{r.userName}</TableCell>
+                                          <TableCell>
+                                            <div className="flex items-center gap-1">
+                                              {[1, 2, 3, 4, 5].map((s) => (
+                                                <Star key={s} className={`w-3.5 h-3.5 ${s <= r.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />
+                                              ))}
+                                            </div>
+                                          </TableCell>
+                                          <TableCell className="text-sm max-w-[250px]">
+                                            {r.comment ? <span className="text-foreground">{r.comment}</span> : <span className="text-muted-foreground/50">—</span>}
+                                          </TableCell>
+                                          <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                                            {new Date(r.timestamp).toLocaleDateString("ar-SA", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </>
                   )}
                 </div>
               )}

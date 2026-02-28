@@ -42,7 +42,7 @@ export async function registerRoutes(httpServer: Server, app: Express) {
   });
 
   app.post("/api/lesson-rating", (req, res) => {
-    const { lessonId, lessonTitle, rating } = req.body;
+    const { lessonId, lessonTitle, rating, comment, stage, subject } = req.body;
     if (!lessonId || !rating || rating < 1 || rating > 5) {
       return res.status(400).json({ error: "Invalid rating" });
     }
@@ -50,12 +50,17 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     const fs = require("fs");
     let ratings: any[] = [];
     try { ratings = JSON.parse(fs.readFileSync(ratingsFile, "utf-8")); } catch {}
+    const user = (req as any).user;
     ratings.push({
       lessonId,
       lessonTitle: lessonTitle || lessonId,
       rating: Number(rating),
+      comment: comment?.trim() || "",
+      stage: stage || "",
+      subject: subject || "",
+      userId: user?.id || null,
+      userName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email : "زائر",
       timestamp: new Date().toISOString(),
-      ip: req.ip
     });
     fs.writeFileSync(ratingsFile, JSON.stringify(ratings, null, 2), "utf-8");
     res.json({ success: true });
@@ -66,22 +71,41 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     const fs = require("fs");
     let ratings: any[] = [];
     try { ratings = JSON.parse(fs.readFileSync(ratingsFile, "utf-8")); } catch {}
-    const grouped: Record<string, { lessonTitle: string; total: number; count: number; ratings: number[] }> = {};
+
+    const grouped: Record<string, { lessonTitle: string; stage: string; subject: string; total: number; count: number; ratings: number[]; comments: { userName: string; rating: number; comment: string; timestamp: string }[] }> = {};
     ratings.forEach((r: any) => {
-      if (!grouped[r.lessonId]) grouped[r.lessonId] = { lessonTitle: r.lessonTitle, total: 0, count: 0, ratings: [] };
+      if (!grouped[r.lessonId]) grouped[r.lessonId] = { lessonTitle: r.lessonTitle, stage: r.stage || "", subject: r.subject || "", total: 0, count: 0, ratings: [], comments: [] };
       grouped[r.lessonId].total += r.rating;
       grouped[r.lessonId].count++;
       grouped[r.lessonId].ratings.push(r.rating);
+      if (r.comment || r.rating <= 3) {
+        grouped[r.lessonId].comments.push({ userName: r.userName || "زائر", rating: r.rating, comment: r.comment || "", timestamp: r.timestamp });
+      }
     });
     const summary = Object.entries(grouped).map(([id, data]) => ({
       lessonId: id,
       lessonTitle: data.lessonTitle,
+      stage: data.stage,
+      subject: data.subject,
       averageRating: Math.round((data.total / data.count) * 10) / 10,
       totalRatings: data.count,
-      distribution: [1,2,3,4,5].map(v => data.ratings.filter((r: number) => r === v).length)
+      distribution: [1,2,3,4,5].map(v => data.ratings.filter((r: number) => r === v).length),
+      comments: data.comments.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     }));
     summary.sort((a, b) => a.averageRating - b.averageRating);
-    res.json({ ratings: summary, totalReviews: ratings.length });
+
+    const allRatings = ratings.map((r: any) => ({
+      lessonId: r.lessonId,
+      lessonTitle: r.lessonTitle || r.lessonId,
+      stage: r.stage || "",
+      subject: r.subject || "",
+      rating: r.rating,
+      comment: r.comment || "",
+      userName: r.userName || "زائر",
+      timestamp: r.timestamp,
+    })).sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    res.json({ ratings: summary, allRatings, totalReviews: ratings.length });
   });
 
   app.get("/sitemap.xml", async (_req, res) => {
