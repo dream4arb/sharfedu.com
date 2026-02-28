@@ -709,7 +709,7 @@ export default function Features() {
                       سجّل مجاناً الآن
                     </Button>
                   </Link>
-                  <Link href="/stage/middle">
+                  <Link href="/stages">
                     <Button
                       size="lg"
                       variant="outline"
