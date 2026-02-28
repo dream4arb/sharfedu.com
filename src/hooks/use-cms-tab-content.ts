@@ -8,7 +8,7 @@ export interface CmsTabContent {
 /**
  * جلب محتوى التبويب من جدول cms_content حسب lesson_id و tab_type
  */
-export function useCmsTabContent(lessonId: string | undefined, tabType: string) {
+export function useCmsTabContent(lessonId: string | undefined, tabType: string, refreshTrigger?: number) {
   const [content, setContent] = useState<CmsTabContent | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export function useCmsTabContent(lessonId: string | undefined, tabType: string) 
       })
       .catch(() => setContent(null))
       .finally(() => setLoading(false));
-  }, [lessonId, tabType]);
+  }, [lessonId, tabType, refreshTrigger]);
 
-  return { content, loading };
+  return { content, loading, setContent };
 }

@@ -363,11 +363,13 @@ export default function Lesson() {
   const { content: cmsLessonContent } = useCmsTabContent(lessonIdFromParams, "lesson");
   const { content: cmsVideoContent } = useCmsTabContent(lessonIdFromParams, "video");
   const { content: cmsSummaryContent } = useCmsTabContent(lessonIdFromParams, "summary");
-  const { content: cmsEducationContent } = useCmsTabContent(lessonIdFromParams, "education");
+  const [educationRefreshTrigger, setEducationRefreshTrigger] = useState(0);
+  const { content: cmsEducationContent, setContent: setCmsEducationContent } = useCmsTabContent(lessonIdFromParams, "education", educationRefreshTrigger);
 
   const [hasSsaContent, setHasSsaContent] = useState<boolean | null>(null);
   const [loadingSsa, setLoadingSsa] = useState(false);
   const [ssaGenerating, setSsaGenerating] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const [hasLessonPdf, setHasLessonPdf] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -386,6 +388,9 @@ export default function Lesson() {
   }, [lessonIdFromParams, cmsLessonContent]);
 
   useEffect(() => {
+    // إذا كان زر إعادة التوليد قد ضُغط، لا نتدخل — الـ polling سيتولى الأمر
+    if (isRegenerating) return;
+
     if (!lessonIdFromParams || activeTab !== "ssa") {
       setHasSsaContent(null);
       setSsaGenerating(false);
@@ -434,7 +439,7 @@ export default function Lesson() {
         setHasSsaContent(false);
         setLoadingSsa(false);
       });
-  }, [lessonIdFromParams, activeTab, cmsEducationContent, hasLessonPdf]);
+  }, [lessonIdFromParams, activeTab, cmsEducationContent, hasLessonPdf, isRegenerating]);
 
   useEffect(() => {
     if (!ssaGenerating || !lessonIdFromParams) return;
@@ -443,10 +448,15 @@ export default function Lesson() {
         .then((r) => r.json())
         .then((status) => {
           if (status.status === "done") {
+            // مسح المحتوى القديم من الذاكرة وإجبار إعادة الجلب من السيرفر
+            setCmsEducationContent(null);
+            setEducationRefreshTrigger(prev => prev + 1);
             setSsaGenerating(false);
+            setIsRegenerating(false);
             setHasSsaContent(true);
           } else if (status.status === "error") {
             setSsaGenerating(false);
+            setIsRegenerating(false);
             setHasSsaContent(false);
           }
         })
@@ -1869,14 +1879,19 @@ export default function Lesson() {
                     onClick={async () => {
                       if (!lessonIdFromParams) return;
                       try {
-                        // 1. مسح المحتوى من الـ DOM نهائياً قبل البدء
+                        // 1. تفعيل حالة إعادة التوليد أولاً لمنع useEffect من إلغائها
+                        setIsRegenerating(true);
+                        setSsaGenerating(true);
+                        setHasSsaContent(false);
+                        
+                        // 2. مسح المحتوى من الذاكرة والـ DOM نهائياً قبل البدء
+                        setCmsEducationContent(null);
                         const ssaContainer = document.querySelector('[data-testid="ssa-container"]');
                         if (ssaContainer) {
                           ssaContainer.innerHTML = '';
                         }
                         
-                        // 2. إظهار حالة التوليد فوراً والتحويل لتبويب شارف AI
-                        setSsaGenerating(true);
+                        // 3. التحويل لتبويب شارف AI
                         setActiveTab("ssa");
                         
                         const res = await fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/regenerate-ssa`, {
@@ -1889,13 +1904,15 @@ export default function Lesson() {
                         
                         if (!res.ok) {
                           setSsaGenerating(false);
+                          setIsRegenerating(false);
                           const errData = await res.json();
                           console.error("Regeneration failed:", errData.message);
                         }
-                        // لا نحتاج لتحديث الصفحة يدوياً، لأن useEffect الخاص بـ ssa-status سيقوم بالمهمة
+                        // الـ polling في useEffect سيكتشف اكتمال التوليد ويحدث المحتوى
                       } catch (err) {
                         console.error("Failed to regenerate:", err);
                         setSsaGenerating(false);
+                        setIsRegenerating(false);
                       }
                     }}
                     data-testid="button-regenerate-content"
