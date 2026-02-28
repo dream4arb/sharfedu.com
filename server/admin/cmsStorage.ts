@@ -22,6 +22,14 @@ export async function upsertCmsContent(data: {
       .update(cmsContent)
       .set({ contentType: data.contentType, dataValue: data.dataValue, updatedAt: new Date() })
       .where(eq(cmsContent.id, existing[0].id));
+    
+    // إذا كان التعديل في تبويب "الدرس" (lesson) وكان النوع PDF، نقوم بحذف محتوى "التعليم" (education) القديم
+    // لإجبار النظام على إعادة التوليد من الملف الجديد
+    if (data.tabType === "lesson" && data.contentType === "pdf") {
+      await db
+        .delete(cmsContent)
+        .where(and(eq(cmsContent.lessonId, data.lessonId), eq(cmsContent.tabType, "education")));
+    }
   } else {
     await db.insert(cmsContent).values(data);
   }
