@@ -6,6 +6,16 @@ import fs from "fs";
 import path from "path";
 import { getUploadsDir } from "../resolve-dir";
 
+export async function deleteCmsContentByLesson(lessonId: string, tabType: string): Promise<void> {
+  await db.delete(cmsContent)
+    .where(
+      and(
+        eq(cmsContent.lessonId, lessonId),
+        eq(cmsContent.tabType, tabType)
+      )
+    );
+}
+
 export async function upsertCmsContent(data: {
   lessonId: string;
   tabType: string;

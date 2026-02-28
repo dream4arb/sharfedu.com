@@ -204,6 +204,10 @@ router.get("/lesson/:lessonId/has-pdf", async (req, res) => {
 router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
   try {
     const { lessonId } = req.params;
+    
+    // 1. مسح المحتوى القديم فوراً من قاعدة البيانات لضمان عدم استرجاعه
+    await cmsStorage.deleteCmsContentByLesson(lessonId, "education");
+    
     const content = await cmsStorage.getCmsContentFull(lessonId, "lesson");
     if (!content || content.contentType !== "pdf" || !content.dataValue) {
       return res.status(400).json({ message: "لا يوجد ملف PDF في تبويب الدرس" });
@@ -214,10 +218,13 @@ router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
       pdfPath = resolve(process.cwd(), pdfPath.slice(1));
     }
     const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
+    
+    // 2. بدء عملية التوليد في الخلفية
     generateLessonHtmlFromPdf({ lessonId, pdfPath, isRegeneration: true }).then((r) => {
       if (!r.success) console.error(`[شارف AI] regenerate failed: ${r.message}`);
     });
-    res.json({ ok: true, message: "بدأ التوليد" });
+    
+    res.json({ ok: true, message: "تم مسح المحتوى القديم وبدأ التوليد الجديد" });
   } catch (e: any) {
     res.status(500).json({ message: e?.message || "خطأ" });
   }

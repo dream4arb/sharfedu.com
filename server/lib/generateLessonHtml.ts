@@ -162,7 +162,9 @@ export async function generateLessonHtmlFromPdf(params: { lessonId: string, pdfP
     });
 
     const result = await model.generateContent([
-      prompt,
+      {
+        text: prompt
+      },
       {
         inlineData: {
           data: pdfBase64,
