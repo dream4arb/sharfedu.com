@@ -93,7 +93,7 @@ Sharaf (شارف) is a comprehensive Arabic K-12 educational platform for Saudi 
 - **Frontend**: شارف AI tab (`Lesson.tsx`) checks if lesson has PDF via `/api/content/lesson/:id/has-pdf`; if no PDF → shows empty state; if generating → shows progress; polls `/api/content/lesson/:id/ssa-status` during generation
 - **Manual regenerate**: `POST /api/admin/cms/content/generate-ssa` with `{ lessonId }` triggers regeneration
 - **Model**: Uses `gemini-2.5-flash` (not 1.5-flash) — older models may return 404
-- **Prompt**: Includes exact CSS template (~200 lines) and HTML structure matching the reference lesson (5-1). Specifies 10 required sections, SVG rules, quiz rules, checklist, and quality standards
+- **Prompt**: Original innovative design with white background, green (#0c6b58) hero, glassmorphism cards, scroll progress bar, numbered sections, timeline steps. SVGs always full-width (no grid). 9 required sections, 8-10 quiz questions, checklist
 - **Regenerate**: Public endpoint `POST /api/content/lesson/:id/regenerate-ssa` triggers regeneration from existing PDF
 
 ### Inline Admin Editing
