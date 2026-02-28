@@ -215,12 +215,39 @@ router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
     if (!content || content.contentType !== "pdf" || !content.dataValue) {
       // محاولة البحث في المسارات الافتراضية للملفات المرفقة
       const { resolve } = await import("path");
-      const possiblePdfPath = resolve(process.cwd(), "attached_assets", "pdfs", `${lessonId}.pdf`);
       const { access } = await import("fs/promises");
-      try {
-        await access(possiblePdfPath);
-        content = { contentType: "pdf", dataValue: `/attached_assets/pdfs/${lessonId}.pdf` };
-      } catch (e) {
+
+      const possiblePdfPaths = [
+        resolve(process.cwd(), "attached_assets", "pdfs", `${lessonId}.pdf`),
+        resolve(process.cwd(), "attached_assets", "lessons", `${lessonId}.pdf`),
+        resolve(process.cwd(), "attached_assets", "uploads", `${lessonId}.pdf`),
+        // تجربة البحث عن أي ملف ينتهي بـ lessonId في مجلد الـ uploads
+        ... (await (async () => {
+             try {
+               const uploadsDir = resolve(process.cwd(), "attached_assets", "uploads");
+               const files = await fs.promises.readdir(uploadsDir);
+               const match = files.find(f => f.includes(lessonId) && f.endsWith(".pdf"));
+               return match ? [resolve(uploadsDir, match)] : [];
+             } catch { return []; }
+        })())
+      ];
+
+      let foundPath = null;
+      for (const p of possiblePdfPaths) {
+        try {
+          await access(p);
+          foundPath = p;
+          break;
+        } catch {}
+      }
+
+      if (foundPath) {
+        // تحويل المسار المطلق لمسار نسبي يفهمه النظام
+        const relativePath = foundPath.includes("attached_assets") 
+          ? "/attached_assets/" + foundPath.split("attached_assets/")[1]
+          : foundPath;
+        content = { contentType: "pdf", dataValue: relativePath };
+      } else {
         return res.status(400).json({ message: "لا يوجد ملف PDF مرتبط بهذا الدرس للقيام بعملية التوليد" });
       }
     }
