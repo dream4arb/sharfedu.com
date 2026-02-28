@@ -55,6 +55,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/", label: "الرئيسية" },
     { href: "/features", label: "المميزات" },
+    { href: "/stages", label: "المراحل الدراسية" },
   ];
 
   return (
@@ -102,7 +103,7 @@ export function Navbar() {
                 }`}
                 data-testid="button-stages-dropdown"
               >
-                المراحل الدراسية
+                اختر المرحلة
                 <ChevronDown className={`w-4 h-4 transition-transform ${stagesOpen ? "rotate-180" : ""}`} />
               </button>
               
@@ -271,7 +272,7 @@ export function Navbar() {
                 </Link>
               ))}
               
-              <div className="px-4 py-2 text-sm font-bold text-muted-foreground">المراحل الدراسية</div>
+              <div className="px-4 py-2 text-sm font-bold text-muted-foreground">اختر المرحلة</div>
               {stages.map((stage) => {
                 const Icon = stage.icon;
                 return (
