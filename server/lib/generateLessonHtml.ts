@@ -112,7 +112,8 @@ async function buildPromptFromFiles(): Promise<string> {
   return prompt;
 }
 
-export async function generateLessonHtmlFromPdf(lessonId: string, pdfPath: string): Promise<{ success: boolean; message: string }> {
+export async function generateLessonHtmlFromPdf(params: { lessonId: string, pdfPath: string, isRegeneration?: boolean }): Promise<{ success: boolean; message: string }> {
+  const { lessonId, pdfPath, isRegeneration } = params;
   const statusKey = lessonId;
   generationStatus.set(statusKey, { status: "generating", updatedAt: Date.now() });
 
@@ -133,7 +134,22 @@ export async function generateLessonHtmlFromPdf(lessonId: string, pdfPath: strin
     const pdfBuffer = await readFile(absolutePath);
     const pdfBase64 = pdfBuffer.toString("base64");
 
-    const prompt = await buildPromptFromFiles();
+    let prompt = await buildPromptFromFiles();
+
+    if (isRegeneration) {
+      prompt += `
+\n
+---
+⚠️ **تنبيه هام جداً (إعادة توليد بناءً على طلب المستخدم):**
+لقد قام المستخدم بطلب إعادة توليد هذا المحتوى لأنه غير راضٍ عن النتيجة السابقة.
+**المشاكل التي يجب معالجتها فوراً وبدقة 100%:**
+1. **الرسومات والأشكال الهندسية:** يجب إعادة رسم جميع الأشكال والرسومات التوضيحية (SVG) من الصفر بجودة احترافية عالية جداً.
+2. **التناسق والتداخل:** تأكد من عدم تداخل العناصر أو النصوص. يجب أن يكون التصميم متناسقاً، مرتباً، ومريحاً للعين (Clean Design).
+3. **الالتزام الصارم:** التزم بجميع الأوامر والتعليمات الواردة في ملفات القوالب والقواعد بنسبة 100% دون أي استثناء.
+4. **التجديد الكامل:** لا تكتفِ بتعديلات طفيفة، بل أعد بناء الهيكل البرمجي والبصري للدرس بشكل كامل لضمان أفضل تجربة تعليمية.
+---
+`;
+    }
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",

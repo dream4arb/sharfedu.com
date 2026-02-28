@@ -214,7 +214,7 @@ router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
       pdfPath = resolve(process.cwd(), pdfPath.slice(1));
     }
     const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
-    generateLessonHtmlFromPdf(lessonId, pdfPath).then((r) => {
+    generateLessonHtmlFromPdf({ lessonId, pdfPath, isRegeneration: true }).then((r) => {
       if (!r.success) console.error(`[شارف AI] regenerate failed: ${r.message}`);
     });
     res.json({ ok: true, message: "بدأ التوليد" });
