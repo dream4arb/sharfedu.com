@@ -157,13 +157,17 @@ export async function generateLessonHtmlFromPdf(params: { lessonId: string, pdfP
       model: "gemini-2.5-flash",
       generationConfig: {
         maxOutputTokens: 65536,
-        temperature: 0.4,
+        temperature: 0.9, // زيادة الحرارة لضمان تنوع المخرجات وعدم التكرار
       },
     });
 
+    // إضافة عنصر عشوائي (Random Seed) لضمان اختلاف النتائج في كل طلب
+    const randomSeed = Math.random().toString(36).substring(7);
+    const finalPrompt = `${prompt}\n\n[Random Identifier for unique generation: ${randomSeed}]`;
+
     const result = await model.generateContent([
       {
-        text: prompt
+        text: finalPrompt
       },
       {
         inlineData: {

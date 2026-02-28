@@ -1869,12 +1869,22 @@ export default function Lesson() {
                     onClick={async () => {
                       if (!lessonIdFromParams) return;
                       try {
-                        // إظهار حالة التوليد فوراً والتحويل لتبويب شارف AI
+                        // 1. مسح المحتوى من الـ DOM نهائياً قبل البدء
+                        const ssaContainer = document.querySelector('[data-testid="ssa-container"]');
+                        if (ssaContainer) {
+                          ssaContainer.innerHTML = '';
+                        }
+                        
+                        // 2. إظهار حالة التوليد فوراً والتحويل لتبويب شارف AI
                         setSsaGenerating(true);
                         setActiveTab("ssa");
                         
                         const res = await fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/regenerate-ssa`, {
-                          method: "POST"
+                          method: "POST",
+                          headers: {
+                            'Cache-Control': 'no-cache',
+                            'Pragma': 'no-cache'
+                          }
                         });
                         
                         if (!res.ok) {
