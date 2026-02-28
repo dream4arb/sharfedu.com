@@ -37,9 +37,10 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
 .section-text{font-size:1rem;color:#334155;line-height:2;margin-bottom:20px}
 .section-text strong{color:#0d9488;font-weight:700}
 
-.visual-card{background:linear-gradient(135deg,#f0fdfa,#ecfeff);border:2px solid #99f6e4;border-radius:20px;padding:24px;margin:20px 0;text-align:center}
+.visual-card{background:linear-gradient(135deg,#f0fdfa,#ecfeff);border:2px solid #99f6e4;border-radius:20px;padding:24px;margin:20px 0;text-align:center;overflow:visible}
 .visual-card h4{font-size:1rem;font-weight:800;color:#0d9488;margin-bottom:16px}
 .visual-card p{font-size:.85rem;color:#64748b;margin-top:12px;line-height:1.7}
+.visual-card svg{overflow:visible}
 
 .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:20px 0}
 .concept-box{background:#f8fafc;border:2px solid #e2e8f0;border-radius:16px;padding:20px;text-align:center;transition:all .3s}
@@ -269,10 +270,10 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
       <polygon points="555,22 575,28 582,48 575,68 555,74 535,68 528,48 535,28" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
       <text x="555" y="95" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">ثماني (8)</text>
       <!-- عشاري -->
-      <circle cx="655" cy="48" r="26" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="5 3"/>
-      <text x="655" y="95" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">n → ∞</text>
+      <polygon points="655,22 670,26 678,40 676,56 665,66 645,66 634,56 632,40 640,26" fill="none" stroke="#64748b" stroke-width="2" stroke-linejoin="round"/>
+      <text x="655" y="95" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">تساعي (9)</text>
     </svg>
-    <p>كلما زاد عدد أضلاع المضلع المنتظم، اقترب شكله من الدائرة</p>
+    <p>أسماء المضلعات حسب عدد أضلاعها — من 3 إلى 9 أضلاع</p>
   </div>
 </div>
 
@@ -287,14 +288,14 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
   <!-- Visual: تقسيم المضلعات إلى مثلثات -->
   <div class="visual-card">
     <h4>الفكرة الأساسية: تقسيم المضلع إلى مثلثات من رأس واحد</h4>
-    <svg viewBox="0 0 700 180" style="max-width:100%;height:auto">
+    <svg viewBox="0 0 700 200" style="max-width:100%;height:auto">
       <!-- مربع = 2 مثلثات -->
       <g transform="translate(50,10)">
         <polygon points="0,0 100,0 100,100 0,100" fill="#f0fdfa" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round"/>
         <line x1="0" y1="0" x2="100" y2="100" stroke="#ef4444" stroke-width="2" stroke-dasharray="5 3"/>
         <circle cx="0" cy="0" r="5" fill="#f59e0b"/>
-        <text x="50" y="130" text-anchor="middle" fill="#0d9488" font-size="12" font-weight="800" font-family="Tajawal">رباعي = 2 مثلث</text>
-        <text x="50" y="150" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600" font-family="Tajawal">360° = 2 × 180°</text>
+        <text x="50" y="128" text-anchor="middle" fill="#0d9488" font-size="12" font-weight="800" font-family="Tajawal">رباعي = 2 مثلث</text>
+        <text x="50" y="148" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600" font-family="Tajawal">360° = 2 × 180°</text>
       </g>
       <!-- خماسي = 3 مثلثات -->
       <g transform="translate(240,10)">
@@ -302,8 +303,8 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
         <line x1="60" y1="0" x2="20" y2="100" stroke="#ef4444" stroke-width="2" stroke-dasharray="5 3"/>
         <line x1="60" y1="0" x2="100" y2="100" stroke="#ef4444" stroke-width="2" stroke-dasharray="5 3"/>
         <circle cx="60" cy="0" r="5" fill="#f59e0b"/>
-        <text x="60" y="130" text-anchor="middle" fill="#0d9488" font-size="12" font-weight="800" font-family="Tajawal">خماسي = 3 مثلثات</text>
-        <text x="60" y="150" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600" font-family="Tajawal">540° = 3 × 180°</text>
+        <text x="60" y="128" text-anchor="middle" fill="#0d9488" font-size="12" font-weight="800" font-family="Tajawal">خماسي = 3 مثلثات</text>
+        <text x="60" y="148" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600" font-family="Tajawal">540° = 3 × 180°</text>
       </g>
       <!-- سداسي = 4 مثلثات -->
       <g transform="translate(450,10)">
@@ -312,8 +313,8 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
         <line x1="60" y1="0" x2="60" y2="100" stroke="#ef4444" stroke-width="2" stroke-dasharray="5 3"/>
         <line x1="60" y1="0" x2="10" y2="80" stroke="#ef4444" stroke-width="2" stroke-dasharray="5 3"/>
         <circle cx="60" cy="0" r="5" fill="#f59e0b"/>
-        <text x="60" y="130" text-anchor="middle" fill="#0d9488" font-size="12" font-weight="800" font-family="Tajawal">سداسي = 4 مثلثات</text>
-        <text x="60" y="150" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600" font-family="Tajawal">720° = 4 × 180°</text>
+        <text x="60" y="128" text-anchor="middle" fill="#0d9488" font-size="12" font-weight="800" font-family="Tajawal">سداسي = 4 مثلثات</text>
+        <text x="60" y="148" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600" font-family="Tajawal">720° = 4 × 180°</text>
       </g>
     </svg>
     <p>النقطة الصفراء تمثل الرأس الذي رُسمت منه الأقطار — الخطوط الحمراء المتقطعة هي الأقطار</p>
@@ -385,8 +386,8 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
         <div class="pname">ثماني</div><div class="pinfo">n = 8</div><div class="pangle">135°</div>
       </div>
       <div class="polygon-item">
-        <svg width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="white" stroke-width="2" stroke-dasharray="4 2"/></svg>
-        <div class="pname">n → ∞</div><div class="pinfo">دائرة</div><div class="pangle">→ 180°</div>
+        <svg width="60" height="60" viewBox="0 0 60 60"><polygon points="30,6 42,10 50,20 52,32 48,44 38,52 26,54 16,48 10,38 12,24 18,14" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>
+        <div class="pname">عشاري</div><div class="pinfo">n = 10</div><div class="pangle">144°</div>
       </div>
     </div>
   </div>
@@ -476,29 +477,29 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
   <!-- Visual: الزوايا الداخلية والخارجية -->
   <div class="visual-card">
     <h4>العلاقة بين الزاوية الداخلية والزاوية الخارجية</h4>
-    <svg viewBox="0 0 600 200" style="max-width:100%;height:auto">
+    <svg viewBox="0 0 600 240" style="max-width:100%;height:auto">
       <!-- Left diagram: single angle -->
-      <g transform="translate(30,10)">
-        <line x1="20" y1="150" x2="200" y2="150" stroke="#cbd5e1" stroke-width="2"/>
-        <line x1="100" y1="150" x2="180" y2="50" stroke="#0d9488" stroke-width="3"/>
-        <line x1="100" y1="150" x2="20" y2="150" stroke="#0d9488" stroke-width="3"/>
-        <line x1="100" y1="150" x2="200" y2="150" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="6 3"/>
-        <path d="M 65 150 A 35 35 0 0 1 135 115" fill="rgba(13,148,136,.1)" stroke="#0d9488" stroke-width="2.5"/>
-        <text x="82" y="130" fill="#0d9488" font-size="14" font-weight="800" font-family="Tajawal">داخلية</text>
-        <path d="M 135 115 A 35 35 0 0 1 135 150" fill="rgba(239,68,68,.1)" stroke="#ef4444" stroke-width="2.5"/>
-        <text x="140" y="130" fill="#ef4444" font-size="14" font-weight="800" font-family="Tajawal">خارجية</text>
-        <circle cx="100" cy="150" r="5" fill="#0f172a"/>
-        <text x="100" y="185" text-anchor="middle" fill="#334155" font-size="12" font-weight="700" font-family="Tajawal">داخلية + خارجية = °180</text>
+      <g transform="translate(30,20)">
+        <line x1="20" y1="130" x2="200" y2="130" stroke="#cbd5e1" stroke-width="2"/>
+        <line x1="100" y1="130" x2="185" y2="35" stroke="#0d9488" stroke-width="3"/>
+        <line x1="100" y1="130" x2="20" y2="130" stroke="#0d9488" stroke-width="3"/>
+        <line x1="100" y1="130" x2="200" y2="130" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="6 3"/>
+        <path d="M 60 130 A 40 40 0 0 1 130 90" fill="rgba(13,148,136,.12)" stroke="#0d9488" stroke-width="2.5"/>
+        <text x="55" y="108" fill="#0d9488" font-size="13" font-weight="800" font-family="Tajawal">داخلية</text>
+        <path d="M 130 90 A 40 40 0 0 1 140 130" fill="rgba(239,68,68,.12)" stroke="#ef4444" stroke-width="2.5"/>
+        <text x="155" y="108" fill="#ef4444" font-size="13" font-weight="800" font-family="Tajawal">خارجية</text>
+        <circle cx="100" cy="130" r="5" fill="#0f172a"/>
+        <text x="100" y="175" text-anchor="middle" fill="#334155" font-size="12" font-weight="700" font-family="Tajawal">داخلية + خارجية = °180</text>
       </g>
       <!-- Right diagram: polygon with all exterior angles -->
-      <g transform="translate(330,10)">
-        <polygon points="100,10 180,50 170,130 40,130 20,50" fill="#f0fdfa" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round"/>
-        <line x1="180" y1="50" x2="210" y2="62" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
-        <line x1="170" y1="130" x2="190" y2="150" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
-        <line x1="40" y1="130" x2="20" y2="150" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
-        <line x1="20" y1="50" x2="-5" y2="62" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
-        <line x1="100" y1="10" x2="100" y2="-10" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
-        <text x="100" y="180" text-anchor="middle" fill="#ef4444" font-size="13" font-weight="800" font-family="Tajawal">مجموع الزوايا الخارجية = °360 دائماً</text>
+      <g transform="translate(330,20)">
+        <polygon points="100,15 175,55 165,125 45,125 25,55" fill="#f0fdfa" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round"/>
+        <line x1="175" y1="55" x2="205" y2="67" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
+        <line x1="165" y1="125" x2="185" y2="145" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
+        <line x1="45" y1="125" x2="25" y2="145" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
+        <line x1="25" y1="55" x2="0" y2="67" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
+        <line x1="100" y1="15" x2="100" y2="-8" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="100" y="180" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="800" font-family="Tajawal">مجموع الزوايا الخارجية = °360 دائماً</text>
       </g>
     </svg>
   </div>
@@ -532,44 +533,50 @@ body{font-family:'Tajawal',sans-serif;background:#f8fffe;color:#1e293b;overflow-
   <!-- Visual: مقارنة الداخلية والخارجية -->
   <div class="visual-card">
     <h4>📊 مقارنة الزاوية الداخلية والخارجية</h4>
-    <svg viewBox="0 0 600 200" style="max-width:100%;height:auto">
-      <!-- Stacked bars -->
-      <g transform="translate(40,10)">
-        <!-- مثلث -->
-        <rect x="10" y="20" width="55" height="100" rx="6" fill="#0d9488"/>
-        <rect x="10" y="120" width="55" height="60" rx="6" fill="#ef4444"/>
-        <text x="37" y="70" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">60°</text>
-        <text x="37" y="155" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">120°</text>
-        <text x="37" y="195" text-anchor="middle" fill="#334155" font-size="10" font-weight="700" font-family="Tajawal">n=3</text>
-        <!-- مربع -->
-        <rect x="85" y="20" width="55" height="120" rx="6" fill="#0d9488"/>
-        <rect x="85" y="140" width="55" height="40" rx="6" fill="#ef4444"/>
-        <text x="112" y="80" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">90°</text>
-        <text x="112" y="163" text-anchor="middle" fill="#fff" font-size="10" font-weight="800" font-family="Tajawal">90°</text>
-        <text x="112" y="195" text-anchor="middle" fill="#334155" font-size="10" font-weight="700" font-family="Tajawal">n=4</text>
-        <!-- خماسي -->
-        <rect x="160" y="20" width="55" height="132" rx="6" fill="#0d9488"/>
-        <rect x="160" y="152" width="55" height="28" rx="6" fill="#ef4444"/>
-        <text x="187" y="86" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">108°</text>
-        <text x="187" y="170" text-anchor="middle" fill="#fff" font-size="9" font-weight="800" font-family="Tajawal">72°</text>
-        <text x="187" y="195" text-anchor="middle" fill="#334155" font-size="10" font-weight="700" font-family="Tajawal">n=5</text>
-        <!-- سداسي -->
-        <rect x="235" y="20" width="55" height="140" rx="6" fill="#0d9488"/>
-        <rect x="235" y="160" width="55" height="20" rx="6" fill="#ef4444"/>
-        <text x="262" y="90" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">120°</text>
-        <text x="262" y="174" text-anchor="middle" fill="#fff" font-size="8" font-weight="800" font-family="Tajawal">60°</text>
-        <text x="262" y="195" text-anchor="middle" fill="#334155" font-size="10" font-weight="700" font-family="Tajawal">n=6</text>
-        <!-- ثماني -->
-        <rect x="310" y="20" width="55" height="150" rx="6" fill="#0d9488"/>
-        <rect x="310" y="170" width="55" height="10" rx="4" fill="#ef4444"/>
-        <text x="337" y="95" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">135°</text>
-        <text x="337" y="195" text-anchor="middle" fill="#334155" font-size="10" font-weight="700" font-family="Tajawal">n=8</text>
+    <svg viewBox="0 0 620 270" style="max-width:100%;height:auto">
+      <g transform="translate(20,15)">
+        <!-- مثلث n=3: داخلية 60° خارجية 120° -->
+        <rect x="10" y="10" width="60" height="90" rx="6" fill="#0d9488"/>
+        <rect x="10" y="102" width="60" height="108" rx="6" fill="#ef4444"/>
+        <text x="40" y="58" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="Tajawal">60°</text>
+        <text x="40" y="160" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="Tajawal">120°</text>
+        <text x="40" y="232" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">مثلث</text>
+        <text x="40" y="248" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600" font-family="Tajawal">n=3</text>
+        <!-- مربع n=4: داخلية 90° خارجية 90° -->
+        <rect x="90" y="10" width="60" height="105" rx="6" fill="#0d9488"/>
+        <rect x="90" y="117" width="60" height="93" rx="6" fill="#ef4444"/>
+        <text x="120" y="65" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="Tajawal">90°</text>
+        <text x="120" y="168" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="Tajawal">90°</text>
+        <text x="120" y="232" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">مربع</text>
+        <text x="120" y="248" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600" font-family="Tajawal">n=4</text>
+        <!-- خماسي n=5: داخلية 108° خارجية 72° -->
+        <rect x="170" y="10" width="60" height="126" rx="6" fill="#0d9488"/>
+        <rect x="170" y="138" width="60" height="72" rx="6" fill="#ef4444"/>
+        <text x="200" y="76" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="Tajawal">108°</text>
+        <text x="200" y="178" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">72°</text>
+        <text x="200" y="232" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">خماسي</text>
+        <text x="200" y="248" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600" font-family="Tajawal">n=5</text>
+        <!-- سداسي n=6: داخلية 120° خارجية 60° -->
+        <rect x="250" y="10" width="60" height="140" rx="6" fill="#0d9488"/>
+        <rect x="250" y="152" width="60" height="58" rx="6" fill="#ef4444"/>
+        <text x="280" y="82" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="Tajawal">120°</text>
+        <text x="280" y="186" text-anchor="middle" fill="#fff" font-size="11" font-weight="800" font-family="Tajawal">60°</text>
+        <text x="280" y="232" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">سداسي</text>
+        <text x="280" y="248" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600" font-family="Tajawal">n=6</text>
+        <!-- ثماني n=8: داخلية 135° خارجية 45° -->
+        <rect x="330" y="10" width="60" height="158" rx="6" fill="#0d9488"/>
+        <rect x="330" y="170" width="60" height="40" rx="6" fill="#ef4444"/>
+        <text x="360" y="92" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="Tajawal">135°</text>
+        <text x="360" y="194" text-anchor="middle" fill="#fff" font-size="10" font-weight="800" font-family="Tajawal">45°</text>
+        <text x="360" y="232" text-anchor="middle" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">ثماني</text>
+        <text x="360" y="248" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600" font-family="Tajawal">n=8</text>
         <!-- Legend -->
-        <rect x="400" y="60" width="16" height="16" rx="4" fill="#0d9488"/>
-        <text x="422" y="73" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">زاوية داخلية</text>
-        <rect x="400" y="85" width="16" height="16" rx="4" fill="#ef4444"/>
-        <text x="422" y="98" fill="#334155" font-size="11" font-weight="700" font-family="Tajawal">زاوية خارجية</text>
-        <text x="420" y="130" text-anchor="middle" fill="#64748b" font-size="10" font-weight="600" font-family="Tajawal">المجموع دائماً = °180</text>
+        <rect x="440" y="50" width="18" height="18" rx="5" fill="#0d9488"/>
+        <text x="464" y="64" fill="#334155" font-size="12" font-weight="700" font-family="Tajawal">زاوية داخلية</text>
+        <rect x="440" y="80" width="18" height="18" rx="5" fill="#ef4444"/>
+        <text x="464" y="94" fill="#334155" font-size="12" font-weight="700" font-family="Tajawal">زاوية خارجية</text>
+        <line x1="440" y1="115" x2="570" y2="115" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="505" y="138" text-anchor="middle" fill="#64748b" font-size="11" font-weight="600" font-family="Tajawal">المجموع دائماً = °180</text>
       </g>
     </svg>
     <p>كلما كبرت الزاوية الداخلية، صغرت الخارجية — ومجموعهما دائماً °180</p>
