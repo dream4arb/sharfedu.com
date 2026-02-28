@@ -2300,8 +2300,17 @@ export default function Lesson() {
                       <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50" data-testid="ssa-no-pdf">
                         <div className="text-center py-12">
                           <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/40" />
-                          <p className="text-lg font-bold text-muted-foreground mb-2">لا يوجد ملف PDF في تبويب الدرس</p>
-                          <p className="text-sm text-muted-foreground">قم بإضافة ملف PDF للدرس أولاً ليتم توليد المحتوى التفاعلي تلقائياً بواسطة شارف AI</p>
+                          {user?.role === "admin" ? (
+                            <>
+                              <p className="text-lg font-bold text-muted-foreground mb-2">لا يوجد ملف PDF في تبويب الدرس</p>
+                              <p className="text-sm text-muted-foreground">قم بإضافة ملف PDF للدرس أولاً ليتم توليد المحتوى التفاعلي تلقائياً بواسطة شارف AI</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-lg font-bold text-muted-foreground mb-2">المحتوى قيد الإعداد</p>
+                              <p className="text-sm text-muted-foreground">سيتم إضافة محتوى شارف AI التفاعلي لهذا الدرس قريباً</p>
+                            </>
+                          )}
                         </div>
                       </div>
                     ) : currentLesson.id === "5-1" ? (
