@@ -445,12 +445,32 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     "assessment-missing-angle",
     "assessment-nonagon-exterior",
   ],
-  video: {
-    title: "زوايا المضلع — شرح بديل",
-    duration: "13:52",
-    url: "https://www.youtube-nocookie.com/embed/_l49Ard1--U?rel=0&modestbranding=1",
-    teacherName: "شرح تعليمي خارجي",
-  },
+  videos: [
+    {
+      id: "_l49Ard1--U",
+      title: "زوايا المضلع — الجزء الأول",
+      url: "https://www.youtube-nocookie.com/embed/_l49Ard1--U?rel=0&modestbranding=1",
+      channelName: "منال التويجري رياضيات",
+    },
+    {
+      id: "E-ndz2M-yfM",
+      title: "زوايا المضلع — الجزء الثاني",
+      url: "https://www.youtube-nocookie.com/embed/E-ndz2M-yfM?rel=0&modestbranding=1",
+      channelName: "منال التويجري رياضيات",
+    },
+    {
+      id: "20JoAErwksw",
+      title: "زوايا المضلع — شرح مبسط",
+      url: "https://www.youtube-nocookie.com/embed/20JoAErwksw?rel=0&modestbranding=1",
+      channelName: "منال التويجري رياضيات",
+    },
+    {
+      id: "O9-_Yy6l-Ok",
+      title: "زوايا المضلع — شرح بديل",
+      url: "https://www.youtube-nocookie.com/embed/O9-_Yy6l-Ok?rel=0&modestbranding=1",
+      channelName: "محمد الحربي — رياضيات ثانوي",
+    },
+  ],
   teacherSummary: {
     status: "editorial",
     attribution: "ملخص تعليمي بانتظار اعتماد معلم المادة",

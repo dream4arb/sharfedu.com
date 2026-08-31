@@ -26,6 +26,7 @@ import { useLessonSession } from "./useLessonSession";
 import { setPageMeta } from "@/lib/seo";
 
 const lesson = polygonAnglesLesson;
+const lessonVideos = (lesson.videos ?? []).slice(0, 4);
 
 export default function InteractiveLessonPage() {
   const {
@@ -38,9 +39,12 @@ export default function InteractiveLessonPage() {
     completeLesson,
   } = useLessonSession(lesson);
   const [visualAction, setVisualAction] = useState<TutorVisualAction | null>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
+  const [loadedVideoId, setLoadedVideoId] = useState<string | null>(null);
+  const [playedVideoIds, setPlayedVideoIds] = useState<string[]>([]);
   const assessmentEventSent = useRef(false);
   const currentStep = lesson.steps[session.stepIndex];
+  const selectedVideo = lessonVideos[selectedVideoIndex] ?? lessonVideos[0];
   const progress = Math.round(((session.unlockedStepIndex + 1) / lesson.steps.length) * 100);
 
   useEffect(() => {
@@ -56,13 +60,32 @@ export default function InteractiveLessonPage() {
     .filter(Boolean), [currentStep]);
 
   const stepComplete = useMemo(() => {
-    if (currentStep.type === "video") return videoLoaded;
+    if (currentStep.type === "video") return lessonVideos.length === 0 || playedVideoIds.length > 0;
     if (!currentQuestions.length) return true;
     if (currentStep.type === "assessment") {
       return currentQuestions.every((question) => (session.questions[question.id]?.attempts ?? 0) > 0);
     }
     return currentQuestions.every((question) => session.questions[question.id]?.correct === true);
-  }, [currentQuestions, currentStep.type, session.questions, videoLoaded]);
+  }, [currentQuestions, currentStep.type, session.questions, playedVideoIds]);
+
+  function selectVideo(index: number) {
+    setSelectedVideoIndex(index);
+    setLoadedVideoId(null);
+  }
+
+  function playSelectedVideo() {
+    if (!selectedVideo) return;
+    setLoadedVideoId(selectedVideo.id);
+    setPlayedVideoIds((ids) => ids.includes(selectedVideo.id) ? ids : [...ids, selectedVideo.id]);
+    emitEvent({
+      name: "video_started",
+      metadata: {
+        videoId: selectedVideo.id,
+        videoNumber: selectedVideoIndex + 1,
+        availableVideos: lessonVideos.length,
+      },
+    });
+  }
 
   useEffect(() => {
     const key = `sharaf:started-event:${lesson.id}:${session.sessionId}`;
@@ -180,30 +203,68 @@ export default function InteractiveLessonPage() {
 
         {step.type === "video" && (
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+              <div className="border-b border-slate-200 p-5 sm:p-6">
+                <div className="flex flex-wrap items-end justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-black text-cyan-700">اختر الشرح الأنسب لك</p>
+                    <h2 className="mt-1 text-xl font-black text-slate-950">{lessonVideos.length} {lessonVideos.length === 1 ? "شرح متاح" : "شروحات متاحة"}</h2>
+                  </div>
+                  {playedVideoIds.length > 0 && <p className="text-sm font-bold text-emerald-700">شاهدت {playedVideoIds.length} من {lessonVideos.length}</p>}
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="group" aria-label="شروحات الفيديو المتاحة">
+                  {lessonVideos.map((video, index) => {
+                    const selected = selectedVideo?.id === video.id;
+                    const played = playedVideoIds.includes(video.id);
+                    return (
+                      <button
+                        key={video.id}
+                        type="button"
+                        onClick={() => selectVideo(index)}
+                        aria-pressed={selected}
+                        className={`overflow-hidden rounded-2xl border-2 text-right transition ${selected ? "border-cyan-700 bg-cyan-50 ring-4 ring-cyan-100" : "border-slate-200 bg-white hover:border-cyan-300"}`}
+                      >
+                        <span className="relative block aspect-video overflow-hidden bg-slate-900">
+                          <img src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
+                          <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35"><PlayCircle className="h-10 w-10 text-white" /></span>
+                          {played && <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2 py-1 text-xs font-black text-white">شاهدته</span>}
+                        </span>
+                        <span className="block p-3">
+                          <span className="block text-xs font-black text-cyan-700">الشرح {index + 1}</span>
+                          <span className="mt-1 block line-clamp-2 text-sm font-black text-slate-900">{video.title}</span>
+                          {video.channelName && <span className="mt-1 block truncate text-xs text-slate-500">{video.channelName}</span>}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {lessonVideos.length > 1 && <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm leading-6 text-amber-950">لم يناسبك شرح المعلم الأول؟ اختر أي شرح آخر من البطاقات، ويمكنك العودة بينها في أي وقت.</p>}
+              </div>
+
               <div className="aspect-video bg-slate-950">
-                {videoLoaded ? (
+                {selectedVideo && loadedVideoId === selectedVideo.id ? (
                   <iframe
                     className="h-full w-full"
-                    src={lesson.video?.url}
-                    title={lesson.video?.title}
+                    src={selectedVideo.url}
+                    title={selectedVideo.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
                 ) : (
                   <button
                     type="button"
-                    onClick={() => { setVideoLoaded(true); emitEvent({ name: "video_started" }); }}
+                    onClick={playSelectedVideo}
+                    disabled={!selectedVideo}
                     className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_center,_#164e63,_#020617_70%)] text-white"
                   >
                     <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-cyan-800"><PlayCircle className="h-9 w-9" /></span>
-                    <span className="text-lg font-black">شغّل الشرح البديل</span>
-                    <span className="text-sm text-slate-300">{lesson.video?.duration}</span>
+                    <span className="px-5 text-center text-lg font-black">شغّل {selectedVideo?.title ?? "الفيديو"}</span>
+                    <span className="text-sm text-slate-300">الشرح {selectedVideoIndex + 1} من {lessonVideos.length}</span>
                   </button>
                 )}
               </div>
               <div className="p-5">
-                <h2 className="font-black text-slate-900">{lesson.video?.title}</h2>
-                <p className="mt-1 text-sm text-slate-500">{lesson.video?.teacherName} · {lesson.video?.duration}</p>
+                <h2 className="font-black text-slate-900">{selectedVideo?.title}</h2>
+                <p className="mt-1 text-sm text-slate-500">{selectedVideo?.channelName}{selectedVideo?.duration ? ` · ${selectedVideo.duration}` : ""}</p>
                 <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-sm leading-6 text-cyan-950">أثناء المشاهدة، تتبّع رأسًا واحدًا في الرسم وعدّ المثلثات التي تظهر. بعد تشغيل الفيديو ستتمكن من الانتقال إلى النشاط التالي.</p>
               </div>
           </section>

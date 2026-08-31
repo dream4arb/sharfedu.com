@@ -130,12 +130,13 @@ export interface InteractiveLessonDefinition {
   questions: LessonQuestionDefinition[];
   steps: LessonStepDefinition[];
   assessmentQuestionIds: string[];
-  video?: {
+  videos?: Array<{
+    id: string;
     title: string;
-    duration: string;
     url: string;
-    teacherName: string;
-  };
+    channelName?: string;
+    duration?: string;
+  }>;
   teacherSummary: TeacherSummaryDefinition;
   tutorKnowledge: TutorKnowledgeDefinition;
 }
