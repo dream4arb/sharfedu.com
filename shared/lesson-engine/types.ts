@@ -134,6 +134,9 @@ export interface InteractiveLessonDefinition {
     id: string;
     title: string;
     url: string;
+    source?: "youtube" | "hosted";
+    thumbnailUrl?: string;
+    captionsUrl?: string;
     channelName?: string;
     duration?: string;
   }>;

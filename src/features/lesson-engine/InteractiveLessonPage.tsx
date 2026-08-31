@@ -215,6 +215,7 @@ export default function InteractiveLessonPage() {
                   {lessonVideos.map((video, index) => {
                     const selected = selectedVideo?.id === video.id;
                     const played = playedVideoIds.includes(video.id);
+                    const thumbnailUrl = video.thumbnailUrl ?? `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
                     return (
                       <button
                         key={video.id}
@@ -224,8 +225,9 @@ export default function InteractiveLessonPage() {
                         className={`overflow-hidden rounded-2xl border-2 text-right transition ${selected ? "border-cyan-700 bg-cyan-50 ring-4 ring-cyan-100" : "border-slate-200 bg-white hover:border-cyan-300"}`}
                       >
                         <span className="relative block aspect-video overflow-hidden bg-slate-900">
-                          <img src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`} alt="" loading="lazy" className="h-full w-full object-cover" />
+                          <img src={thumbnailUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
                           <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35"><PlayCircle className="h-10 w-10 text-white" /></span>
+                          {video.source === "hosted" && <span className="absolute right-2 top-2 rounded-full bg-cyan-700 px-2 py-1 text-xs font-black text-white">شرح شارف</span>}
                           {played && <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2 py-1 text-xs font-black text-white">شاهدته</span>}
                         </span>
                         <span className="block p-3">
@@ -242,13 +244,37 @@ export default function InteractiveLessonPage() {
 
               <div className="aspect-video bg-slate-950">
                 {selectedVideo && loadedVideoId === selectedVideo.id ? (
-                  <iframe
-                    className="h-full w-full"
-                    src={selectedVideo.url}
-                    title={selectedVideo.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                  selectedVideo.source === "hosted" ? (
+                    <video
+                      className="h-full w-full"
+                      controls
+                      playsInline
+                      autoPlay
+                      preload="metadata"
+                      poster={selectedVideo.thumbnailUrl}
+                      aria-label={selectedVideo.title}
+                    >
+                      <source src={selectedVideo.url} type="video/mp4" />
+                      {selectedVideo.captionsUrl && (
+                        <track
+                          kind="subtitles"
+                          src={selectedVideo.captionsUrl}
+                          srcLang="ar"
+                          label="العربية"
+                          default
+                        />
+                      )}
+                      متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                  ) : (
+                    <iframe
+                      className="h-full w-full"
+                      src={selectedVideo.url}
+                      title={selectedVideo.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )
                 ) : (
                   <button
                     type="button"

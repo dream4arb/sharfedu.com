@@ -447,6 +447,16 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
   ],
   videos: [
     {
+      id: "sharaf-polygon-angles-whiteboard",
+      title: "شرح شارف الأصلي — سبورة تعليمية",
+      url: "/videos/sharaf-polygon-angles/sharaf-polygon-angles-whiteboard.mp4",
+      source: "hosted",
+      thumbnailUrl: "/videos/sharaf-polygon-angles/sharaf-polygon-angles-poster.jpg",
+      captionsUrl: "/videos/sharaf-polygon-angles/sharaf-polygon-angles-whiteboard.ar.vtt",
+      channelName: "منصة شارف التعليمية",
+      duration: "10:00",
+    },
+    {
       id: "_l49Ard1--U",
       title: "زوايا المضلع — الجزء الأول",
       url: "https://www.youtube-nocookie.com/embed/_l49Ard1--U?rel=0&modestbranding=1",
@@ -456,12 +466,6 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       id: "E-ndz2M-yfM",
       title: "زوايا المضلع — الجزء الثاني",
       url: "https://www.youtube-nocookie.com/embed/E-ndz2M-yfM?rel=0&modestbranding=1",
-      channelName: "منال التويجري رياضيات",
-    },
-    {
-      id: "20JoAErwksw",
-      title: "زوايا المضلع — شرح مبسط",
-      url: "https://www.youtube-nocookie.com/embed/20JoAErwksw?rel=0&modestbranding=1",
       channelName: "منال التويجري رياضيات",
     },
     {

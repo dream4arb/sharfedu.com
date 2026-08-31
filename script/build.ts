@@ -26,7 +26,7 @@ async function buildAll() {
   await rm("dist", { recursive: true, force: true });
 
   console.log("Building client...");
-  await viteBuild();
+  await viteBuild({ configLoader: "runner" });
 
   console.log("Building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));
@@ -37,11 +37,12 @@ async function buildAll() {
   const externals = allDeps.filter((dep) => !allowlist.includes(dep));
 
   await esbuild({
-    entryPoints: ["server/index.ts"],
+    entryPoints: ["./server/index.ts"],
+    absWorkingDir: root,
     platform: "node",
     bundle: true,
     format: "cjs",
-    outfile: "dist/index.cjs",
+    outfile: "./dist/index.cjs",
     define: {
       "process.env.NODE_ENV": '"production"',
       "import.meta.url": '""',
