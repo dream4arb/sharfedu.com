@@ -21,6 +21,7 @@ interface StoredLessonSession {
   lessonVersion: number;
   sessionId: string;
   stepIndex: number;
+  unlockedStepIndex: number;
   startedAt: string;
   completedAt?: string;
   questions: Record<string, QuestionProgress>;
@@ -48,6 +49,7 @@ function createSession(lesson: InteractiveLessonDefinition): StoredLessonSession
     lessonVersion: lesson.version,
     sessionId: crypto.randomUUID(),
     stepIndex: 0,
+    unlockedStepIndex: 0,
     startedAt: new Date().toISOString(),
     questions: {},
   };
@@ -60,7 +62,10 @@ function loadSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
     if (!raw) return createSession(lesson);
     const parsed = JSON.parse(raw) as StoredLessonSession;
     if (parsed.lessonVersion !== lesson.version || !parsed.sessionId) return createSession(lesson);
-    return parsed;
+    return {
+      ...parsed,
+      unlockedStepIndex: Math.max(parsed.stepIndex, parsed.unlockedStepIndex ?? parsed.stepIndex),
+    };
   } catch {
     return createSession(lesson);
   }
@@ -91,7 +96,12 @@ export function useLessonSession(lesson: InteractiveLessonDefinition) {
   }, [lesson.id, session.sessionId]);
 
   const setStepIndex = useCallback((stepIndex: number) => {
-    persist({ ...session, stepIndex: Math.max(0, Math.min(stepIndex, lesson.steps.length - 1)) });
+    const nextStepIndex = Math.max(0, Math.min(stepIndex, lesson.steps.length - 1));
+    persist({
+      ...session,
+      stepIndex: nextStepIndex,
+      unlockedStepIndex: Math.max(session.unlockedStepIndex ?? session.stepIndex, nextStepIndex),
+    });
   }, [lesson.steps.length, persist, session]);
 
   const recordAttempt = useCallback((input: {

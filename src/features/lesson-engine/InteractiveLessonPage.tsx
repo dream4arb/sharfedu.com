@@ -41,7 +41,7 @@ export default function InteractiveLessonPage() {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const assessmentEventSent = useRef(false);
   const currentStep = lesson.steps[session.stepIndex];
-  const progress = Math.round(((session.stepIndex + 1) / lesson.steps.length) * 100);
+  const progress = Math.round(((session.unlockedStepIndex + 1) / lesson.steps.length) * 100);
 
   useEffect(() => {
     setPageMeta({
@@ -56,12 +56,13 @@ export default function InteractiveLessonPage() {
     .filter(Boolean), [currentStep]);
 
   const stepComplete = useMemo(() => {
+    if (currentStep.type === "video") return videoLoaded;
     if (!currentQuestions.length) return true;
     if (currentStep.type === "assessment") {
       return currentQuestions.every((question) => (session.questions[question.id]?.attempts ?? 0) > 0);
     }
     return currentQuestions.every((question) => session.questions[question.id]?.correct === true);
-  }, [currentQuestions, currentStep.type, session.questions]);
+  }, [currentQuestions, currentStep.type, session.questions, videoLoaded]);
 
   useEffect(() => {
     const key = `sharaf:started-event:${lesson.id}:${session.sessionId}`;
@@ -136,8 +137,8 @@ export default function InteractiveLessonPage() {
             </section>
             <section className="rounded-3xl bg-gradient-to-l from-cyan-800 to-slate-900 p-6 text-white sm:p-8">
               <p className="text-sm font-bold text-cyan-200">طريقة التعلم</p>
-              <h2 className="mt-2 text-2xl font-black">شاهد، جرّب، ثم فسّر</h2>
-              <p className="mt-3 max-w-2xl leading-8 text-slate-200">ستبني القانون بنفسك من رسم تفاعلي. إذا أخطأت، ستحصل على ملاحظة مرتبطة بنوع الخطأ، ثم تلميح تدريجي ومحاولة جديدة.</p>
+              <h2 className="mt-2 text-2xl font-black">افهم، شاهد، حرّك، ثم طبّق</h2>
+              <p className="mt-3 max-w-2xl leading-8 text-slate-200">تبدأ بشرح واضح، ثم فيديو، ثم أنشطة رسم وسحب واختيار. إذا أخطأت، ستحصل على ملاحظة مرتبطة بنوع الخطأ ثم محاولة جديدة.</p>
             </section>
           </div>
         )}
@@ -178,8 +179,7 @@ export default function InteractiveLessonPage() {
         )}
 
         {step.type === "video" && (
-          <div className="space-y-5">
-            <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
               <div className="aspect-video bg-slate-950">
                 {videoLoaded ? (
                   <iframe
@@ -201,17 +201,27 @@ export default function InteractiveLessonPage() {
                   </button>
                 )}
               </div>
-              <div className="p-5"><h2 className="font-black text-slate-900">{lesson.video?.title}</h2><p className="mt-1 text-sm text-slate-500">{lesson.video?.teacherName}</p></div>
-            </section>
+              <div className="p-5">
+                <h2 className="font-black text-slate-900">{lesson.video?.title}</h2>
+                <p className="mt-1 text-sm text-slate-500">{lesson.video?.teacherName} · {lesson.video?.duration}</p>
+                <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-sm leading-6 text-cyan-950">أثناء المشاهدة، تتبّع رأسًا واحدًا في الرسم وعدّ المثلثات التي تظهر. بعد تشغيل الفيديو ستتمكن من الانتقال إلى النشاط التالي.</p>
+              </div>
+          </section>
+        )}
 
-            <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
-              <div className="flex items-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المعلم</h2></div>
-              <p className="mt-2 text-sm font-bold text-emerald-700">{lesson.teacherSummary.attribution}</p>
-              <ul className="mt-4 space-y-3">
-                {lesson.teacherSummary.points.map((point) => <li key={point} className="flex gap-3 leading-7 text-emerald-950"><Check className="mt-1 h-5 w-5 shrink-0" />{point}</li>)}
-              </ul>
-            </section>
-          </div>
+        {step.type === "teacher_summary" && (
+          <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
+            <div className="flex items-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المعلم</h2></div>
+            <p className="mt-2 text-sm font-bold text-emerald-700">{lesson.teacherSummary.attribution}</p>
+            <ol className="mt-5 grid gap-3 sm:grid-cols-2">
+              {lesson.teacherSummary.points.map((point, index) => (
+                <li key={point} className="flex gap-3 rounded-2xl border border-emerald-100 bg-white/80 p-4 leading-7 text-emerald-950">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-700 font-black text-white">{index + 1}</span>
+                  {point}
+                </li>
+              ))}
+            </ol>
+          </section>
         )}
 
         {step.type === "report" && <MasteryReport lesson={lesson} mastery={mastery} onReview={reviewSkill} />}
@@ -245,14 +255,14 @@ export default function InteractiveLessonPage() {
             <button
               key={step.id}
               type="button"
-              onClick={() => { if (index <= session.stepIndex) setStepIndex(index); }}
-              disabled={index > session.stepIndex}
+              onClick={() => { if (index <= session.unlockedStepIndex) setStepIndex(index); }}
+              disabled={index > session.unlockedStepIndex}
               aria-current={index === session.stepIndex ? "step" : undefined}
               className={`min-h-9 shrink-0 rounded-full px-3 text-xs font-bold transition ${
-                index === session.stepIndex ? "bg-cyan-800 text-white" : index < session.stepIndex ? "bg-cyan-50 text-cyan-800 hover:bg-cyan-100" : "bg-slate-100 text-slate-400"
+                index === session.stepIndex ? "bg-cyan-800 text-white" : index <= session.unlockedStepIndex ? "bg-cyan-50 text-cyan-800 hover:bg-cyan-100" : "bg-slate-100 text-slate-400"
               }`}
             >
-              {index < session.stepIndex && <Check className="ml-1 inline h-3.5 w-3.5" />}{index + 1}. {step.eyebrow}
+              {index < session.unlockedStepIndex && <Check className="ml-1 inline h-3.5 w-3.5" />}{index + 1}. {step.eyebrow}
             </button>
           ))}
         </nav>
@@ -264,7 +274,7 @@ export default function InteractiveLessonPage() {
 
           {currentStep.type !== "report" && (
             <footer className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5">
-              {!stepComplete && <p className="mb-3 text-center text-sm font-bold text-amber-700">أكمل {currentStep.type === "assessment" ? "جميع إجابات الاختبار" : "التحقق الحالي"} للانتقال إلى الخطوة التالية.</p>}
+              {!stepComplete && <p className="mb-3 text-center text-sm font-bold text-amber-700">{currentStep.type === "video" ? "شغّل الفيديو التعليمي للانتقال إلى النشاط التالي." : `أكمل ${currentStep.type === "assessment" ? "جميع إجابات الاختبار" : "التحقق الحالي"} للانتقال إلى الخطوة التالية.`}</p>}
               <div className="flex items-center justify-between gap-3">
                 <button type="button" onClick={previous} disabled={session.stepIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>
                 <span className="hidden text-sm font-bold text-slate-500 sm:inline">{session.stepIndex + 1} من {lesson.steps.length}</span>

@@ -15,6 +15,11 @@ export interface LessonSkillDefinition {
 export interface LessonQuestionOption {
   id: string;
   label: string;
+  visual?: {
+    kind: "polygon";
+    sides: number;
+    split?: boolean;
+  };
 }
 
 export interface LessonErrorPattern {
@@ -84,8 +89,29 @@ export interface LessonIntroductionExample {
 export interface LessonIntroductionDefinition {
   heading: string;
   paragraphs: string[];
+  foundationSteps: Array<{
+    title: string;
+    description: string;
+  }>;
   examples: LessonIntroductionExample[];
   takeaway: string;
+  formula: {
+    expression: string;
+    label: string;
+    parts: Array<{
+      symbol: string;
+      meaning: string;
+    }>;
+  };
+  workedExample: {
+    title: string;
+    steps: string[];
+    result: string;
+  };
+  commonMistake: {
+    wrong: string;
+    correction: string;
+  };
 }
 
 export interface InteractiveLessonDefinition {
