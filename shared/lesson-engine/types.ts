@@ -74,6 +74,20 @@ export interface TutorKnowledgeDefinition {
   outOfScopeReply: string;
 }
 
+export interface LessonIntroductionExample {
+  label: string;
+  sides: number;
+  triangles: number;
+  angleSum: number;
+}
+
+export interface LessonIntroductionDefinition {
+  heading: string;
+  paragraphs: string[];
+  examples: LessonIntroductionExample[];
+  takeaway: string;
+}
+
 export interface InteractiveLessonDefinition {
   id: string;
   version: number;
@@ -84,6 +98,7 @@ export interface InteractiveLessonDefinition {
   subject: string;
   unit: string;
   estimatedMinutes: number;
+  introduction: LessonIntroductionDefinition;
   objectives: string[];
   skills: LessonSkillDefinition[];
   questions: LessonQuestionDefinition[];

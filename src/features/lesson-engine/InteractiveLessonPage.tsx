@@ -18,6 +18,7 @@ import { polygonAnglesLesson, polygonAnglesQuestionMap } from "@shared/lesson-en
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
 import { MathFormula } from "./MathFormula";
+import { LessonIntroduction } from "./LessonIntroduction";
 import { PolygonLab } from "./PolygonLab";
 import { QuestionCard } from "./QuestionCard";
 import { TutorPanel } from "./TutorPanel";
@@ -119,6 +120,7 @@ export default function InteractiveLessonPage() {
 
         {step.type === "objectives" && (
           <div className="space-y-5">
+            <LessonIntroduction introduction={lesson.introduction} />
             <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
               <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
                 <span className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2"><Clock3 className="h-4 w-4" /> نحو {lesson.estimatedMinutes} دقيقة</span>

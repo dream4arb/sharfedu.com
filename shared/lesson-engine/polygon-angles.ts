@@ -12,6 +12,19 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
   subject: "الرياضيات",
   unit: "الأشكال الرباعية",
   estimatedMinutes: 22,
+  introduction: {
+    heading: "نحوّل المضلع إلى مثلثات نعرفها",
+    paragraphs: [
+      "المضلع شكل مغلق مكوّن من أضلاع مستقيمة، مثل المثلث والرباعي والخماسي.",
+      "بدل أن نحفظ مجموع زوايا كل شكل، نرسم خطوطًا من رأس واحد فنقسّم المضلع إلى مثلثات. ثم نجمع 180° مرة لكل مثلث.",
+    ],
+    examples: [
+      { label: "مثلث", sides: 3, triangles: 1, angleSum: 180 },
+      { label: "رباعي", sides: 4, triangles: 2, angleSum: 360 },
+      { label: "خماسي", sides: 5, triangles: 3, angleSum: 540 },
+    ],
+    takeaway: "لاحظ النمط: كلما أضفنا ضلعًا ظهر مثلث جديد. في الخطوات التالية ستكتشف بنفسك كيف يتحول هذا النمط إلى قانون.",
+  },
   objectives: [
     "أفسّر لماذا يمكن تقسيم المضلع من رأس واحد إلى مثلثات.",
     "أستنتج قانون مجموع الزوايا الداخلية وأستخدمه.",
@@ -249,9 +262,9 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     {
       id: "goals",
       type: "objectives",
-      eyebrow: "بداية الرحلة",
-      title: "ماذا ستكتشف اليوم؟",
-      tutorMessage: "لن أحفظك القانون مباشرة. سنبنيه معًا من مثلثات تعرفها.",
+      eyebrow: "شرح الدرس",
+      title: "افهم الفكرة قبل أن تجيب",
+      tutorMessage: "هذه الخطوة للشرح فقط، ولا يوجد فيها سؤال. اقرأ الفكرة وشاهد كيف يتحول المضلع إلى مثلثات.",
     },
     {
       id: "warmup",
