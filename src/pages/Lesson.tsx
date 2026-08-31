@@ -108,6 +108,7 @@ function VideoTabContent({
   metadata: Record<string, { title: string; channelName: string; duration: string }>;
   lessonTitle: string;
 }) {
+  const availableVideos = videos.filter((video) => video.url.trim()).slice(0, 4);
   const extractId = (url: string) => {
     const m = url.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&\n?#]+)/);
     return m ? m[1] : null;
@@ -118,7 +119,7 @@ function VideoTabContent({
     return id ? `https://www.youtube-nocookie.com/embed/${id}` : url;
   };
 
-  const firstEmbed = videos[0] ? toEmbed(videos[0].url) : null;
+  const firstEmbed = availableVideos[0] ? toEmbed(availableVideos[0].url) : null;
   const [selectedUrl, setSelectedUrl] = useState<string | null>(firstEmbed);
 
   useEffect(() => {
@@ -134,7 +135,7 @@ function VideoTabContent({
     ? selectedUrl + "?rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&fs=1&controls=1&disablekb=0&autoplay=0"
     : "";
 
-  if (videos.length === 0) return null;
+  if (availableVideos.length === 0) return null;
 
   return (
     <>
@@ -153,7 +154,7 @@ function VideoTabContent({
       <div className="mb-8">
         <h3 className="text-lg font-bold mb-4 text-foreground" id="video-list-heading">فيديوهات أخرى لنفس الدرس</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {videos.map((v, i) => {
+          {availableVideos.map((v, i) => {
             const emb = toEmbed(v.url);
             const vid = extractId(v.url);
             const isActive = vid && selectedId && vid === selectedId;
