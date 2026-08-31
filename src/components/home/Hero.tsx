@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowLeft, Sparkles, Star, Users, BookOpen } from "lucide-react";
+import { ArrowLeft, Sparkles, Bot, BookOpen } from "lucide-react";
 import { Link } from "wouter";
 import heroStudentImg from "@/assets/images/hero-student-new.jpg";
 
@@ -32,7 +32,7 @@ export function Hero() {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-primary/10 to-cyan-100/50 text-primary text-xs sm:text-sm font-bold mb-8 border border-primary/20"
             >
               <Sparkles className="w-4 h-4 shrink-0" />
-              <span className="break-words">منصة تعليمية متكاملة لجميع المراحل الدراسية</span>
+              <span className="break-words">تجربة تعليم تفاعلية عربية للمنهج السعودي</span>
             </motion.div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-foreground leading-[1.1] mb-6">
@@ -44,18 +44,18 @@ export function Hero() {
             </h1>
             
             <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              تعلّم بأسلوب عصري وممتع مع دروس تفاعلية، شروحات مبسطة، 
-              واختبارات ذكية تساعدك على التفوق في كل مادة.
+              تعلّم بالمحاولة والرسم والتغذية الراجعة، واسأل معلمًا افتراضيًا
+              يعرف الدرس ونقاط الفهم التي تحتاج إلى مراجعتها.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Link href="/register">
+              <Link href="/lesson/secondary/math/l-mm6el08l">
                 <Button 
                   size="lg" 
                   className="rounded-full font-bold shadow-lg shadow-primary/25"
                   data-testid="button-start-learning"
                 >
-                  ابدأ الآن مجاناً
+                  جرّب درس زوايا المضلع
                   <ArrowLeft className="mr-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -77,21 +77,21 @@ export function Hero() {
             <div className="flex items-center justify-center lg:justify-start gap-8">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-primary" />
+                  <BookOpen className="w-6 h-6 text-primary" />
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-black text-foreground">+20,000</div>
-                  <div className="text-sm text-muted-foreground">طالب مسجل</div>
+                  <div className="font-black text-foreground">تعلّم تفاعلي</div>
+                  <div className="text-sm text-muted-foreground">خطوة بخطوة</div>
                 </div>
               </div>
               <div className="w-px h-12 bg-border" />
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                  <Star className="w-6 h-6 text-amber-500 fill-amber-500" />
+                  <Bot className="w-6 h-6 text-amber-600" />
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-black text-foreground">4.9</div>
-                  <div className="text-sm text-muted-foreground">تقييم الطلاب</div>
+                  <div className="font-black text-foreground">شارف Tutor</div>
+                  <div className="text-sm text-muted-foreground">مرتبط بسياق الدرس</div>
                 </div>
               </div>
             </div>
@@ -152,8 +152,8 @@ export function Hero() {
                 <BookOpen className="w-6 h-6" />
               </div>
               <div className="text-right">
-                <div className="font-bold text-sm">+500 درس تفاعلي</div>
-                <div className="text-xs text-muted-foreground">في جميع المواد</div>
+                <div className="font-bold text-sm">محتوى قابل للتوسع</div>
+                <div className="text-xs text-muted-foreground">محرك واحد لدروس متعددة</div>
               </div>
             </motion.div>
           </motion.div>

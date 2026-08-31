@@ -10,6 +10,7 @@ const stages = [
     title: "المرحلة الابتدائية",
     subtitle: "الصف الأول - السادس",
     description: "أساسيات التعلم بأسلوب ممتع وتفاعلي",
+    comingSoon: true,
     icon: Baby,
     gradient: "from-sky-400 to-blue-500",
     bgGradient: "from-sky-50 to-blue-50",
@@ -23,6 +24,7 @@ const stages = [
     title: "المرحلة المتوسطة",
     subtitle: "الصف الأول - الثالث",
     description: "تعمق في المواد الدراسية الأساسية",
+    comingSoon: true,
     icon: BookOpen,
     gradient: "from-emerald-400 to-teal-500",
     bgGradient: "from-emerald-50 to-teal-50",
@@ -35,7 +37,7 @@ const stages = [
     id: "high",
     title: "المرحلة الثانوية",
     subtitle: "الصف الأول - الثالث",
-    description: "استعد للمرحلة الجامعية بثقة",
+    description: "نموذج درس زوايا المضلع متاح الآن",
     icon: GraduationCap,
     gradient: "from-violet-400 to-purple-500",
     bgGradient: "from-violet-50 to-purple-50",
@@ -91,7 +93,7 @@ export function StageSelector() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6">
             <BookOpen className="w-4 h-4" />
-            جميع المراحل الدراسية
+            خطة المراحل الدراسية
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-6">
             اختر{" "}
@@ -100,13 +102,13 @@ export function StageSelector() {
             </span>
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            منصة شارف تغطي جميع المراحل الدراسية من الابتدائية وحتى الثانوية، بالإضافة إلى المسارات واختبارات القدرات والتحصيلي
+            نبدأ بنموذج تفاعلي للمرحلة الثانوية، ونضيف بقية المراحل بعد تجهيز محتوى حقيقي واعتماده
           </p>
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {stages.map((stage, index) => {
-            const locked = profileComplete && !canAccessStage(stage.id, user) && !(stage as { comingSoon?: boolean }).comingSoon;
+            const locked = profileComplete && !canAccessStage(stage.id, user) && !(stage as { comingSoon?: boolean }).comingSoon && stage.id !== "high";
             return (
               <motion.div
                 key={stage.id}
@@ -134,7 +136,7 @@ export function StageSelector() {
                     </div>
                   </div>
                 ) : (
-                  <Link href={`/stage/${stage.id}`} data-testid={`link-stage-${stage.id}`} className="block h-full">
+                  <Link href={(stage as { comingSoon?: boolean }).comingSoon ? "/stages" : "/lesson/secondary/math/l-mm6el08l"} data-testid={`link-stage-${stage.id}`} className="block h-full">
                     <div className={`
                       group relative bg-white rounded-[1.5rem] p-6 border ${stage.borderColor}
                       shadow-lg hover:shadow-2xl ${stage.shadowColor}

@@ -17,7 +17,10 @@ if (envDb?.startsWith("file:")) {
 } else if (envDb) {
   dbUrl = `file:${path.resolve(process.cwd(), envDb)}`;
 } else {
-  dbUrl = `file:${path.resolve(__dirname, "..", "sqlite.db")}`;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("DATABASE_URL is required in production");
+  }
+  dbUrl = `file:${path.resolve(process.cwd(), ".local", "sharaf-dev.db")}`;
 }
 
 const client = createClient({

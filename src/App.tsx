@@ -15,6 +15,7 @@ const Profile = lazy(() => import("@/pages/Profile"));
 const Courses = lazy(() => import("@/pages/Courses"));
 const Stage = lazy(() => import("@/pages/Stage"));
 const Lesson = lazy(() => import("@/pages/Lesson"));
+const InteractiveLessonPage = lazy(() => import("@/features/lesson-engine/InteractiveLessonPage"));
 const PdfViewer = lazy(() => import("@/pages/PdfViewer"));
 const PdfExtractor = lazy(() => import("@/pages/PdfExtractor"));
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
@@ -109,6 +110,8 @@ function Router() {
           </Route>
           <Route path="/courses/:gradeLevel" component={Courses} />
           <Route path="/stage/:stageId" component={Stage} />
+          <Route path="/lesson/secondary/math/l-mm6el08l" component={InteractiveLessonPage} />
+          <Route path="/lesson/high/math/l-mm6el08l" component={InteractiveLessonPage} />
           <Route path="/lesson/:stage/:subject/:lessonId?" component={Lesson} />
           <Route path="/pdf-viewer" component={PdfViewer} />
           <Route path="/privacy" component={PrivacyPolicy} />

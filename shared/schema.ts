@@ -73,7 +73,7 @@ export type Course = typeof courses.$inferSelect;
 // Lesson Progress Tracking
 export const lessonProgress = sqliteTable("lesson_progress", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: integer("user_id").notNull(), // Reference to user
+  userId: text("user_id").notNull(), // UUID from users.id
   subjectSlug: text("subject_slug").notNull(), // e.g., 'math_high1_s2'
   lessonId: text("lesson_id").notNull(), // e.g., '5-1'
   lessonCompleted: integer("lesson_completed", { mode: "boolean" }).default(false),
@@ -164,3 +164,50 @@ export const seoData = sqliteTable("seo_data", {
   ogImage: text("og_image"),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
+
+// Sharaf 2.0: محاولات الطالب. لا نخزن نص الإجابة لتقليل البيانات الشخصية.
+export const lessonAttempts = sqliteTable("lesson_attempts", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id"),
+  sessionId: text("session_id").notNull(),
+  lessonId: text("lesson_id").notNull(),
+  questionId: text("question_id").notNull(),
+  skillId: text("skill_id").notNull(),
+  correct: integer("correct", { mode: "boolean" }).notNull(),
+  hintsUsed: integer("hints_used").notNull().default(0),
+  masteryScore: integer("mastery_score").notNull().default(0),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+export const skillMastery = sqliteTable(
+  "skill_mastery",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id").notNull(),
+    lessonId: text("lesson_id").notNull(),
+    skillId: text("skill_id").notNull(),
+    score: integer("score").notNull().default(0),
+    attempts: integer("attempts").notNull().default(0),
+    correctAttempts: integer("correct_attempts").notNull().default(0),
+    hintsUsed: integer("hints_used").notNull().default(0),
+    updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  },
+  (t) => [uniqueIndex("skill_mastery_user_lesson_skill").on(t.userId, t.lessonId, t.skillId)],
+);
+
+export const productEvents = sqliteTable("product_events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id"),
+  sessionId: text("session_id").notNull(),
+  lessonId: text("lesson_id").notNull(),
+  eventName: text("event_name").notNull(),
+  questionId: text("question_id"),
+  skillId: text("skill_id"),
+  stepId: text("step_id"),
+  metadata: text("metadata"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+export type LessonAttempt = typeof lessonAttempts.$inferSelect;
+export type SkillMastery = typeof skillMastery.$inferSelect;
+export type ProductEvent = typeof productEvents.$inferSelect;

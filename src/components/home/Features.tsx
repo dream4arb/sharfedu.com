@@ -1,41 +1,41 @@
 import { motion } from "framer-motion";
-import { BookOpen, Video, CheckCircle, Users, Zap, Award, Brain, Clock, Shield } from "lucide-react";
+import { Bot, ChartNoAxesColumnIncreasing, CheckCircle, FileCheck2, Shapes, Video, Zap } from "lucide-react";
 
 const features = [
   {
     icon: Video,
-    title: "دروس مصورة احترافية",
-    description: "شروحات فيديو عالية الجودة من نخبة المعلمين المتميزين بأسلوب سهل ومبسط",
+    title: "فيديو داخل رحلة الدرس",
+    description: "فيديو مدمج داخل رحلة التعلم عند الحاجة بدل التنقل بين صفحات منفصلة",
     gradient: "from-blue-500 to-cyan-500",
   },
   {
-    icon: Brain,
-    title: "تعلم ذكي تفاعلي",
-    description: "نظام ذكي يتكيف مع مستواك ويقدم لك محتوى مخصص يناسب قدراتك",
+    icon: Bot,
+    title: "شارف Tutor",
+    description: "معلم افتراضي يعرف سياق الدرس ومحاولات الطالب ويقدّم تلميحات متدرجة",
     gradient: "from-purple-500 to-pink-500",
   },
   {
     icon: CheckCircle,
-    title: "اختبارات فورية",
-    description: "اختبر نفسك بعد كل درس واحصل على تقييم فوري لمعرفة مستواك الحقيقي",
+    title: "تغذية راجعة تعليمية",
+    description: "لا يكتفي بقول إن الإجابة خاطئة؛ بل يشخّص نمط الخطأ ويتيح محاولة جديدة",
     gradient: "from-green-500 to-emerald-500",
   },
   {
-    icon: BookOpen,
-    title: "ملخصات شاملة",
-    description: "ملخصات مركزة لكل درس تسهل عليك المراجعة السريعة قبل الاختبارات",
+    icon: Shapes,
+    title: "رسومات تفاعلية",
+    description: "مكوّنات SVG مرنة وواضحة تساعد الطالب على اكتشاف المفهوم بنفسه",
     gradient: "from-amber-500 to-orange-500",
   },
   {
-    icon: Clock,
-    title: "تعلم في أي وقت",
-    description: "منصة متاحة على مدار الساعة، تعلم من أي مكان وفي أي وقت يناسبك",
+    icon: ChartNoAxesColumnIncreasing,
+    title: "إتقان حسب المهارة",
+    description: "تقرير مبني على المحاولات والتلميحات يوضح ما أتقنه الطالب وما يحتاج مراجعة",
     gradient: "from-red-500 to-rose-500",
   },
   {
-    icon: Award,
-    title: "شهادات إنجاز",
-    description: "احصل على شهادات معتمدة تثبت إتمامك للدورات وتفوقك الدراسي",
+    icon: FileCheck2,
+    title: "ملخص واضح المصدر",
+    description: "تظهر حالة اعتماد الملخص بوضوح، ولا ننسب محتوى إلى معلم قبل مراجعته",
     gradient: "from-primary to-cyan-500",
   },
 ];

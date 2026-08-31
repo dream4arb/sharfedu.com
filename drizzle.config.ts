@@ -5,6 +5,7 @@ export default defineConfig({
   schema: "./shared/schema.ts",
   out: "./drizzle",
   dbCredentials: {
-    url: "file:sqlite.db",
+    // قاعدة التطوير منفصلة افتراضيًا؛ يجب تمرير DATABASE_URL صراحة في البيئات المنشورة.
+    url: process.env.DATABASE_URL || "file:.local/sharaf-dev.db",
   },
 });

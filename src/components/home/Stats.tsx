@@ -1,29 +1,29 @@
 import { motion } from "framer-motion";
-import { Users, BookOpen, Award, Clock } from "lucide-react";
+import { Bot, ChartNoAxesColumnIncreasing, MousePointer2, Shapes } from "lucide-react";
 
 const stats = [
   {
-    icon: Users,
-    value: "+20,000",
-    label: "طالب مسجل",
+    icon: MousePointer2,
+    value: "تعلّم بالمشاركة",
+    label: "أسئلة ومحاولات أثناء الشرح",
     gradient: "from-blue-500 to-cyan-500",
   },
   {
-    icon: BookOpen,
-    value: "+500",
-    label: "درس تفاعلي",
+    icon: Shapes,
+    value: "رسم تفاعلي",
+    label: "SVG واضح على كل الشاشات",
     gradient: "from-emerald-500 to-green-500",
   },
   {
-    icon: Award,
-    value: "+1,000",
-    label: "شهادة صادرة",
+    icon: Bot,
+    value: "معلم سياقي",
+    label: "يفهم الدرس والمحاولات السابقة",
     gradient: "from-amber-500 to-orange-500",
   },
   {
-    icon: Clock,
-    value: "+10,000",
-    label: "ساعة تعلم",
+    icon: ChartNoAxesColumnIncreasing,
+    value: "إتقان المهارات",
+    label: "تقرير يوضح ما يحتاج مراجعة",
     gradient: "from-purple-500 to-pink-500",
   },
 ];
@@ -54,7 +54,7 @@ export function Stats() {
                 <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center text-white mb-4 shadow-lg`}>
                   <stat.icon className="w-8 h-8" />
                 </div>
-                <div className="text-4xl lg:text-5xl font-black text-white mb-2">{stat.value}</div>
+                <div className="text-xl lg:text-2xl font-black text-white mb-2">{stat.value}</div>
                 <div className="text-white/60 font-medium">{stat.label}</div>
               </motion.div>
             ))}

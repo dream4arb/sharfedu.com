@@ -43,12 +43,12 @@ export function CTA() {
             </h2>
             
             <p className="text-white/90 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
-              انضم لآلاف الطلاب الذين يتعلمون مع شارف كل يوم.
-              سجّل الآن مجاناً وابدأ رحلتك نحو النجاح!
+              ابدأ بالنموذج التفاعلي لدرس زوايا المضلع، وجرّب الرسم والأسئلة
+              ومعلم شارف وتقرير الإتقان في رحلة واحدة.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/stage/middle">
+              <Link href="/lesson/secondary/math/l-mm6el08l">
                 <Button 
                   size="lg" 
                   className="bg-white text-primary rounded-full font-bold shadow-xl"

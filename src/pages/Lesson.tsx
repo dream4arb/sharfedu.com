@@ -568,8 +568,6 @@ export default function Lesson() {
     const sg = typeof window !== "undefined" ? sessionStorage.getItem("lesson_grade") : null;
     const ss = typeof window !== "undefined" ? sessionStorage.getItem("lesson_stage") : null;
     if (ss && sg && gradeShortMap[ss]?.[sg]) return gradeShortMap[ss][sg];
-    const fromUrl = subjectData?.grades?.[0];
-    if (fromUrl && gradeShortMap[internalStage]?.[String(fromUrl)]) return gradeShortMap[internalStage][String(fromUrl)];
     return stageShortNames[internalStage] || "";
   })();
   const currentSemesterName = (() => {

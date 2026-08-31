@@ -8,8 +8,13 @@ import { db } from "../db";
 import { users, passwordResetCodes } from "@shared/schema";
 import { eq, and, gt } from "drizzle-orm";
 import { sendPasswordResetCode } from "../lib/sendMail";
+import rateLimit from "express-rate-limit";
+import { randomInt } from "crypto";
 
 const router = Router();
+
+const authLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 20, standardHeaders: true, legacyHeaders: false });
+const recoveryLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 6, standardHeaders: true, legacyHeaders: false });
 
 declare global {
   namespace Express {
@@ -26,7 +31,9 @@ declare global {
   }
 }
 
-function toPublicUser(u: typeof users.$inferSelect) {
+type PublicUserSource = Pick<typeof users.$inferSelect, "id" | "email" | "firstName" | "lastName" | "profileImageUrl" | "role" | "stageSlug" | "gradeId">;
+
+function toPublicUser(u: PublicUserSource) {
   return {
     id: u.id,
     email: u.email,
@@ -126,7 +133,7 @@ router.get("/user", (req, res) => {
   res.json(null);
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body as { email?: string; password?: string };
     const emailNorm = String(email ?? "").toLowerCase().trim();
@@ -157,7 +164,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", (req, res, next) => {
+router.post("/login", authLimiter, (req, res, next) => {
   passport.authenticate("local", (err: Error | null, user: Express.User | false, info?: { message?: string }) => {
     if (err) return res.status(500).json({ message: err.message || "خطأ في الخادم." });
     if (!user) return res.status(401).json({ message: info?.message || "البريد أو كلمة المرور غير صحيحة." });
@@ -175,28 +182,28 @@ router.post("/logout", (req, res, next) => {
   });
 });
 
-router.post("/forgot-password", async (req, res) => {
+router.post("/forgot-password", recoveryLimiter, async (req, res) => {
   try {
     const email = String(req.body?.email ?? "").toLowerCase().trim();
     if (!email) return res.status(400).json({ message: "البريد الإلكتروني مطلوب." });
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const genericMessage = "إذا كان البريد مسجّلًا فسيصلك رمز الاستعادة خلال دقائق.";
+    const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+    if (existing.length === 0) return res.json({ message: genericMessage });
+    const code = String(randomInt(100000, 1000000));
+    const codeHash = await bcrypt.hash(code, 10);
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
     await db.delete(passwordResetCodes).where(eq(passwordResetCodes.email, email));
-    await db.insert(passwordResetCodes).values({ email, code, expiresAt });
+    await db.insert(passwordResetCodes).values({ email, code: codeHash, expiresAt });
     const result = await sendPasswordResetCode(email, code);
-    const message = result.sent
-      ? "تم إرسال الرمز إلى بريدك."
-      : result.error
-        ? `تم إنشاء الرمز لكن فشل الإرسال: ${result.error}`
-        : "تم إنشاء الرمز. (الإرسال الفعلي يتطلب إعداد SMTP في .env.)";
-    res.json({ message, code: result.sent ? undefined : code });
+    if (!result.sent) console.error("[Password reset] Delivery failed:", result.error ?? "SMTP is not configured");
+    res.json({ message: genericMessage });
   } catch (e) {
     console.error("Forgot password error:", e);
     res.status(500).json({ message: "خطأ في الخادم." });
   }
 });
 
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", recoveryLimiter, async (req, res) => {
   try {
     const { email, code, newPassword } = req.body as { email?: string; code?: string; newPassword?: string };
     const emailNorm = String(email ?? "").toLowerCase().trim();
@@ -209,12 +216,13 @@ router.post("/reset-password", async (req, res) => {
       .where(
         and(
           eq(passwordResetCodes.email, emailNorm),
-          eq(passwordResetCodes.code, String(code).trim()),
           gt(passwordResetCodes.expiresAt, now)
         )
       )
       .limit(1);
-    if (rows.length === 0) return res.status(400).json({ message: "الرمز غير صالح أو منتهي الصلاحية." });
+    if (rows.length === 0 || !(await bcrypt.compare(String(code).trim(), rows[0].code))) {
+      return res.status(400).json({ message: "الرمز غير صالح أو منتهي الصلاحية." });
+    }
     const hash = await bcrypt.hash(newPassword, 10);
     await db.update(users).set({ password: hash, updatedAt: now }).where(eq(users.email, emailNorm));
     await db.delete(passwordResetCodes).where(eq(passwordResetCodes.email, emailNorm));

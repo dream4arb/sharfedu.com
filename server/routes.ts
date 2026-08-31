@@ -5,20 +5,23 @@ import passport from "passport";
 import { type Server } from "http";
 import { storage } from "./storage";
 import { db, ensurePasswordResetTable } from "./db";
-import { platformStats } from "@shared/schema";
+import { cmsContent, platformStats } from "@shared/schema";
 import { api } from "@shared/routes";
 import { getGeminiClient, getGeminiModel } from "./lib/gemini";
 import pdfExtractorRoutes from "./routes/pdf-extractor";
 import extractQuestionsRoutes from "./routes/extract-questions";
 import adminRoutes from "./admin/adminRoutes";
 import contentRoutes from "./admin/contentRoutes";
-import authRoutes from "./auth/authRoutes";
+import authRoutes, { requireAuth } from "./auth/authRoutes";
+import lessonEngineRoutes from "./routes/lessonEngine";
 import { createSessionStore } from "./auth/sessionStore";
 import { requireAdmin } from "./middleware/adminAuth";
 import path from "path";
 import { access } from "fs/promises";
+import rateLimit from "express-rate-limit";
 
 const SAFE_NAME = /^[a-zA-Z0-9._-]+$/;
+const ratingLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 10, standardHeaders: true, legacyHeaders: false });
 
 export async function registerRoutes(httpServer: Server, app: Express) {
   const { initHierarchy } = await import("./admin/hierarchyStore");
@@ -41,9 +44,11 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.sendFile(filePath);
   });
 
-  app.post("/api/lesson-rating", (req, res) => {
+  app.post("/api/lesson-rating", ratingLimiter, (req, res) => {
     const { lessonId, lessonTitle, rating, comment, stage, subject } = req.body;
-    if (!lessonId || !rating || rating < 1 || rating > 5) {
+    const safeLessonId = String(lessonId ?? "").trim();
+    const numericRating = Number(rating);
+    if (!/^[a-zA-Z0-9_-]{1,80}$/.test(safeLessonId) || !Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
       return res.status(400).json({ error: "Invalid rating" });
     }
     try {
@@ -57,12 +62,12 @@ export async function registerRoutes(httpServer: Server, app: Express) {
       try { ratings = JSON.parse(fs.readFileSync(ratingsFile, "utf-8")); } catch {}
       const user = (req as any).user;
       ratings.push({
-        lessonId,
-        lessonTitle: lessonTitle || lessonId,
-        rating: Number(rating),
-        comment: comment?.trim() || "",
-        stage: stage || "",
-        subject: subject || "",
+        lessonId: safeLessonId,
+        lessonTitle: String(lessonTitle ?? safeLessonId).trim().slice(0, 160),
+        rating: numericRating,
+        comment: String(comment ?? "").trim().slice(0, 800),
+        stage: String(stage ?? "").trim().slice(0, 80),
+        subject: String(subject ?? "").trim().slice(0, 80),
         userId: user?.id || null,
         userName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email : "زائر",
         timestamp: new Date().toISOString(),
@@ -85,24 +90,22 @@ export async function registerRoutes(httpServer: Server, app: Express) {
         { loc: "/", changefreq: "weekly", priority: "1.0" },
         { loc: "/features", changefreq: "monthly", priority: "0.8" },
         { loc: "/stages", changefreq: "monthly", priority: "0.9" },
-        { loc: "/login", changefreq: "monthly", priority: "0.5" },
-        { loc: "/register", changefreq: "monthly", priority: "0.6" },
         { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
+        { loc: "/lesson/secondary/math/l-mm6el08l", changefreq: "monthly", priority: "0.9" },
       ];
 
+      const publishedRows = await db.select({ lessonId: cmsContent.lessonId, tabType: cmsContent.tabType, dataValue: cmsContent.dataValue }).from(cmsContent);
+      const publishedIds = new Set(publishedRows.filter((row) => row.tabType === "lesson" && row.dataValue.trim().length > 0).map((row) => row.lessonId));
+      const allLessons = getAllLessons().filter((lesson) => publishedIds.has(lesson.lessonId));
       const stagePages: { loc: string; changefreq: string; priority: string }[] = [];
-      const hierarchy = getFullHierarchy();
-      for (const stage of hierarchy) {
-        stagePages.push({ loc: `/stage/${stage.slug}`, changefreq: "weekly", priority: "0.9" });
-        for (const grade of stage.grades ?? []) {
-          for (const subject of grade.subjects) {
-            stagePages.push({ loc: `/lesson/${stage.slug}/${subject.slug}`, changefreq: "weekly", priority: "0.8" });
-          }
-        }
+      for (const stageSlug of new Set(allLessons.map((lesson) => lesson.stageSlug))) {
+        stagePages.push({ loc: `/stage/${stageSlug}`, changefreq: "weekly", priority: "0.8" });
+      }
+      for (const subjectPath of new Set(allLessons.map((lesson) => `${lesson.stageSlug}/${lesson.subjectSlug}`))) {
+        stagePages.push({ loc: `/lesson/${subjectPath}`, changefreq: "weekly", priority: "0.7" });
       }
 
       const lessonPages: { loc: string; changefreq: string; priority: string }[] = [];
-      const allLessons = getAllLessons();
       for (const lesson of allLessons) {
         lessonPages.push({
           loc: `/lesson/${lesson.stageSlug}/${lesson.subjectSlug}/${lesson.lessonId}`,
@@ -111,7 +114,7 @@ export async function registerRoutes(httpServer: Server, app: Express) {
         });
       }
 
-      const allPages = [...staticPages, ...stagePages, ...lessonPages];
+      const allPages = [...new Map([...staticPages, ...stagePages, ...lessonPages].map((page) => [page.loc, page])).values()];
 
       let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
       xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
@@ -226,10 +229,14 @@ export async function registerRoutes(httpServer: Server, app: Express) {
 
   const sessionStore = createSessionStore();
   const isSecure = process.env.NODE_ENV === "production" && (process.env.BASE_URL?.startsWith("https:") ?? false);
+  const sessionSecret = process.env.SESSION_SECRET?.trim();
+  if (process.env.NODE_ENV === "production" && !sessionSecret) {
+    throw new Error("SESSION_SECRET is required in production");
+  }
   app.use(
     session({
       store: sessionStore,
-      secret: process.env.SESSION_SECRET || "sharf-edu-session-secret-change-in-production",
+      secret: sessionSecret || "local-development-session-secret",
       resave: false,
       saveUninitialized: false,
       name: "sharf.sid",
@@ -245,6 +252,7 @@ export async function registerRoutes(httpServer: Server, app: Express) {
   app.use(passport.session());
 
   app.use("/api/auth", authRoutes);
+  app.use("/api", lessonEngineRoutes);
 
   app.get("/api/admin/lesson-ratings", requireAdmin, (_req, res) => {
     const ratingsFile = path.resolve(process.cwd(), "server", "data", "lesson-ratings.json");
@@ -545,12 +553,13 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.json(courses);
   });
 
-  app.post("/api/progress/lesson", async (req, res) => {
+  app.post("/api/progress/lesson", requireAuth, async (req, res) => {
     try {
-      const { userId, subjectSlug, lessonId, lessonCompleted, videoCompleted, questionsScore, questionsProgress, totalProgress } = req.body;
+      const { subjectSlug, lessonId, lessonCompleted, videoCompleted, questionsScore, questionsProgress, totalProgress } = req.body;
+      const userId = req.user!.id;
       
       if (!userId || !subjectSlug || !lessonId) {
-        return res.status(400).json({ error: "userId, subjectSlug, and lessonId are required" });
+        return res.status(400).json({ error: "subjectSlug and lessonId are required" });
       }
 
       const progress = await storage.saveLessonProgress(
@@ -567,14 +576,14 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     }
   });
 
-  app.get("/api/progress/lesson", async (req, res) => {
+  app.get("/api/progress/lesson", requireAuth, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
+      const userId = req.user!.id;
       const subjectSlug = req.query.subjectSlug as string;
       const lessonId = req.query.lessonId as string;
 
       if (!userId || !subjectSlug || !lessonId) {
-        return res.status(400).json({ error: "userId, subjectSlug, and lessonId are required" });
+        return res.status(400).json({ error: "subjectSlug and lessonId are required" });
       }
 
       const progress = await storage.getLessonProgress(userId, subjectSlug, lessonId);
@@ -585,14 +594,10 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     }
   });
 
-  app.get("/api/progress/user", async (req, res) => {
+  app.get("/api/progress/user", requireAuth, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
+      const userId = req.user!.id;
       const subjectSlug = req.query.subjectSlug as string | undefined;
-
-      if (!userId) {
-        return res.status(400).json({ error: "userId is required" });
-      }
 
       const progress = await storage.getUserProgress(userId, subjectSlug);
       res.json(progress);
@@ -601,25 +606,6 @@ export async function registerRoutes(httpServer: Server, app: Express) {
       res.status(500).json({ error: "Failed to get user progress" });
     }
   });
-
-  const existingCourses = await storage.getCourses();
-  if (existingCourses.length === 0) {
-    const initialCourses = [
-      { title: "العلوم", description: "استكشف عجائب الطبيعة والكون", gradeLevel: "1", stageSlug: "elementary", subjectSlug: "science", imageUrl: "https://placehold.co/600x400?text=Science+1" },
-      { title: "الرياضيات", description: "أساسيات الحساب والمنطق", gradeLevel: "1", stageSlug: "elementary", subjectSlug: "math", imageUrl: "https://placehold.co/600x400?text=Math+1" },
-      { title: "الاجتماعيات", description: "تاريخنا وحضارتنا العريقة", gradeLevel: "1", stageSlug: "elementary", subjectSlug: "social", imageUrl: "https://placehold.co/600x400?text=Social+1" },
-      { title: "العلوم", description: "تجارب علمية متقدمة", gradeLevel: "2", stageSlug: "elementary", subjectSlug: "science", imageUrl: "https://placehold.co/600x400?text=Science+2" },
-      { title: "الرياضيات", description: "الجبر والهندسة للمستوى الثاني", gradeLevel: "2", stageSlug: "elementary", subjectSlug: "math", imageUrl: "https://placehold.co/600x400?text=Math+2" },
-      { title: "الاجتماعيات", description: "الجغرافيا والمجتمع", gradeLevel: "2", stageSlug: "elementary", subjectSlug: "social", imageUrl: "https://placehold.co/600x400?text=Social+2" },
-      { title: "العلوم", description: "التحضير للفيزياء والكيمياء", gradeLevel: "3", stageSlug: "elementary", subjectSlug: "science", imageUrl: "https://placehold.co/600x400?text=Science+3" },
-      { title: "الرياضيات", description: "التحليل الرياضي المتقدم", gradeLevel: "3", stageSlug: "elementary", subjectSlug: "math", imageUrl: "https://placehold.co/600x400?text=Math+3" },
-      { title: "الاجتماعيات", description: "التاريخ الحديث والمعاصر", gradeLevel: "3", stageSlug: "elementary", subjectSlug: "social", imageUrl: "https://placehold.co/600x400?text=Social+3" },
-    ];
-
-    for (const course of initialCourses) {
-      await storage.createCourse(course);
-    }
-  }
 
   return httpServer;
 }

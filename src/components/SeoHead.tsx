@@ -37,6 +37,14 @@ export function SeoHead() {
 
   useEffect(() => {
     const path = pathname || "/";
+    const privatePaths = ["/login", "/register", "/forgot-password", "/reset-password", "/dashboard", "/profile", "/admin", "/pdf-viewer"];
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots) {
+      robots = document.createElement("meta");
+      robots.setAttribute("name", "robots");
+      document.head.appendChild(robots);
+    }
+    robots.setAttribute("content", privatePaths.some((item) => path === item || path.startsWith(`${item}/`)) ? "noindex, nofollow" : "index, follow");
     const managedByPage = PAGES_WITH_OWN_SEO.some((p) => p === path || (p.endsWith("/") && path.startsWith(p)));
     if (managedByPage) return;
 
