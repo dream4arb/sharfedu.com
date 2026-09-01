@@ -18,6 +18,7 @@ import { polygonAnglesLesson, polygonAnglesQuestionMap } from "@shared/lesson-en
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
 import { LessonIntroduction } from "./LessonIntroduction";
+import { OfficialBookLesson } from "./OfficialBookLesson";
 import { PolygonLab } from "./PolygonLab";
 import { QuestionCard } from "./QuestionCard";
 import { TutorPanel } from "./TutorPanel";
@@ -109,6 +110,14 @@ export default function InteractiveLessonPage() {
     if (currentStep.type === "report") completeLesson();
   }, [completeLesson, currentStep.type, emitEvent, stepComplete]);
 
+  useEffect(() => {
+    if (currentStep.type !== "official_book") return;
+    const key = `sharaf:book-opened-event:${lesson.id}:${session.sessionId}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    emitEvent({ name: "book_opened", stepId: currentStep.id, metadata: { pages: lesson.curriculumSource.lessonPages?.length ?? 0 } });
+  }, [currentStep.id, currentStep.type, emitEvent, session.sessionId]);
+
   function next() {
     if (!stepComplete || session.stepIndex >= lesson.steps.length - 1) return;
     setStepIndex(session.stepIndex + 1);
@@ -167,9 +176,16 @@ export default function InteractiveLessonPage() {
             <section className="rounded-3xl bg-gradient-to-l from-cyan-800 to-slate-900 p-6 text-white sm:p-8">
               <p className="text-sm font-bold text-cyan-200">طريقة التعلم</p>
               <h2 className="mt-2 text-2xl font-black">افهم، شاهد، حرّك، ثم طبّق</h2>
-              <p className="mt-3 max-w-2xl leading-8 text-slate-200">تبدأ بشرح واضح، ثم فيديو، ثم أنشطة رسم وحركة بلا درجات. بعد أن تستوعب الفكرة يأتي اختبار واحد، وتحصل فيه على ملاحظة مرتبطة بنوع الخطأ ثم محاولة جديدة.</p>
+              <p className="mt-3 max-w-2xl leading-8 text-slate-200">تبدأ بشرح واضح، ثم تستطيع مراجعة صفحات الدرس في كتاب الوزارة، وبعدها تختار شرح الفيديو الأنسب لك. تتابع بأنشطة رسم وحركة بلا درجات، ثم يأتي اختبار واحد بتغذية راجعة مرتبطة بنوع الخطأ.</p>
             </section>
           </div>
+        )}
+
+        {step.type === "official_book" && (
+          <OfficialBookLesson
+            source={lesson.curriculumSource}
+            onPageViewed={(pageNumber) => emitEvent({ name: "book_page_viewed", stepId: step.id, metadata: { pageNumber } })}
+          />
         )}
 
         {step.id === "warmup" && <PolygonPatternExplorer />}

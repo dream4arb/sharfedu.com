@@ -197,17 +197,19 @@ export function MissingAngleLab() {
       </div>
 
       <div className="mt-5 grid items-center gap-6 lg:grid-cols-2">
-        <div className="rounded-3xl bg-slate-50 p-3">
-          <svg viewBox="0 0 290 260" className="mx-auto aspect-[29/26] w-full max-w-[430px]" role="img" aria-label="رباعي زواياه تسعون وتسعون ومئة وخمس وثلاثون وزاوية مجهولة">
+        <div className="rounded-3xl border border-slate-100 bg-slate-50 p-4">
+          <svg viewBox="20 90 250 150" className="mx-auto aspect-[5/3] w-full max-w-[500px]" role="img" aria-label="رباعي زواياه تسعون وتسعون ومئة وخمس وثلاثون وزاوية مجهولة">
             <polygon points="45,220 245,220 145,120 45,120" fill="#f5f3ff" stroke="#6d28d9" strokeWidth="5" strokeLinejoin="round" />
             <path d="M 45 190 A 30 30 0 0 1 75 220 L 45 220 Z" fill={stage >= 1 ? "#f59e0b" : "#e2e8f0"} />
             <path d="M 166.2 141.2 A 30 30 0 0 1 115 120 L 145 120 Z" fill={stage >= 1 ? "#0891b2" : "#e2e8f0"} />
             <path d="M 75 120 A 30 30 0 0 1 45 150 L 45 120 Z" fill={stage >= 1 ? "#7c3aed" : "#e2e8f0"} />
             <path d="M 215 220 A 30 30 0 0 1 223.8 198.8 L 245 220 Z" fill={stage >= 3 ? "#059669" : "#ffffff"} stroke="#059669" strokeWidth="3" />
-            <text x="68" y="198" textAnchor="middle" className={`${stage >= 1 ? "fill-white" : "fill-slate-700"} text-[16px] font-black`}>90°</text>
-            <text x="145" y="153" textAnchor="middle" className={`${stage >= 1 ? "fill-white" : "fill-slate-700"} text-[16px] font-black`}>135°</text>
-            <text x="68" y="145" textAnchor="middle" className={`${stage >= 1 ? "fill-white" : "fill-slate-700"} text-[16px] font-black`}>90°</text>
-            <text x="217" y="199" textAnchor="middle" className={`text-[18px] font-black ${stage >= 3 ? "fill-white" : "fill-emerald-700"}`}>{stage >= 3 ? "45°" : "؟"}</text>
+            <g aria-hidden="true" fill="#0f172a" stroke="#ffffff" strokeWidth="4" strokeLinejoin="round" paintOrder="stroke">
+              <text x="68" y="199" textAnchor="middle" className="text-[16px] font-black">90°</text>
+              <text x="145" y="154" textAnchor="middle" className="text-[16px] font-black">135°</text>
+              <text x="68" y="146" textAnchor="middle" className="text-[16px] font-black">90°</text>
+              <text x="217" y="200" textAnchor="middle" className="text-[17px] font-black">{stage >= 3 ? "45°" : "؟"}</text>
+            </g>
           </svg>
         </div>
 

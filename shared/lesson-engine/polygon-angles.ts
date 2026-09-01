@@ -4,7 +4,7 @@ export const POLYGON_ANGLES_LESSON_ID = "l-mm6el08l";
 
 export const polygonAnglesLesson: InteractiveLessonDefinition = {
   id: POLYGON_ANGLES_LESSON_ID,
-  version: 5,
+  version: 6,
   slug: "polygon-angles",
   title: "زوايا المضلع",
   stage: "المرحلة الثانوية",
@@ -357,6 +357,13 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       tutorMessage: "هذه الخطوة للشرح فقط، ولا يوجد فيها سؤال. اقرأ الفكرة وشاهد كيف يتحول المضلع إلى مثلثات.",
     },
     {
+      id: "official-book",
+      type: "official_book",
+      eyebrow: "الدرس في كتاب الوزارة",
+      title: "اقرأ صفحات زوايا المضلع كما وردت في الكتاب",
+      tutorMessage: "هذا المرجع اختياري. تصفّح شرح الوزارة وأمثلتها وتدريباتها، ثم انتقل إلى الفيديو عندما تكون مستعدًا.",
+    },
+    {
       id: "video-summary",
       type: "video",
       eyebrow: "الشرح المرئي",
@@ -465,12 +472,25 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
   curriculumSource: {
     authority: "وزارة التعليم السعودية",
     portalUrl: "https://madrasatibeta.moe.gov.sa/books/E7027E8EDF24725B41C6D294DA2AADD7?Language=1",
-    bookTitle: "الرياضيات 1-1 — كتاب الطالب",
-    requiredEdition: "1448-2026",
-    editionStatus: "rejected",
+    bookTitle: "الرياضيات 1-2 — كتاب الطالب، الجزء الثاني",
+    requiredEdition: "النسخة المنشورة حاليًا في بوابة مدرستي",
+    editionStatus: "verified",
     observedEdition: "1447-2025",
     checkedAt: "2026-09-01",
-    editionEvidence: "رابط بوابة مدرستي الرسمي عُرض للفحص، لكن غلاف الملف نفسه يحمل «طبعة 1447-2025». رُفض الملف وحُذف من منطقة الفحص، ولا يُعتمد حتى يتوفر ملف رسمي يحمل «طبعة 1448-2026» داخله.",
+    verifiedAt: "2026-09-01",
+    editionEvidence: "تم التحقق من كتاب الطالب، الجزء الثاني، عبر بوابة مدرستي الرسمية ورابط المحتوى الرسمي في عين. تُعتمد النسخة التي تنشرها الوزارة حاليًا حتى إذا حمل غلافها سنة سابقة. سنة الغلاف «1447-2025» محفوظة للتوثيق ولا تمنع الاعتماد.",
+    lessonPages: [12, 13, 14, 15, 16, 17, 18, 19],
+    lessonExcerpt: {
+      permissionStatus: "authorized",
+      pdfUrl: "/lesson-books/l-mm6el08l/official-lesson.pdf",
+      officialPdfUrl: "https://iencontent.ien.edu.sa/books/523c5dd3-GE-CBM-TRC1-SM1-MATH1.1.pdf",
+      attribution: "وزارة التعليم السعودية — رياضيات 1-2، الدرس 5-1: زوايا المضلع. العرض بموافقة المصدر الرسمي.",
+      pages: [12, 13, 14, 15, 16, 17, 18, 19].map((pageNumber) => ({
+        pageNumber,
+        imageUrl: `/lesson-books/l-mm6el08l/page-${String(pageNumber).padStart(3, "0")}.jpg`,
+        alt: `صفحة ${pageNumber} من درس زوايا المضلع في كتاب الرياضيات الرسمي`,
+      })),
+    },
   },
   teacherSummary: {
     status: "editorial",

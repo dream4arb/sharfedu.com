@@ -70,6 +70,8 @@ const eventNames = [
   "answer_wrong",
   "hint_requested",
   "tutor_question",
+  "book_opened",
+  "book_page_viewed",
   "video_started",
   "assessment_completed",
 ] as const;

@@ -46,6 +46,7 @@ export interface LessonQuestionDefinition {
 
 export type LessonStepType =
   | "objectives"
+  | "official_book"
   | "warmup"
   | "polygon_discovery"
   | "concept"
@@ -91,6 +92,17 @@ export interface CurriculumSourceDefinition {
   checkedAt?: string;
   verifiedAt?: string;
   lessonPages?: number[];
+  lessonExcerpt?: {
+    permissionStatus: "authorized";
+    pdfUrl: string;
+    officialPdfUrl: string;
+    attribution: string;
+    pages: Array<{
+      pageNumber: number;
+      imageUrl: string;
+      alt: string;
+    }>;
+  };
 }
 
 export interface LessonIntroductionExample {
