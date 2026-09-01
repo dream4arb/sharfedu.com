@@ -67,6 +67,17 @@ export interface LessonStepDefinition {
   formula?: string;
   formulaLabel?: string;
   questionIds?: string[];
+  visualKind?:
+    | "polygon-pattern"
+    | "polygon-discovery"
+    | "polygon-formula"
+    | "polygon-missing-angle"
+    | "polygon-exterior"
+    | "real-number-sets"
+    | "real-number-decimals"
+    | "real-number-properties"
+    | "rational-number-line"
+    | "fraction-decimal-machine";
 }
 
 export interface TeacherSummaryDefinition {
@@ -120,10 +131,13 @@ export interface LessonIntroductionDefinition {
     description: string;
   }>;
   examples: LessonIntroductionExample[];
+  takeawayLabel?: string;
   takeaway: string;
   formula: {
     expression: string;
     label: string;
+    eyebrow?: string;
+    heading?: string;
     parts: Array<{
       symbol: string;
       meaning: string;

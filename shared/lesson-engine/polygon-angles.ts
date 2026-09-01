@@ -373,6 +373,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     {
       id: "warmup",
       type: "warmup",
+      visualKind: "polygon-pattern",
       eyebrow: "الفكرة في صور",
       title: "شاهد النمط يكبر أمامك",
       tutorMessage: "هذه مساحة استكشاف وليست اختبارًا. المس الأشكال بالترتيب ولاحظ كيف يضيف كل ضلع مثلثًا جديدًا.",
@@ -380,6 +381,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     {
       id: "discover",
       type: "polygon_discovery",
+      visualKind: "polygon-discovery",
       eyebrow: "مختبر الأشكال",
       title: "قسّم المضلع بيدك",
       tutorMessage: "غيّر عدد الأضلاع واضغط «قسّم المضلع». لا توجد إجابة صحيحة أو خاطئة هنا؛ الهدف أن ترى العلاقة بنفسك.",
@@ -387,6 +389,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     {
       id: "formula",
       type: "concept",
+      visualKind: "polygon-formula",
       eyebrow: "ابنِ القانون",
       title: "حوّل الرسم إلى قانون خطوة خطوة",
       body: [
@@ -399,6 +402,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     {
       id: "worked-example",
       type: "worked_example",
+      visualKind: "polygon-missing-angle",
       eyebrow: "الزاوية المجهولة",
       title: "شاهد 45° تظهر كجزء متبقٍ",
       body: [
@@ -409,6 +413,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     {
       id: "exterior",
       type: "concept",
+      visualKind: "polygon-exterior",
       eyebrow: "دورة خارجية",
       title: "امشِ حول المضلع حتى تكمل 360°",
       body: ["الزوايا الخارجية تمثل مقدار دورانك عند الرؤوس. بعد دورة كاملة يكون مجموع الدوران 360°."],

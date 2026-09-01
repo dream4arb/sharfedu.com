@@ -62,19 +62,21 @@ export function LessonIntroduction({ introduction }: { introduction: LessonIntro
         ))}
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {introduction.examples.map((example) => <PolygonExample key={example.sides} {...example} />)}
-      </div>
+      {introduction.examples.length > 0 && (
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          {introduction.examples.map((example) => <PolygonExample key={example.sides} {...example} />)}
+        </div>
+      )}
 
       <div className="mt-5 flex gap-3 rounded-2xl bg-amber-50 p-4 leading-7 text-amber-950">
         <Check className="mt-1 h-5 w-5 shrink-0 text-amber-700" />
-        <p><strong>ما الذي نلاحظه؟</strong> {introduction.takeaway}</p>
+        <p><strong>{introduction.takeawayLabel ?? "ما الذي نلاحظه؟"}</strong> {introduction.takeaway}</p>
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
         <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="formula-preview-heading">
-          <p className="text-sm font-black text-violet-700">معنى القانون، لا حفظه فقط</p>
-          <h3 id="formula-preview-heading" className="mt-1 text-xl font-black text-slate-950">كل رمز يحكي جزءًا من الرسم</h3>
+          <p className="text-sm font-black text-violet-700">{introduction.formula.eyebrow ?? "معنى القانون، لا حفظه فقط"}</p>
+          <h3 id="formula-preview-heading" className="mt-1 text-xl font-black text-slate-950">{introduction.formula.heading ?? "كل رمز يحكي جزءًا من الفكرة"}</h3>
           <MathFormula expression={introduction.formula.expression} label={introduction.formula.label} />
           <dl className="mt-4 grid gap-2 sm:grid-cols-2">
             {introduction.formula.parts.map((part) => (

@@ -35,7 +35,7 @@ export function TutorPanel({
     {
       id: "welcome",
       role: "tutor",
-      text: "أنا معك داخل درس زوايا المضلع. اسألني عن الرسم أو القانون، أو قل: لم أفهم لماذا نطرح 2؟",
+      text: `أنا معك داخل درس ${lesson.title}. اسألني عن أي فكرة في الخطوة الحالية، أو قل: لم أفهم، وسأعيدها بطريقة أبسط.`,
     },
   ]);
   const [input, setInput] = useState("");
@@ -138,7 +138,7 @@ export function TutorPanel({
               }}
               maxLength={500}
               rows={2}
-              placeholder="مثال: لماذا نطرح 2؟"
+              placeholder={`اسأل عن ${lesson.title}...`}
               className="w-full resize-none rounded-2xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100"
               data-testid="input-tutor-question"
             />

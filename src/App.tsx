@@ -14,6 +14,7 @@ const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Courses = lazy(() => import("@/pages/Courses"));
 const Stage = lazy(() => import("@/pages/Stage"));
+const CurriculumSubject = lazy(() => import("@/pages/CurriculumSubject"));
 const Lesson = lazy(() => import("@/pages/Lesson"));
 const InteractiveLessonPage = lazy(() => import("@/features/lesson-engine/InteractiveLessonPage"));
 const PdfViewer = lazy(() => import("@/pages/PdfViewer"));
@@ -123,6 +124,8 @@ function Router() {
           </Route>
           <Route path="/courses/:gradeLevel" component={Courses} />
           <Route path="/stage/:stageId" component={Stage} />
+          <Route path="/curriculum/:stage/:grade/:subject" component={CurriculumSubject} />
+          <Route path="/learn/:lessonId" component={InteractiveLessonPage} />
           <Route path="/lesson/secondary/math/l-mm6el08l" component={InteractiveLessonPage} />
           <Route path="/lesson/high/math/l-mm6el08l" component={InteractiveLessonPage} />
           <Route path="/lesson/:stage/:subject/:lessonId?" component={Lesson} />
