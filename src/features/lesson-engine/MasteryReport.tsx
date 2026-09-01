@@ -28,6 +28,7 @@ export function MasteryReport({
   }));
   const overall = Math.round(enriched.reduce((total, item) => total + item.snapshot.score, 0) / enriched.length);
   const weakest = [...enriched].sort((a, b) => a.snapshot.score - b.snapshot.score)[0];
+  const allMastered = enriched.every((item) => item.snapshot.score >= 85);
 
   return (
     <div className="space-y-5">
@@ -36,7 +37,7 @@ export function MasteryReport({
           <div>
             <p className="flex items-center gap-2 text-sm font-bold text-cyan-300"><CheckCircle2 className="h-5 w-5" /> أكملت درس زوايا المضلع</p>
             <h2 className="mt-3 text-3xl font-black sm:text-4xl">مستوى الإتقان الحالي</h2>
-            <p className="mt-3 max-w-xl leading-7 text-slate-300">هذا التقرير مبني على محاولاتك وتلميحاتك داخل الدرس، وليس مجرد درجة اختبار واحدة.</p>
+            <p className="mt-3 max-w-xl leading-7 text-slate-300">هذا التقرير مبني على إجاباتك في اختبار الدرس وعدد المحاولات في كل مهارة.</p>
           </div>
           <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full border-[10px] border-cyan-400/25 bg-white/5">
             <div className="text-center"><span className="block text-4xl font-black tabular-nums">{overall}%</span><span className="text-xs text-slate-300">الإجمالي</span></div>
@@ -62,14 +63,22 @@ export function MasteryReport({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-6">
-        <p className="text-sm font-bold text-amber-700">توصية شارف</p>
-        <h3 className="mt-1 text-xl font-black text-amber-950">راجع: {weakest.title}</h3>
-        <p className="mt-2 leading-7 text-amber-900">{weakest.description}</p>
-        <button type="button" onClick={() => onReview(weakest.id)} className="mt-4 flex min-h-12 items-center gap-2 rounded-xl bg-amber-400 px-5 font-black text-slate-950 hover:bg-amber-300">
-          <RefreshCcw className="h-5 w-5" /> راجع هذه المهارة
-        </button>
-      </section>
+      {allMastered ? (
+        <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
+          <p className="text-sm font-bold text-emerald-700">توصية شارف</p>
+          <h3 className="mt-1 text-xl font-black text-emerald-950">أحسنت، أتقنت مهارات الدرس</h3>
+          <p className="mt-2 leading-7 text-emerald-900">يمكنك الانتقال إلى الدرس التالي، والعودة إلى الخريطة البصرية متى احتجت إلى مراجعة سريعة.</p>
+        </section>
+      ) : (
+        <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-6">
+          <p className="text-sm font-bold text-amber-700">توصية شارف</p>
+          <h3 className="mt-1 text-xl font-black text-amber-950">راجع: {weakest.title}</h3>
+          <p className="mt-2 leading-7 text-amber-900">{weakest.description}</p>
+          <button type="button" onClick={() => onReview(weakest.id)} className="mt-4 flex min-h-12 items-center gap-2 rounded-xl bg-amber-400 px-5 font-black text-slate-950 hover:bg-amber-300">
+            <RefreshCcw className="h-5 w-5" /> راجع هذه المهارة
+          </button>
+        </section>
+      )}
     </div>
   );
 }

@@ -39,6 +39,7 @@ check("unique-steps", "معرّفات خطوات الرحلة غير مكررة"
 check("unique-videos", "معرّفات الفيديو غير مكررة", unique(videoIds), `${videoIds.length} فيديو`);
 check("question-references", "كل سؤال مستخدم في الرحلة موجود", referencedQuestionIds.every((id) => questionIds.includes(id)), "لا توجد مراجع مفقودة");
 check("assessment-references", "كل سؤال في الاختبار النهائي موجود", lesson.assessmentQuestionIds.every((id) => questionIds.includes(id)), `${lesson.assessmentQuestionIds.length} أسئلة نهائية`);
+check("assessment-only-questions", "جميع الأسئلة الظاهرة محصورة في تبويب اختبار الدرس", lesson.steps.every((step) => step.type === "assessment" || !(step.questionIds?.length)), "التبويبات 1–8 للفهم والتفاعل البصري، والتبويب 9 للاختبار");
 check("assessment-skills", "الاختبار النهائي يغطي جميع المهارات", skillIds.every((id) => assessedSkills.has(id)), `${assessedSkills.size} من ${skillIds.length} مهارات`);
 check("non-written-questions", "لا توجد إجابات كتابية في الرحلة", lesson.questions.every((question) => !["numeric", "short_answer"].includes(question.type)), "الأنواع المتاحة: اختيار، صح/خطأ، وترتيب");
 check("question-feedback", "لكل سؤال تغذية راجعة تعليمية", lesson.questions.every((question) => Boolean(question.correctFeedback.trim()) && Boolean(question.defaultIncorrectFeedback.trim())), "تغذية راجعة للصحيح والخطأ في جميع الأسئلة");

@@ -17,12 +17,18 @@ import {
 import { polygonAnglesLesson, polygonAnglesQuestionMap } from "@shared/lesson-engine/polygon-angles";
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
-import { MathFormula } from "./MathFormula";
 import { LessonIntroduction } from "./LessonIntroduction";
 import { PolygonLab } from "./PolygonLab";
 import { QuestionCard } from "./QuestionCard";
 import { TutorPanel } from "./TutorPanel";
 import { useLessonSession } from "./useLessonSession";
+import {
+  ExteriorTurnLab,
+  FormulaDiscoveryLab,
+  MissingAngleLab,
+  PolygonPatternExplorer,
+  VisualLessonMap,
+} from "./VisualLessonLabs";
 import { setPageMeta } from "@/lib/seo";
 
 const lesson = polygonAnglesLesson;
@@ -50,7 +56,7 @@ export default function InteractiveLessonPage() {
   useEffect(() => {
     setPageMeta({
       title: "زوايا المضلع - درس تفاعلي",
-      description: "تعلّم مجموع الزوايا الداخلية للمضلع بالرسم التفاعلي والأسئلة وشارف Tutor واختبار إتقان المهارات.",
+      description: "تعلّم مجموع الزوايا الداخلية للمضلع بالرسم التفاعلي وشارف Tutor واختبار إتقان المهارات.",
       keywords: "زوايا المضلع, مجموع الزوايا الداخلية, رياضيات أول ثانوي, درس تفاعلي",
     });
   }, []);
@@ -161,23 +167,28 @@ export default function InteractiveLessonPage() {
             <section className="rounded-3xl bg-gradient-to-l from-cyan-800 to-slate-900 p-6 text-white sm:p-8">
               <p className="text-sm font-bold text-cyan-200">طريقة التعلم</p>
               <h2 className="mt-2 text-2xl font-black">افهم، شاهد، حرّك، ثم طبّق</h2>
-              <p className="mt-3 max-w-2xl leading-8 text-slate-200">تبدأ بشرح واضح، ثم فيديو، ثم أنشطة رسم وسحب واختيار. إذا أخطأت، ستحصل على ملاحظة مرتبطة بنوع الخطأ ثم محاولة جديدة.</p>
+              <p className="mt-3 max-w-2xl leading-8 text-slate-200">تبدأ بشرح واضح، ثم فيديو، ثم أنشطة رسم وحركة بلا درجات. بعد أن تستوعب الفكرة يأتي اختبار واحد، وتحصل فيه على ملاحظة مرتبطة بنوع الخطأ ثم محاولة جديدة.</p>
             </section>
           </div>
         )}
 
+        {step.id === "warmup" && <PolygonPatternExplorer />}
+
         {step.type === "polygon_discovery" && <PolygonLab externalAction={visualAction} />}
 
-        {step.body && (
+        {step.id === "formula" && <FormulaDiscoveryLab />}
+
+        {step.id === "worked-example" && <MissingAngleLab />}
+
+        {step.id === "exterior" && <ExteriorTurnLab />}
+
+        {step.body && !["formula", "worked-example", "exterior"].includes(step.id) && (
           <section className="mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
             <ul className="space-y-3">
               {step.body.map((paragraph) => <li key={paragraph} className="flex gap-3 text-lg leading-8 text-slate-800"><span className="mt-3 h-2 w-2 shrink-0 rounded-full bg-cyan-600" />{paragraph}</li>)}
             </ul>
-            {step.type === "worked_example" && <MathFormula expression="360^\circ - (135^\circ + 90^\circ + 90^\circ) = 45^\circ" label="ثلاثمئة وستون ناقص مجموع مئة وخمس وثلاثين وتسعين وتسعين يساوي خمسًا وأربعين درجة" />}
           </section>
         )}
-
-        {step.formula && <MathFormula expression={step.formula} label={step.formulaLabel} />}
 
         {step.type === "assessment" && (
           <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-4 leading-7 text-violet-950">
@@ -297,18 +308,21 @@ export default function InteractiveLessonPage() {
         )}
 
         {step.type === "teacher_summary" && (
-          <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
-            <div className="flex items-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المعلم</h2></div>
-            <p className="mt-2 text-sm font-bold text-emerald-700">{lesson.teacherSummary.attribution}</p>
-            <ol className="mt-5 grid gap-3 sm:grid-cols-2">
-              {lesson.teacherSummary.points.map((point, index) => (
-                <li key={point} className="flex gap-3 rounded-2xl border border-emerald-100 bg-white/80 p-4 leading-7 text-emerald-950">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-700 font-black text-white">{index + 1}</span>
-                  {point}
-                </li>
-              ))}
-            </ol>
-          </section>
+          <div className="space-y-5">
+            <VisualLessonMap />
+            <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
+              <div className="flex items-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المحتوى</h2></div>
+              <p className="mt-2 text-sm font-bold text-emerald-700">{lesson.teacherSummary.attribution}</p>
+              <ol className="mt-5 grid gap-3 sm:grid-cols-2">
+                {lesson.teacherSummary.points.map((point, index) => (
+                  <li key={point} className="flex gap-3 rounded-2xl border border-emerald-100 bg-white/80 p-4 leading-7 text-emerald-950">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-700 font-black text-white">{index + 1}</span>
+                    {point}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </div>
         )}
 
         {step.type === "report" && <MasteryReport lesson={lesson} mastery={mastery} onReview={reviewSkill} />}
