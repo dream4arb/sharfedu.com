@@ -18,8 +18,8 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (password.length < 6) {
-      setError("كلمة المرور يجب أن تكون 6 أحرف على الأقل.");
+    if (password.length < 8) {
+      setError("كلمة المرور يجب أن تكون 8 أحرف على الأقل.");
       return;
     }
     setLoading(true);
@@ -84,7 +84,7 @@ export default function RegisterPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">كلمة المرور (6 أحرف على الأقل)</Label>
+              <Label htmlFor="password">كلمة المرور (8 أحرف على الأقل)</Label>
               <div className="relative">
                 <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <Input
@@ -95,7 +95,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="pr-10"
                   required
-                  minLength={6}
+                  minLength={8}
                   autoComplete="new-password"
                 />
               </div>

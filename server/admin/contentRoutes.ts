@@ -5,6 +5,8 @@ import path from "path";
 import { getDirname } from "../resolve-dir";
 import * as storage from "./contentStorage";
 import * as cmsStorage from "./cmsStorage";
+import rateLimit from "express-rate-limit";
+import { requireAdmin } from "../middleware/adminAuth";
 
 async function fileExists(p: string): Promise<boolean> {
   try { await access(p); return true; } catch { return false; }
@@ -17,6 +19,7 @@ const __dirname = getDirname();
 const attachedRoot = path.resolve(__dirname, "..", "..", "attached_assets");
 
 const router = Router();
+const generationLimiter = rateLimit({ windowMs: 30 * 60_000, limit: 6, standardHeaders: true, legacyHeaders: false });
 
 /**
  * GET /api/content/lesson/:lessonId/tab/:tabType
@@ -49,7 +52,10 @@ router.get("/lesson/:lessonId/tab/:tabType", async (req, res) => {
  */
 router.get("/lesson/:lessonId/education-html", async (req, res) => {
   try {
-    const { lessonId } = req.params;
+    const lessonId = Array.isArray(req.params.lessonId) ? req.params.lessonId[0] : req.params.lessonId;
+    if (!lessonId || !/^[a-zA-Z0-9_-]{1,80}$/.test(lessonId)) {
+      return res.status(400).json({ message: "معرّف الدرس غير صالح." });
+    }
     let html: string | null = null;
     try {
       const cms = await cmsStorage.getCmsContent(lessonId, "education");
@@ -202,9 +208,12 @@ router.get("/lesson/:lessonId/has-pdf", async (req, res) => {
   }
 });
 
-router.post("/lesson/:lessonId/regenerate-ssa", async (req, res) => {
+router.post("/lesson/:lessonId/regenerate-ssa", requireAdmin, generationLimiter, async (req, res) => {
   try {
-    const { lessonId } = req.params;
+    const lessonId = Array.isArray(req.params.lessonId) ? req.params.lessonId[0] : req.params.lessonId;
+    if (!lessonId || !/^[a-zA-Z0-9_-]{1,80}$/.test(lessonId)) {
+      return res.status(400).json({ message: "معرّف الدرس غير صالح." });
+    }
     
     // 1. مسح المحتوى القديم فوراً من قاعدة البيانات لضمان عدم استرجاعه
     await cmsStorage.deleteCmsContentByLesson(lessonId, "education");

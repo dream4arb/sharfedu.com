@@ -80,6 +80,30 @@ function scopeEducationCss(css: string, scopeClass = ".education-sandbox") {
   return out;
 }
 
+function sanitizeEducationHtml(rawHtml: string) {
+  const template = document.createElement("template");
+  template.innerHTML = rawHtml;
+  template.content.querySelectorAll("script, iframe, object, embed, form, base, meta").forEach((element) => element.remove());
+  template.content.querySelectorAll<HTMLElement>("*").forEach((element) => {
+    for (const attribute of Array.from(element.attributes)) {
+      const name = attribute.name.toLowerCase();
+      const value = attribute.value.trim();
+      if (name.startsWith("on") || name === "srcdoc" || name === "formaction") {
+        element.removeAttribute(attribute.name);
+        continue;
+      }
+      if (["href", "src", "xlink:href"].includes(name)) {
+        const safe = value.startsWith("/")
+          || value.startsWith("#")
+          || /^https?:\/\//i.test(value)
+          || /^data:image\/(png|jpeg|gif|webp);base64,/i.test(value);
+        if (!safe) element.removeAttribute(attribute.name);
+      }
+    }
+  });
+  return template.innerHTML;
+}
+
 /** عنوان الدرس المعروض - يُفضّل التعديل من لوحة التحكم عند توفره (لا نعرض المعرف إن بدا كمعرف تلقائي) */
 function getLessonDisplayTitle(lesson: { id: string; title: string }, titlesFromApi: Record<string, string>): string {
   const fromApi = titlesFromApi[lesson.id];
@@ -968,7 +992,7 @@ export default function Lesson() {
             const scoped = styleContent ? scopeEducationCss(styleContent, ".education-sandbox") : "";
             content = `${linkContent}${scoped ? `<style>${scoped}</style>` : ""}${bodyContent}`;
           }
-          setEducationContent(content.trim());
+          setEducationContent(sanitizeEducationHtml(content.trim()));
         } else {
           setEducationContent("");
         }
@@ -2365,7 +2389,8 @@ export default function Lesson() {
                       <div className="w-full rounded-2xl overflow-x-auto sm:overflow-hidden border border-border/50 bg-white dark:bg-card shadow-sm" style={{ WebkitOverflowScrolling: 'touch' }}>
                         <iframe
                           srcDoc={educationRawHtml}
-                          sandbox="allow-scripts allow-same-origin"
+                          sandbox="allow-scripts"
+                          referrerPolicy="no-referrer"
                           title="المحتوى التعليمي"
                           className="w-full border-0 block"
                           scrolling="no"

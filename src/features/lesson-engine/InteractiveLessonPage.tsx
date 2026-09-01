@@ -177,7 +177,7 @@ export default function InteractiveLessonPage() {
           </section>
         )}
 
-        {step.formula && <MathFormula expression={step.formula} label="قانون مجموع الزوايا الداخلية" />}
+        {step.formula && <MathFormula expression={step.formula} label={step.formulaLabel} />}
 
         {step.type === "assessment" && (
           <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-4 leading-7 text-violet-950">

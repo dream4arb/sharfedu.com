@@ -1,13 +1,16 @@
 import { Router, Request, Response } from "express";
 import { getGeminiClient } from "../lib/gemini";
+import rateLimit from "express-rate-limit";
+import { requireAdmin } from "../middleware/adminAuth";
 
 const router = Router();
+const extractionLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 12, standardHeaders: true, legacyHeaders: false });
 
-router.post("/api/extract-questions", async (req: Request, res: Response) => {
+router.post("/api/extract-questions", requireAdmin, extractionLimiter, async (req: Request, res: Response) => {
   try {
     const { imageBase64 } = req.body;
 
-    if (!imageBase64) {
+    if (typeof imageBase64 !== "string" || imageBase64.length === 0 || imageBase64.length > 8_000_000) {
       return res.status(400).json({ error: "Image data is required" });
     }
 

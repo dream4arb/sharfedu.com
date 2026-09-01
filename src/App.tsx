@@ -81,6 +81,19 @@ function ProtectedAdmin() {
   return <AdminDashboard />;
 }
 
+function ProtectedPdfExtractor() {
+  const { user, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    if (isLoading) return;
+    if (!user) setLocation("/login");
+    else if (user.role !== "admin") setLocation("/dashboard");
+  }, [isLoading, user, setLocation]);
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
+  if (!user || user.role !== "admin") return null;
+  return <PdfExtractor />;
+}
+
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
     <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
@@ -104,7 +117,7 @@ function Router() {
           <Route path="/dashboard" component={ProtectedDashboard} />
           <Route path="/complete-profile" component={ProtectedDashboard} />
           <Route path="/profile" component={ProtectedProfile} />
-          <Route path="/admin/pdf-extractor" component={PdfExtractor} />
+          <Route path="/admin/pdf-extractor" component={ProtectedPdfExtractor} />
           <Route path="/admin">
             <ProtectedAdmin />
           </Route>

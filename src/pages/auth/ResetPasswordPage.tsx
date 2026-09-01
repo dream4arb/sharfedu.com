@@ -18,8 +18,8 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (newPassword.length < 6) {
-      setError("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل.");
+    if (newPassword.length < 8) {
+      setError("كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل.");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -103,7 +103,7 @@ export default function ResetPasswordPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="newPassword">كلمة المرور الجديدة (6 أحرف على الأقل)</Label>
+              <Label htmlFor="newPassword">كلمة المرور الجديدة (8 أحرف على الأقل)</Label>
               <div className="relative">
                 <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <Input
@@ -114,7 +114,7 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="pr-10"
                   required
-                  minLength={6}
+                  minLength={8}
                   autoComplete="new-password"
                 />
               </div>
@@ -128,7 +128,7 @@ export default function ResetPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
                 autoComplete="new-password"
               />
             </div>

@@ -64,6 +64,7 @@ export interface LessonStepDefinition {
   tutorMessage?: string;
   body?: string[];
   formula?: string;
+  formulaLabel?: string;
   questionIds?: string[];
 }
 
@@ -77,6 +78,19 @@ export interface TutorKnowledgeDefinition {
   approvedFacts: string[];
   socraticPrompts: string[];
   outOfScopeReply: string;
+}
+
+export interface CurriculumSourceDefinition {
+  authority: string;
+  portalUrl: string;
+  bookTitle: string;
+  requiredEdition: string;
+  editionStatus: "verified" | "pending" | "rejected";
+  observedEdition?: string;
+  editionEvidence?: string;
+  checkedAt?: string;
+  verifiedAt?: string;
+  lessonPages?: number[];
 }
 
 export interface LessonIntroductionExample {
@@ -140,6 +154,7 @@ export interface InteractiveLessonDefinition {
     channelName?: string;
     duration?: string;
   }>;
+  curriculumSource: CurriculumSourceDefinition;
   teacherSummary: TeacherSummaryDefinition;
   tutorKnowledge: TutorKnowledgeDefinition;
 }

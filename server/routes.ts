@@ -4,7 +4,7 @@ import session from "express-session";
 import passport from "passport";
 import { type Server } from "http";
 import { storage } from "./storage";
-import { db, ensurePasswordResetTable } from "./db";
+import { db, ensureLessonEngineTables, ensurePasswordResetTable } from "./db";
 import { cmsContent, platformStats } from "@shared/schema";
 import { api } from "@shared/routes";
 import { getGeminiClient, getGeminiModel } from "./lib/gemini";
@@ -22,11 +22,13 @@ import rateLimit from "express-rate-limit";
 
 const SAFE_NAME = /^[a-zA-Z0-9._-]+$/;
 const ratingLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 10, standardHeaders: true, legacyHeaders: false });
+const summarizeLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 10, standardHeaders: true, legacyHeaders: false });
 
 export async function registerRoutes(httpServer: Server, app: Express) {
   const { initHierarchy } = await import("./admin/hierarchyStore");
   await initHierarchy();
   await ensurePasswordResetTable();
+  await ensureLessonEngineTables();
 
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true, service: "sharfedu-api" });
@@ -69,7 +71,7 @@ export async function registerRoutes(httpServer: Server, app: Express) {
         stage: String(stage ?? "").trim().slice(0, 80),
         subject: String(subject ?? "").trim().slice(0, 80),
         userId: user?.id || null,
-        userName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email : "زائر",
+        userName: user ? `${user.firstName || ""} ${user.lastName || ""}`.trim().slice(0, 80) || "طالب مسجّل" : "زائر",
         timestamp: new Date().toISOString(),
       });
       fs.writeFileSync(ratingsFile, JSON.stringify(ratings, null, 2), "utf-8");
@@ -500,9 +502,13 @@ export async function registerRoutes(httpServer: Server, app: Express) {
   const cmsRoutes = (await import("./admin/cmsRoutes")).default;
   app.use("/api/admin/cms", requireAdmin, cmsRoutes);
 
-  app.post("/api/ai/summarize", async (req, res) => {
+  app.post("/api/ai/summarize", summarizeLimiter, async (req, res) => {
     try {
-      const { lessonTitle, subjectName } = req.body;
+      const lessonTitle = String(req.body?.lessonTitle ?? "").trim().slice(0, 160);
+      const subjectName = String(req.body?.subjectName ?? "").trim().slice(0, 100);
+      if (!lessonTitle || !subjectName) {
+        return res.status(400).json({ error: "عنوان الدرس واسم المادة مطلوبان." });
+      }
 
       const genAI = getGeminiClient();
       if (!genAI) {

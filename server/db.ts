@@ -41,3 +41,60 @@ export async function ensurePasswordResetTable(): Promise<void> {
     )
   `);
 }
+
+/**
+ * جداول Sharaf 2.0 إضافية فقط. جميع الأوامر idempotent ولا تعدّل أو تحذف
+ * الجداول القديمة أو بيانات المستخدمين الموجودة.
+ */
+export async function ensureLessonEngineTables(): Promise<void> {
+  const statements = [
+    `CREATE TABLE IF NOT EXISTS lesson_attempts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT,
+      session_id TEXT NOT NULL,
+      lesson_id TEXT NOT NULL,
+      question_id TEXT NOT NULL,
+      skill_id TEXT NOT NULL,
+      correct INTEGER NOT NULL,
+      hints_used INTEGER NOT NULL DEFAULT 0,
+      mastery_score INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    )`,
+    `CREATE INDEX IF NOT EXISTS lesson_attempts_session_idx
+      ON lesson_attempts (session_id, lesson_id)`,
+    `CREATE INDEX IF NOT EXISTS lesson_attempts_user_lesson_idx
+      ON lesson_attempts (user_id, lesson_id)`,
+    `CREATE TABLE IF NOT EXISTS skill_mastery (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL,
+      lesson_id TEXT NOT NULL,
+      skill_id TEXT NOT NULL,
+      score INTEGER NOT NULL DEFAULT 0,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      correct_attempts INTEGER NOT NULL DEFAULT 0,
+      hints_used INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT (unixepoch()),
+      UNIQUE (user_id, lesson_id, skill_id)
+    )`,
+    `CREATE TABLE IF NOT EXISTS product_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT,
+      session_id TEXT NOT NULL,
+      lesson_id TEXT NOT NULL,
+      event_name TEXT NOT NULL,
+      question_id TEXT,
+      skill_id TEXT,
+      step_id TEXT,
+      metadata TEXT,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    )`,
+    `CREATE INDEX IF NOT EXISTS product_events_lesson_event_idx
+      ON product_events (lesson_id, event_name, created_at)`,
+    `CREATE INDEX IF NOT EXISTS product_events_session_idx
+      ON product_events (session_id, created_at)`,
+  ];
+
+  for (const statement of statements) {
+    await client.execute(statement);
+  }
+}

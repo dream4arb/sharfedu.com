@@ -12,8 +12,9 @@ export function SsaIframe({ src, lessonId }: SsaIframeProps) {
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === "sharef-iframe-height" && typeof e.data.height === "number") {
-        setHeight(Math.max(e.data.height, 300));
+      if (e.source !== iframeRef.current?.contentWindow) return;
+      if (e.data?.type === "sharef-iframe-height" && typeof e.data.height === "number" && Number.isFinite(e.data.height)) {
+        setHeight(Math.min(Math.max(e.data.height, 300), 20_000));
       }
     };
     window.addEventListener("message", handler);
@@ -36,6 +37,8 @@ export function SsaIframe({ src, lessonId }: SsaIframeProps) {
         ref={iframeRef}
         key={lessonId}
         src={src}
+        sandbox="allow-scripts"
+        referrerPolicy="no-referrer"
         className="w-full border-0 block"
         scrolling="no"
         style={{

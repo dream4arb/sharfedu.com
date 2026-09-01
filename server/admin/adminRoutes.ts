@@ -1,7 +1,7 @@
 import { Router, type Request } from "express";
 import path from "path";
 import fs from "fs";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { getDirname, getUploadsDir } from "../resolve-dir";
 import multer from "multer";
 import * as storage from "./contentStorage";
@@ -22,7 +22,6 @@ const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/webp",
   "image/gif",
-  "image/svg+xml",
 ]);
 
 const upload = multer({

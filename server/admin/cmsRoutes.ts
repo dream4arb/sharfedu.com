@@ -17,6 +17,7 @@ import { saveHierarchyToDb } from "./hierarchyStore";
 import multer from "multer";
 import path from "path";
 import { mkdir } from "fs/promises";
+import { readFile, unlink } from "fs/promises";
 import { getUploadsDir, resolveAttachedAssetPath } from "../resolve-dir";
 
 const uploadsDir = getUploadsDir();
@@ -28,8 +29,15 @@ const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/webp",
   "image/gif",
-  "image/svg+xml",
 ]);
+
+const FILE_SIGNATURES: Record<string, number[]> = {
+  "application/pdf": [0x25, 0x50, 0x44, 0x46],
+  "image/png": [0x89, 0x50, 0x4e, 0x47],
+  "image/jpeg": [0xff, 0xd8, 0xff],
+  "image/gif": [0x47, 0x49, 0x46, 0x38],
+  "image/webp": [0x52, 0x49, 0x46, 0x46],
+};
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -250,6 +258,13 @@ router.post("/content/upload", upload.single("file"), async (req: Request & { fi
     const file = req.file;
     const { lessonId, tabType } = req.body;
     if (!file || !lessonId || !tabType) return res.status(400).json({ message: "ملف و lessonId و tabType مطلوبة" });
+    const storedPath = path.resolve(uploadsDir, file.filename);
+    const signature = FILE_SIGNATURES[file.mimetype];
+    const header = Array.from((await readFile(storedPath)).subarray(0, 8));
+    if (!signature || !signature.every((byte, index) => header[index] === byte)) {
+      await unlink(storedPath).catch(() => {});
+      return res.status(400).json({ message: "محتوى الملف لا يتطابق مع نوعه المُعلن." });
+    }
     const url = `/attached_assets/uploads/${file.filename}`;
     const contentType = file.mimetype === "application/pdf" ? "pdf" : "image";
     await cmsStorage.upsertCmsContent({
@@ -261,7 +276,7 @@ router.post("/content/upload", upload.single("file"), async (req: Request & { fi
 
     if (tabType === "lesson" && file.mimetype === "application/pdf") {
       const { generateLessonHtmlFromPdf } = await import("../lib/generateLessonHtml");
-      const pdfPath = path.resolve(uploadsDir, file.filename);
+      const pdfPath = storedPath;
       generateLessonHtmlFromPdf({ lessonId: String(lessonId), pdfPath })
         .then((result) => {
           if (!result.success) {

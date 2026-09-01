@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 // @ts-expect-error no types for passport-google-oauth20
@@ -137,8 +137,8 @@ router.post("/register", authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body as { email?: string; password?: string };
     const emailNorm = String(email ?? "").toLowerCase().trim();
-    if (!emailNorm || !password || password.length < 6)
-      return res.status(400).json({ message: "البريد وكلمة المرور (6 أحرف على الأقل) مطلوبان." });
+    if (!emailNorm || !password || password.length < 8)
+      return res.status(400).json({ message: "البريد وكلمة المرور (8 أحرف على الأقل) مطلوبان." });
     const existing = await db.select().from(users).where(eq(users.email, emailNorm)).limit(1);
     if (existing.length > 0) return res.status(400).json({ message: "هذا البريد مسجّل مسبقاً." });
     const hash = await bcrypt.hash(password, 10);
@@ -207,8 +207,8 @@ router.post("/reset-password", recoveryLimiter, async (req, res) => {
   try {
     const { email, code, newPassword } = req.body as { email?: string; code?: string; newPassword?: string };
     const emailNorm = String(email ?? "").toLowerCase().trim();
-    if (!emailNorm || !code || !newPassword || newPassword.length < 6)
-      return res.status(400).json({ message: "البريد والرمز وكلمة المرور الجديدة (6 أحرف على الأقل) مطلوبة." });
+    if (!emailNorm || !code || !newPassword || newPassword.length < 8)
+      return res.status(400).json({ message: "البريد والرمز وكلمة المرور الجديدة (8 أحرف على الأقل) مطلوبة." });
     const now = new Date();
     const rows = await db
       .select()
@@ -265,7 +265,7 @@ router.put("/account", requireAuth, (req: Request, res: Response, next: (err?: u
       if (existing.length > 0 && existing[0].id !== userId) return res.status(400).json({ message: "هذا البريد مسجّل لحساب آخر." });
       updates.email = emailNorm;
     }
-    if (body.newPassword !== undefined && body.newPassword !== null && String(body.newPassword).trim().length >= 6) {
+    if (body.newPassword !== undefined && body.newPassword !== null && String(body.newPassword).trim().length >= 8) {
       const curPass = String(body.currentPassword ?? "").trim();
       if (!curPass) return res.status(400).json({ message: "أدخل كلمة المرور الحالية لتغيير كلمة المرور." });
       if (!current.password) return res.status(400).json({ message: "سجّل الدخول بكلمة مرور لتتمكن من تغييرها." });

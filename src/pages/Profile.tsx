@@ -150,7 +150,7 @@ export default function Profile() {
               />
               <Input
                 type="password"
-                placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)"
+                placeholder="كلمة المرور الجديدة (8 أحرف على الأقل)"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="font-tajawal"

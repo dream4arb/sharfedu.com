@@ -4,7 +4,7 @@ export const POLYGON_ANGLES_LESSON_ID = "l-mm6el08l";
 
 export const polygonAnglesLesson: InteractiveLessonDefinition = {
   id: POLYGON_ANGLES_LESSON_ID,
-  version: 2,
+  version: 3,
   slug: "polygon-angles",
   title: "زوايا المضلع",
   stage: "المرحلة الثانوية",
@@ -389,6 +389,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
         "كل مثلث يضيف 180° إلى مجموع الزوايا الداخلية.",
       ],
       formula: "S = (n - 2) \\times 180^\\circ",
+      formulaLabel: "مجموع الزوايا الداخلية يساوي عدد الأضلاع ناقص اثنين، مضروبًا في مئة وثمانين درجة",
       questionIds: ["formula-order", "heptagon-sum"],
     },
     {
@@ -408,7 +409,8 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       eyebrow: "مفهوم مكمل",
       title: "لفة كاملة حول المضلع",
       body: ["الزوايا الخارجية تمثل مقدار دورانك عند الرؤوس. بعد دورة كاملة يكون مجموع الدوران 360°."],
-      formula: "\\sum \\text{الزوايا الخارجية} = 360^\\circ",
+      formula: "E = 360^\\circ",
+      formulaLabel: "مجموع زاوية خارجية واحدة عند كل رأس يساوي ثلاثمئة وستين درجة",
       questionIds: ["exterior-sum"],
     },
     {
@@ -447,16 +449,6 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
   ],
   videos: [
     {
-      id: "sharaf-polygon-angles-whiteboard",
-      title: "شرح شارف الأصلي — سبورة تعليمية",
-      url: "/videos/sharaf-polygon-angles/sharaf-polygon-angles-whiteboard.mp4",
-      source: "hosted",
-      thumbnailUrl: "/videos/sharaf-polygon-angles/sharaf-polygon-angles-poster.jpg",
-      captionsUrl: "/videos/sharaf-polygon-angles/sharaf-polygon-angles-whiteboard.ar.vtt",
-      channelName: "منصة شارف التعليمية",
-      duration: "10:00",
-    },
-    {
       id: "_l49Ard1--U",
       title: "زوايا المضلع — الجزء الأول",
       url: "https://www.youtube-nocookie.com/embed/_l49Ard1--U?rel=0&modestbranding=1",
@@ -475,6 +467,16 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       channelName: "محمد الحربي — رياضيات ثانوي",
     },
   ],
+  curriculumSource: {
+    authority: "وزارة التعليم السعودية",
+    portalUrl: "https://madrasatibeta.moe.gov.sa/books/E7027E8EDF24725B41C6D294DA2AADD7?Language=1",
+    bookTitle: "الرياضيات 1-1 — كتاب الطالب",
+    requiredEdition: "1448-2026",
+    editionStatus: "rejected",
+    observedEdition: "1447-2025",
+    checkedAt: "2026-09-01",
+    editionEvidence: "رابط بوابة مدرستي الرسمي عُرض للفحص، لكن غلاف الملف نفسه يحمل «طبعة 1447-2025». رُفض الملف وحُذف من منطقة الفحص، ولا يُعتمد حتى يتوفر ملف رسمي يحمل «طبعة 1448-2026» داخله.",
+  },
   teacherSummary: {
     status: "editorial",
     attribution: "ملخص تعليمي بانتظار اعتماد معلم المادة",
@@ -500,7 +502,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       "ما الفرق بين عدد الأضلاع وعدد المثلثات في الرسم؟",
       "ما الخطوة التي تسبق الضرب في 180؟",
     ],
-    outOfScopeReply: "سؤالك خارج هدف درس زوايا المضلع. أستطيع مساعدتك في التقسيم إلى مثلثات، القانون، الزوايا المجهولة، أو الزوايا الخارجية.",
+    outOfScopeReply: "أهلًا بك. هذا السؤال لا يبدو مرتبطًا بدرس زوايا المضلع. أستطيع مساعدتك في فهم الرسم، والتقسيم إلى مثلثات، والقانون، والزوايا المجهولة أو الخارجية. ما الجزء الذي تريد أن نبدأ به؟",
   },
 };
 

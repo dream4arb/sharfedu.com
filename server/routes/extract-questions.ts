@@ -2,8 +2,11 @@ import { Router } from "express";
 import { getGeminiClient } from "../lib/gemini";
 import { access, readFile } from "fs/promises";
 import path from "path";
+import rateLimit from "express-rate-limit";
+import { requireAdmin } from "../middleware/adminAuth";
 
 const router = Router();
+const extractionLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 12, standardHeaders: true, legacyHeaders: false });
 
 interface ExtractedQuestion {
   id: number;
@@ -19,11 +22,11 @@ interface ExtractedQuestion {
   correctAnswer?: string;
 }
 
-router.post("/api/extract-questions-from-file", async (req, res) => {
+router.post("/api/extract-questions-from-file", requireAdmin, extractionLimiter, async (req, res) => {
   try {
     const { imagePath } = req.body;
     
-    if (!imagePath) {
+    if (typeof imagePath !== "string" || imagePath.length === 0 || imagePath.length > 180) {
       return res.status(400).json({ error: "Image path is required" });
     }
 
