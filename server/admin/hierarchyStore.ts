@@ -99,13 +99,43 @@ function mergeWithDefaults(loaded: HierarchyStage[]): HierarchyStage[] {
         stage.grades.push(grade);
       }
       for (const defSubject of defGrade.subjects ?? []) {
-        const exists = grade.subjects?.some((s) => s.slug === defSubject.slug);
-        if (!exists) {
+        const existingSubject = grade.subjects?.find((s) => s.slug === defSubject.slug);
+        if (!existingSubject) {
           const newSub = ensureSubjectHasSemesters(
             JSON.parse(JSON.stringify(defSubject)) as HierarchySubject
           );
           grade.subjects = grade.subjects ?? [];
           grade.subjects.push(newSub);
+          continue;
+        }
+
+        // الإضافات الافتراضية للمناهج موثقة في الشفرة. ندمجها بصورة إضافية فقط
+        // حتى لا نمس تعديلات الإدارة ولا نحذف أي محتوى مرتبط بقاعدة البيانات.
+        for (const defSemester of defSubject.semesters ?? []) {
+          let semester = existingSubject.semesters?.find((item) => item.id === defSemester.id);
+          if (!semester) {
+            existingSubject.semesters = existingSubject.semesters ?? [];
+            existingSubject.semesters.push(JSON.parse(JSON.stringify(defSemester)) as HierarchySemester);
+            continue;
+          }
+          for (const defChapter of defSemester.chapters ?? []) {
+            let chapter = semester.chapters?.find((item) => item.id === defChapter.id);
+            if (!chapter) {
+              semester.chapters = semester.chapters ?? [];
+              semester.chapters.push(JSON.parse(JSON.stringify(defChapter)));
+              continue;
+            }
+            for (const defLesson of defChapter.lessons ?? []) {
+              const existingLesson = chapter.lessons?.find((item) => item.id === defLesson.id);
+              if (!existingLesson) {
+                chapter.lessons = chapter.lessons ?? [];
+                chapter.lessons.push(JSON.parse(JSON.stringify(defLesson)));
+              } else {
+                existingLesson.status = defLesson.status ?? existingLesson.status;
+                existingLesson.engineLessonId = defLesson.engineLessonId ?? existingLesson.engineLessonId;
+              }
+            }
+          }
         }
       }
     }

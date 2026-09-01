@@ -397,7 +397,11 @@ export default function Stage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
                       {grade.subjects.map((subject, subIndex) => {
                         const SubjectIcon = subject.icon;
-                        const subjectHref = `/lesson/${urlStage}/${subject.id}`;
+                        const usesNewCurriculum = subject.id === "math"
+                          && ((stageId === "middle" && grade.id === "2") || (stageId === "high" && grade.id === "2"));
+                        const subjectHref = usesNewCurriculum
+                          ? `/curriculum/${stageId}/${grade.id}/${subject.id}`
+                          : `/lesson/${urlStage}/${subject.id}`;
                         
                         if (gradeLocked) {
                           return (

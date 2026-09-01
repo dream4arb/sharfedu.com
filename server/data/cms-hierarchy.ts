@@ -1,3 +1,10 @@
+import {
+  highGrade2MathCatalog,
+  middleGrade2MathCatalog,
+  type CurriculumContentStatus,
+  type CurriculumSubjectCatalog,
+} from "@shared/curriculum/catalog";
+
 /**
  * CMS Hierarchy - هيكل المراحل والمواد والفصول والدروس
  * يستخدم في الرفع الذكي وقوائم الاختيار
@@ -13,6 +20,8 @@ export const STAGE_NAMES: Record<string, string> = {
 export interface HierarchyLesson {
   id: string;
   title: string;
+  status?: CurriculumContentStatus;
+  engineLessonId?: string;
 }
 
 export interface HierarchyChapter {
@@ -48,6 +57,27 @@ export interface HierarchyStage {
   /** المرحلة > الصف > المادة > الفصل > الوحدة > الدرس */
   grades: HierarchyGrade[];
 }
+
+function catalogSemesters(catalog: CurriculumSubjectCatalog): HierarchySemester[] {
+  return catalog.semesters.map((semester) => ({
+    id: semester.id,
+    name: semester.name,
+    chapters: semester.chapters.map((chapter) => ({
+      id: chapter.id,
+      name: chapter.name,
+      number: chapter.number,
+      lessons: chapter.lessons.map((lesson) => ({
+        id: lesson.id,
+        title: lesson.title,
+        status: lesson.status,
+        engineLessonId: lesson.engineLessonId,
+      })),
+    })),
+  }));
+}
+
+const MIDDLE_GRADE_2_MATH_SEMESTERS = catalogSemesters(middleGrade2MathCatalog);
+const HIGH_GRADE_2_MATH_SEMESTERS = catalogSemesters(highGrade2MathCatalog);
 
 // هيكل افتراضي - يُحمّل من DB عند التشغيل
 let currentHierarchy: HierarchyStage[] | null = null;
@@ -126,7 +156,7 @@ export const CMS_HIERARCHY: HierarchyStage[] = [
           { slug: "fikria", name: "التربية الفكرية", semesters: [] },
         ],
       },
-      { id: "2", name: "ثاني متوسط", subjects: [{ slug: "math", name: "الرياضيات", semesters: [] }, { slug: "science", name: "العلوم", semesters: [] }, { slug: "arabic", name: "لغتي", semesters: [] }, { slug: "english", name: "اللغة الإنجليزية", semesters: [] }, { slug: "social", name: "الدراسات الاجتماعية", semesters: [] }, { slug: "tajweed", name: "التجويد", semesters: [] }, { slug: "islamic", name: "الدراسات الإسلامية", semesters: [] }, { slug: "digital", name: "الرقمية", semesters: [] }, { slug: "family", name: "الأسرية", semesters: [] }, { slug: "art", name: "التربية الفنية", semesters: [] }, { slug: "fikria", name: "التربية الفكرية", semesters: [] }] },
+      { id: "2", name: "ثاني متوسط", subjects: [{ slug: "math", name: "الرياضيات", semesters: MIDDLE_GRADE_2_MATH_SEMESTERS }, { slug: "science", name: "العلوم", semesters: [] }, { slug: "arabic", name: "لغتي", semesters: [] }, { slug: "english", name: "اللغة الإنجليزية", semesters: [] }, { slug: "social", name: "الدراسات الاجتماعية", semesters: [] }, { slug: "tajweed", name: "التجويد", semesters: [] }, { slug: "islamic", name: "الدراسات الإسلامية", semesters: [] }, { slug: "digital", name: "الرقمية", semesters: [] }, { slug: "family", name: "الأسرية", semesters: [] }, { slug: "art", name: "التربية الفنية", semesters: [] }, { slug: "fikria", name: "التربية الفكرية", semesters: [] }] },
       { id: "3", name: "ثالث متوسط", subjects: [{ slug: "math", name: "الرياضيات", semesters: [] }, { slug: "science", name: "العلوم", semesters: [] }, { slug: "arabic", name: "لغتي", semesters: [] }, { slug: "english", name: "اللغة الإنجليزية", semesters: [] }, { slug: "social", name: "الدراسات الاجتماعية", semesters: [] }, { slug: "tajweed", name: "التجويد", semesters: [] }, { slug: "islamic", name: "الدراسات الإسلامية", semesters: [] }, { slug: "critical", name: "التفكير الناقد", semesters: [] }, { slug: "digital", name: "الرقمية", semesters: [] }, { slug: "family", name: "الأسرية", semesters: [] }, { slug: "art", name: "التربية الفنية", semesters: [] }, { slug: "fikria", name: "التربية الفكرية", semesters: [] }] },
     ],
   },
@@ -168,7 +198,7 @@ export const CMS_HIERARCHY: HierarchyStage[] = [
           { slug: "fikria", name: "التربية الفكرية", semesters: [] },
         ],
       },
-      { id: "2", name: "ثاني ثانوي", subjects: [{ slug: "math", name: "الرياضيات", semesters: [] }, { slug: "chemistry", name: "الكيمياء", semesters: [] }, { slug: "biology", name: "الأحياء", semesters: [] }, { slug: "arabic", name: "اللغة العربية", semesters: [] }, { slug: "qiraat", name: "قراءات", semesters: [] }, { slug: "tawheed", name: "توحيد", semesters: [] }, { slug: "english", name: "إنجليزي", semesters: [] }, { slug: "financial-mgmt", name: "الإدارة المالية", semesters: [] }, { slug: "arts", name: "الفنون", semesters: [] }, { slug: "business-decision", name: "صناعة القرار في الأعمال", semesters: [] }, { slug: "intro-business", name: "مقدمة في الأعمال", semesters: [] }, { slug: "iot", name: "انترنت الأشياء", semesters: [] }, { slug: "health-sciences", name: "مبادئ العلوم الصحية", semesters: [] }, { slug: "fikria", name: "التربية الفكرية", semesters: [] }] },
+      { id: "2", name: "ثاني ثانوي", subjects: [{ slug: "math", name: "الرياضيات", semesters: HIGH_GRADE_2_MATH_SEMESTERS }, { slug: "chemistry", name: "الكيمياء", semesters: [] }, { slug: "biology", name: "الأحياء", semesters: [] }, { slug: "arabic", name: "اللغة العربية", semesters: [] }, { slug: "qiraat", name: "قراءات", semesters: [] }, { slug: "tawheed", name: "توحيد", semesters: [] }, { slug: "english", name: "إنجليزي", semesters: [] }, { slug: "financial-mgmt", name: "الإدارة المالية", semesters: [] }, { slug: "arts", name: "الفنون", semesters: [] }, { slug: "business-decision", name: "صناعة القرار في الأعمال", semesters: [] }, { slug: "intro-business", name: "مقدمة في الأعمال", semesters: [] }, { slug: "iot", name: "انترنت الأشياء", semesters: [] }, { slug: "health-sciences", name: "مبادئ العلوم الصحية", semesters: [] }, { slug: "fikria", name: "التربية الفكرية", semesters: [] }] },
       { id: "3", name: "ثالث ثانوي", subjects: [{ slug: "math", name: "الرياضيات", semesters: [] }, { slug: "physics", name: "الفيزياء", semesters: [] }, { slug: "english", name: "اللغة الإنجليزية", semesters: [] }, { slug: "fiqh", name: "فقه", semesters: [] }, { slug: "chinese", name: "اللغة الصينية", semesters: [] }, { slug: "fikria", name: "التربية الفكرية", semesters: [] }, { slug: "earth-space", name: "علوم الأرض والفضاء", semesters: [] }, { slug: "ai", name: "الذكاء الاصطناعي", semesters: [] }, { slug: "digital-design", name: "التصميم الرقمي", semesters: [] }, { slug: "statistics", name: "الإحصاء", semesters: [] }, { slug: "law", name: "مبادئ القانون", semesters: [] }, { slug: "marketing-planning", name: "تخطيط الحملات التسويقية", semesters: [] }, { slug: "sustainability", name: "التنمية المستدامة", semesters: [] }, { slug: "mgmt-skills", name: "المهارات الإدارية", semesters: [] }, { slug: "writing", name: "الكتابة الوظيفية والإبداعية", semesters: [] }, { slug: "event-mgmt", name: "إدارة الفعاليات", semesters: [] }] },
     ],
   },
@@ -425,16 +455,15 @@ export function getAllSeoPaths(): SeoPathItem[] {
 /** هيكل العرض للموقع: مرحلة_مادة → فصول ووحدات ودروس (باستخدام أول صف) */
 export function getDisplayStructure(): Record<
   string,
-  { semesters: { id: string; name: string; chapters: { id: string; name: string; number?: number; lessons: { id: string; title: string }[] }[] }[] }
+  { semesters: { id: string; name: string; chapters: { id: string; name: string; number?: number; lessons: HierarchyLesson[] }[] }[] }
 > {
-  const out: Record<string, { semesters: { id: string; name: string; chapters: { id: string; name: string; number?: number; lessons: { id: string; title: string }[] }[] }[] }> = {};
+  const out: Record<string, { semesters: { id: string; name: string; chapters: { id: string; name: string; number?: number; lessons: HierarchyLesson[] }[] }[] }> = {};
   for (const stage of getFullHierarchy()) {
     const grades = stage.grades ?? [];
     for (const grade of grades) {
       for (const subject of grade.subjects) {
-        const key = `${stage.slug}_${subject.slug}`;
-        if (out[key]) continue; // استخدم أول صف فقط
-        out[key] = {
+        const gradeKey = `${stage.slug}_${grade.id}_${subject.slug}`;
+        const value = {
           semesters: (subject.semesters ?? []).map((s) => ({
             id: s.id,
             name: s.name,
@@ -442,10 +471,20 @@ export function getDisplayStructure(): Record<
               id: ch.id,
               name: ch.name,
               number: ch.number,
-              lessons: (ch.lessons ?? []).map((l) => ({ id: l.id, title: l.title })),
+              lessons: (ch.lessons ?? []).map((l) => ({
+                id: l.id,
+                title: l.title,
+                status: l.status,
+                engineLessonId: l.engineLessonId,
+              })),
             })),
           })),
         };
+        out[gradeKey] = value;
+
+        // توافق مع الروابط القديمة التي لم تكن تحمل الصف صراحةً.
+        const legacyKey = `${stage.slug}_${subject.slug}`;
+        if (!out[legacyKey]) out[legacyKey] = value;
       }
     }
   }

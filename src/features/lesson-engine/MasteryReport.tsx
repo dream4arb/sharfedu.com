@@ -35,7 +35,7 @@ export function MasteryReport({
       <section className="overflow-hidden rounded-3xl bg-slate-950 p-6 text-white sm:p-8">
         <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
           <div>
-            <p className="flex items-center gap-2 text-sm font-bold text-cyan-300"><CheckCircle2 className="h-5 w-5" /> أكملت درس زوايا المضلع</p>
+            <p className="flex items-center gap-2 text-sm font-bold text-cyan-300"><CheckCircle2 className="h-5 w-5" /> أكملت درس {lesson.title}</p>
             <h2 className="mt-3 text-3xl font-black sm:text-4xl">مستوى الإتقان الحالي</h2>
             <p className="mt-3 max-w-xl leading-7 text-slate-300">هذا التقرير مبني على إجاباتك في اختبار الدرس وعدد المحاولات في كل مهارة.</p>
           </div>

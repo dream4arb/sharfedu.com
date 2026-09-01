@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
+import type { CurriculumContentStatus } from "@shared/curriculum/catalog";
+
+export type DisplayLesson = {
+  id: string;
+  title: string;
+  status?: CurriculumContentStatus;
+  engineLessonId?: string;
+};
 
 export type DisplaySemester = {
   id: string;
   name: string;
-  chapters: { id: string; name: string; number?: number; lessons: { id: string; title: string }[] }[];
+  chapters: { id: string; name: string; number?: number; lessons: DisplayLesson[] }[];
 };
 
 export type DisplayStructure = Record<string, { semesters: DisplaySemester[] }>;

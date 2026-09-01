@@ -140,10 +140,6 @@ export function QuestionCard({ question, progress, assessmentMode = false, onAtt
               <li
                 key={id}
                 draggable
-                tabIndex={0}
-                role="button"
-                aria-pressed={selectedOrderingId === id}
-                aria-label={`${labels[id]}، الموضع ${index + 1}`}
                 onDragStart={() => setDraggedOrderingId(id)}
                 onDragEnd={() => setDraggedOrderingId(null)}
                 onDragOver={(event) => event.preventDefault()}
@@ -152,24 +148,25 @@ export function QuestionCard({ question, progress, assessmentMode = false, onAtt
                   if (draggedOrderingId) moveOrderingTo(draggedOrderingId, id);
                   setDraggedOrderingId(null);
                 }}
-                onClick={() => selectOrdering(id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    selectOrdering(id);
-                  }
-                }}
                 className={`flex min-h-16 cursor-grab items-center gap-3 rounded-2xl border bg-white p-3 transition active:cursor-grabbing ${
                   selectedOrderingId === id ? "border-cyan-600 ring-4 ring-cyan-100" : "border-slate-200 hover:border-cyan-300"
                 }`}
               >
-                <GripVertical className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-100 font-black text-cyan-800">{index + 1}</span>
-                {visuals[id] && <OptionVisual sides={visuals[id]!.sides} split={visuals[id]!.split} />}
-                <span className="flex-1 font-bold text-slate-800">{labels[id]}</span>
+                <button
+                  type="button"
+                  aria-pressed={selectedOrderingId === id}
+                  aria-label={`${labels[id]}، الموضع ${index + 1}`}
+                  onClick={() => selectOrdering(id)}
+                  className="flex min-w-0 flex-1 items-center gap-3 rounded-xl text-right focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100"
+                >
+                  <GripVertical className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-100 font-black text-cyan-800">{index + 1}</span>
+                  {visuals[id] && <OptionVisual sides={visuals[id]!.sides} split={visuals[id]!.split} />}
+                  <span className="flex-1 font-bold text-slate-800">{labels[id]}</span>
+                </button>
                 <div className="flex gap-1">
-                  <button type="button" onClick={(event) => { event.stopPropagation(); moveOrdering(index, -1); }} disabled={index === 0} aria-label={`حرّك ${labels[id]} إلى أعلى`} className="rounded-lg p-2 hover:bg-slate-100 disabled:opacity-30"><ArrowUp className="h-5 w-5" /></button>
-                  <button type="button" onClick={(event) => { event.stopPropagation(); moveOrdering(index, 1); }} disabled={index === (answer as string[]).length - 1} aria-label={`حرّك ${labels[id]} إلى أسفل`} className="rounded-lg p-2 hover:bg-slate-100 disabled:opacity-30"><ArrowDown className="h-5 w-5" /></button>
+                  <button type="button" onClick={() => moveOrdering(index, -1)} disabled={index === 0} aria-label={`حرّك ${labels[id]} إلى أعلى`} className="rounded-lg p-2 hover:bg-slate-100 disabled:opacity-30"><ArrowUp className="h-5 w-5" /></button>
+                  <button type="button" onClick={() => moveOrdering(index, 1)} disabled={index === (answer as string[]).length - 1} aria-label={`حرّك ${labels[id]} إلى أسفل`} className="rounded-lg p-2 hover:bg-slate-100 disabled:opacity-30"><ArrowDown className="h-5 w-5" /></button>
                 </div>
               </li>
             ))}

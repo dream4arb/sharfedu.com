@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "wouter";
+import { Link, useParams } from "wouter";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,7 +14,8 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
-import { polygonAnglesLesson, polygonAnglesQuestionMap } from "@shared/lesson-engine/polygon-angles";
+import { POLYGON_ANGLES_LESSON_ID } from "@shared/lesson-engine/polygon-angles";
+import { getRegisteredLesson, lessonRegistry } from "@shared/lesson-engine/registry";
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
 import { LessonIntroduction } from "./LessonIntroduction";
@@ -30,12 +31,22 @@ import {
   PolygonPatternExplorer,
   VisualLessonMap,
 } from "./VisualLessonLabs";
+import {
+  DecimalPatternLab,
+  FractionDecimalMachine,
+  OperationPropertiesLab,
+  RationalNumberLineLab,
+  RealNumberSetsLab,
+} from "./RealNumberVisualLabs";
 import { setPageMeta } from "@/lib/seo";
 
-const lesson = polygonAnglesLesson;
-const lessonVideos = (lesson.videos ?? []).slice(0, 4);
-
 export default function InteractiveLessonPage() {
+  const { lessonId: requestedLessonId } = useParams<{ lessonId?: string }>();
+  const requestedEntry = getRegisteredLesson(requestedLessonId);
+  const registered = requestedEntry ?? lessonRegistry[POLYGON_ANGLES_LESSON_ID];
+  const lesson = registered.lesson;
+  const questionMap = registered.questionMap;
+  const lessonVideos = (lesson.videos ?? []).slice(0, 4);
   const {
     session,
     setStepIndex,
@@ -56,15 +67,15 @@ export default function InteractiveLessonPage() {
 
   useEffect(() => {
     setPageMeta({
-      title: "زوايا المضلع - درس تفاعلي",
-      description: "تعلّم مجموع الزوايا الداخلية للمضلع بالرسم التفاعلي وشارف Tutor واختبار إتقان المهارات.",
-      keywords: "زوايا المضلع, مجموع الزوايا الداخلية, رياضيات أول ثانوي, درس تفاعلي",
+      title: `${lesson.title} - درس تفاعلي`,
+      description: `تعلّم ${lesson.title} بالشرح التفاعلي ومعلم شارف واختبار إتقان المهارات.`,
+      keywords: `${lesson.title}, ${lesson.subject}, ${lesson.grade}, درس تفاعلي`,
     });
-  }, []);
+  }, [lesson.grade, lesson.subject, lesson.title]);
 
   const currentQuestions = useMemo(() => (currentStep.questionIds ?? [])
-    .map((id) => polygonAnglesQuestionMap[id])
-    .filter(Boolean), [currentStep]);
+    .map((id) => questionMap[id])
+    .filter(Boolean), [currentStep, questionMap]);
 
   const stepComplete = useMemo(() => {
     if (currentStep.type === "video") return lessonVideos.length === 0 || playedVideoIds.length > 0;
@@ -121,26 +132,27 @@ export default function InteractiveLessonPage() {
   function next() {
     if (!stepComplete || session.stepIndex >= lesson.steps.length - 1) return;
     setStepIndex(session.stepIndex + 1);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   }
 
   function previous() {
     if (session.stepIndex === 0) return;
     setStepIndex(session.stepIndex - 1);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   }
 
   function handleVisualAction(action: TutorVisualAction) {
+    if (action.type !== "show_polygon") return;
     const discoveryIndex = lesson.steps.findIndex((step) => step.type === "polygon_discovery");
     if (discoveryIndex >= 0) setStepIndex(discoveryIndex);
     setVisualAction({ ...action });
-    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+    requestAnimationFrame(() => window.scrollTo({ top: 0 }));
   }
 
   function reviewSkill(skillId: string) {
-    const stepIndex = lesson.steps.findIndex((step) => step.questionIds?.some((questionId) => polygonAnglesQuestionMap[questionId]?.skillId === skillId));
+    const stepIndex = lesson.steps.findIndex((step) => step.questionIds?.some((questionId) => questionMap[questionId]?.skillId === skillId));
     setStepIndex(stepIndex >= 0 ? stepIndex : 0);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0 });
   }
 
   function renderStep(step: LessonStepDefinition) {
@@ -188,17 +200,18 @@ export default function InteractiveLessonPage() {
           />
         )}
 
-        {step.id === "warmup" && <PolygonPatternExplorer />}
+        {step.visualKind === "polygon-pattern" && <PolygonPatternExplorer />}
+        {step.visualKind === "polygon-discovery" && <PolygonLab externalAction={visualAction} />}
+        {step.visualKind === "polygon-formula" && <FormulaDiscoveryLab />}
+        {step.visualKind === "polygon-missing-angle" && <MissingAngleLab />}
+        {step.visualKind === "polygon-exterior" && <ExteriorTurnLab />}
+        {step.visualKind === "real-number-sets" && <RealNumberSetsLab />}
+        {step.visualKind === "real-number-decimals" && <DecimalPatternLab />}
+        {step.visualKind === "real-number-properties" && <OperationPropertiesLab />}
+        {step.visualKind === "rational-number-line" && <RationalNumberLineLab />}
+        {step.visualKind === "fraction-decimal-machine" && <FractionDecimalMachine />}
 
-        {step.type === "polygon_discovery" && <PolygonLab externalAction={visualAction} />}
-
-        {step.id === "formula" && <FormulaDiscoveryLab />}
-
-        {step.id === "worked-example" && <MissingAngleLab />}
-
-        {step.id === "exterior" && <ExteriorTurnLab />}
-
-        {step.body && !["formula", "worked-example", "exterior"].includes(step.id) && (
+        {step.body && !step.visualKind?.startsWith("polygon-") && (
           <section className="mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
             <ul className="space-y-3">
               {step.body.map((paragraph) => <li key={paragraph} className="flex gap-3 text-lg leading-8 text-slate-800"><span className="mt-3 h-2 w-2 shrink-0 rounded-full bg-cyan-600" />{paragraph}</li>)}
@@ -208,7 +221,7 @@ export default function InteractiveLessonPage() {
 
         {step.type === "assessment" && (
           <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-4 leading-7 text-violet-950">
-            <p className="flex items-center gap-2 font-black"><ListChecks className="h-5 w-5" /> خمسة أسئلة تغطي مهارات الدرس</p>
+            <p className="flex items-center gap-2 font-black"><ListChecks className="h-5 w-5" /> {currentQuestions.length} أسئلة تغطي مهارات الدرس</p>
             <p className="mt-1 text-sm">أجب من دون تلميحات. يمكنك تصحيح إجابتك، لكن التقرير سيأخذ عدد المحاولات في الحسبان.</p>
           </div>
         )}
@@ -318,14 +331,26 @@ export default function InteractiveLessonPage() {
               <div className="p-5">
                 <h2 className="font-black text-slate-900">{selectedVideo?.title}</h2>
                 <p className="mt-1 text-sm text-slate-500">{selectedVideo?.channelName}{selectedVideo?.duration ? ` · ${selectedVideo.duration}` : ""}</p>
-                <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-sm leading-6 text-cyan-950">أثناء المشاهدة، تتبّع رأسًا واحدًا في الرسم وعدّ المثلثات التي تظهر. بعد تشغيل الفيديو ستتمكن من الانتقال إلى النشاط التالي.</p>
+                <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-sm leading-6 text-cyan-950">أثناء المشاهدة، دوّن الفكرة التي أصبحت أوضح لك. بعد تشغيل أحد الشروحات ستتمكن من الانتقال إلى النشاط التالي.</p>
               </div>
           </section>
         )}
 
         {step.type === "teacher_summary" && (
           <div className="space-y-5">
-            <VisualLessonMap />
+            {lesson.id === POLYGON_ANGLES_LESSON_ID ? <VisualLessonMap /> : (
+              <section className="rounded-3xl border border-cyan-200 bg-cyan-50 p-5 sm:p-7">
+                <p className="text-sm font-black text-cyan-700">خريطة المهارات</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {lesson.skills.map((skill, index) => (
+                    <div key={skill.id} className="flex items-start gap-3 rounded-2xl border border-cyan-100 bg-white p-4">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan-800 font-black text-white">{index + 1}</span>
+                      <div><p className="font-black text-slate-900">{skill.title}</p><p className="mt-1 text-sm leading-6 text-slate-600">{skill.description}</p></div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
             <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
               <div className="flex items-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المحتوى</h2></div>
               <p className="mt-2 text-sm font-bold text-emerald-700">{lesson.teacherSummary.attribution}</p>
@@ -343,6 +368,14 @@ export default function InteractiveLessonPage() {
 
         {step.type === "report" && <MasteryReport lesson={lesson} mastery={mastery} onReview={reviewSkill} />}
       </>
+    );
+  }
+
+  if (requestedLessonId && !requestedEntry) {
+    return (
+      <main dir="rtl" className="flex min-h-screen items-center justify-center bg-slate-50 p-6 text-center">
+        <div><h1 className="text-2xl font-black">الدرس غير متاح بعد</h1><p className="mt-2 text-slate-600">لن نعرض صفحة فارغة. عد إلى فهرس المادة واختر درسًا متاحًا.</p><Link href="/" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-cyan-800 px-5 font-black text-white">العودة إلى شارف</Link></div>
+      </main>
     );
   }
 
