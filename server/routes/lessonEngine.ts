@@ -120,9 +120,17 @@ function addGreeting(reply: TutorReply, greeting: string | null): TutorReply {
 }
 
 function isClearlyOutsideLesson(message: string): boolean {
+  const explicitOutsideLesson = [
+    /(?:ليس|مو|مش)\s+(?:عن|حول|في)\s+(?:هذا\s+)?الدرس/,
+    /(?:سؤالي|سوالى|سوال)\s+(?:ليس|مو|مش)\s+(?:عن|حول)\s+الدرس/,
+    /خارج\s+(?:موضوع\s+)?الدرس/,
+  ];
+  if (explicitOutsideLesson.some((pattern) => pattern.test(message))) return true;
+
   const outsideTopics = [
     "الطقس", "مباراه", "كوره", "كره القدم", "سياره", "سيارات", "سياسه",
     "اخبار", "طبخ", "برمجه", "سهم", "اسهم", "عملات", "اغنيه", "فيلم",
+    "عاصمه", "دوله", "بلد", "فرنسا", "جغرافيا", "تاريخ", "رئيس", "وزير",
   ];
   return outsideTopics.some((topic) => message.includes(topic));
 }
