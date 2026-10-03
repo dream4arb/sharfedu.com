@@ -126,7 +126,7 @@ export function OperationPropertiesLab() {
       </div>
       <div className="grid items-center gap-5 bg-slate-50 p-5 sm:p-7 lg:grid-cols-[1fr_auto_1fr]">
         <div className={`rounded-2xl border-2 bg-white p-6 text-center text-2xl font-black transition-all duration-500 ${swapped ? "border-emerald-400 opacity-70" : "border-cyan-500 shadow-md"}`} dir="ltr">{selected.before}</div>
-        <button type="button" onClick={() => setSwapped((value) => !value)} className="mx-auto flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-cyan-800"><Play className="h-5 w-5" /> حرّك</button>
+        <button type="button" data-activity-primary onClick={() => setSwapped((value) => !value)} className="mx-auto flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-cyan-800"><Play className="h-5 w-5" /> حرّك</button>
         <div className={`rounded-2xl border-2 bg-white p-6 text-center text-2xl font-black transition-all duration-500 ${swapped ? "border-emerald-500 shadow-md ring-4 ring-emerald-100" : "border-slate-200 opacity-55"}`} dir="ltr">{selected.after}</div>
       </div>
       <div className="flex items-center justify-center gap-3 border-t border-slate-200 p-4 text-center"><Icon className="h-5 w-5 text-amber-600" /><p className="font-bold text-slate-700">{selected.note}، لذلك تبقى القيمة نفسها.</p></div>
@@ -183,7 +183,7 @@ export function FractionDecimalMachine() {
         <ArrowLeftRight className={`mx-auto h-7 w-7 text-emerald-600 transition ${stage >= 2 ? "opacity-100" : "opacity-20"}`} />
         <div className={`rounded-2xl border-2 bg-white p-6 text-center transition duration-500 ${stage >= 2 ? "border-emerald-400 opacity-100 shadow-md" : "border-slate-200 opacity-30"}`}><span className="block text-xs font-bold text-slate-500">الناتج</span><strong className="mt-2 block text-3xl" dir="ltr">{selected.decimal}</strong><span className="mt-2 block text-xs font-bold text-emerald-700">{selected.note}</span></div>
       </div>
-      <div className="border-t border-slate-200 p-4 text-center"><button type="button" onClick={() => setStage((value) => (value >= 2 ? 0 : value + 1))} className="min-h-12 rounded-xl bg-violet-700 px-6 font-black text-white hover:bg-violet-800">{stage >= 2 ? "أعد التحويل" : "الخطوة التالية"}</button></div>
+      <div className="border-t border-slate-200 p-4 text-center"><button type="button" data-activity-primary onClick={() => setStage((value) => (value >= 2 ? 0 : value + 1))} className="min-h-12 rounded-xl bg-violet-700 px-6 font-black text-white hover:bg-violet-800">{stage >= 2 ? "أعد التحويل" : "الخطوة التالية"}</button></div>
     </section>
   );
 }

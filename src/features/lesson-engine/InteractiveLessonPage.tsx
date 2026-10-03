@@ -42,12 +42,22 @@ import { setPageMeta } from "@/lib/seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buildLessonTabs, getLessonTabId, getReviewStepIndex, type LessonTabId } from "./lessonNavigation";
 import { lessonPresentation } from "./lessonPresentation";
+import { ActivityGuide } from "./ActivityGuide";
+import { ActivityReminder } from "./ActivityReminder";
+import { getLessonActivities, getPendingActivities } from "./lessonActivities";
+import { useActivityProgress } from "./useActivityProgress";
 
 export default function InteractiveLessonPage() {
   const { lessonId: requestedLessonId } = useParams<{ lessonId?: string }>();
   const requestedEntry = getRegisteredLesson(requestedLessonId);
   const registered = requestedEntry ?? lessonRegistry[POLYGON_ANGLES_LESSON_ID];
   const lesson = registered.lesson;
+  const activities = useMemo(() => getLessonActivities(lesson), [lesson]);
+  const { triedStepIds, markTried } = useActivityProgress(lesson, activities);
+  const pendingActivities = getPendingActivities(activities, triedStepIds);
+  const [showActivityReminder, setShowActivityReminder] = useState(false);
+  const remindedLessons = useRef(new Set<string>());
+  const restoreReminderFocus = useRef<() => void>(() => undefined);
   const questionMap = registered.questionMap;
   const lessonVideos = (lesson.videos ?? []).slice(0, 4);
   const {
@@ -158,20 +168,28 @@ export default function InteractiveLessonPage() {
     return () => observer.disconnect();
   }, [activeTabId, lesson.id]);
 
-  function selectTab(tabId: LessonTabId) {
+  function selectTab(tabId: LessonTabId, skipActivityReminder = false) {
     const tab = lessonTabs.find((item) => item.id === tabId);
-    if (!tab || !tab.stepIndexes.length) return;
+    if (!tab || !tab.stepIndexes.length) return false;
+    if (tabId === "assessment" && activeTabId !== "assessment" && !assessmentComplete
+      && pendingActivities.length > 0 && !skipActivityReminder && !remindedLessons.current.has(lesson.id)) {
+      remindedLessons.current.add(lesson.id);
+      const origin = document.activeElement;
+      restoreReminderFocus.current = () => { if (origin instanceof HTMLElement && origin.isConnected) origin.focus(); };
+      setShowActivityReminder(true);
+      return false;
+    }
     const nextStepIndex = tabId === "learn" ? lastLearningStep.current
       : tabId === "assessment" && session.completedAt && assessmentComplete ? reportStepIndex
       : tab.stepIndexes[0];
     setStepIndex(nextStepIndex >= 0 ? nextStepIndex : tab.stepIndexes[0]);
+    return true;
   }
 
   function navigateTab(direction: -1 | 1) {
     const nextTab = lessonTabs[activeTabIndex + direction];
     if (!nextTab) return;
-    selectTab(nextTab.id);
-    window.scrollTo({ top: 0 });
+    if (selectTab(nextTab.id)) window.scrollTo({ top: 0 });
   }
 
   function showResults() {
@@ -205,6 +223,19 @@ export default function InteractiveLessonPage() {
     // Graded questions live only in the final tab, not in the learning sections.
     const stepQuestions = step.type === "assessment" ? assessmentQuestions : [];
     const tutorMessage = showTutorMessage ? step.tutorMessage : undefined;
+    const activity = activities.find((item) => item.stepId === step.id);
+    const visuals = {
+      "polygon-pattern": <PolygonPatternExplorer />,
+      "polygon-discovery": <PolygonLab externalAction={visualAction} />,
+      "polygon-formula": <FormulaDiscoveryLab />,
+      "polygon-missing-angle": <MissingAngleLab />,
+      "polygon-exterior": <ExteriorTurnLab />,
+      "real-number-sets": <RealNumberSetsLab />,
+      "real-number-decimals": <DecimalPatternLab />,
+      "real-number-properties": <OperationPropertiesLab />,
+      "rational-number-line": <RationalNumberLineLab />,
+      "fraction-decimal-machine": <FractionDecimalMachine />,
+    };
     return (
       <>
         {step.type !== "official_book" && (showHeading || tutorMessage) && <div className="mb-6">
@@ -251,16 +282,7 @@ export default function InteractiveLessonPage() {
           />
         )}
 
-        {step.visualKind === "polygon-pattern" && <PolygonPatternExplorer />}
-        {step.visualKind === "polygon-discovery" && <PolygonLab externalAction={visualAction} />}
-        {step.visualKind === "polygon-formula" && <FormulaDiscoveryLab />}
-        {step.visualKind === "polygon-missing-angle" && <MissingAngleLab />}
-        {step.visualKind === "polygon-exterior" && <ExteriorTurnLab />}
-        {step.visualKind === "real-number-sets" && <RealNumberSetsLab />}
-        {step.visualKind === "real-number-decimals" && <DecimalPatternLab />}
-        {step.visualKind === "real-number-properties" && <OperationPropertiesLab />}
-        {step.visualKind === "rational-number-line" && <RationalNumberLineLab />}
-        {step.visualKind === "fraction-decimal-machine" && <FractionDecimalMachine />}
+        {step.visualKind && activity && <ActivityGuide activity={activity} tried={triedStepIds.includes(step.id)} onTry={markTried}>{visuals[step.visualKind]}</ActivityGuide>}
 
         {step.body && !step.visualKind?.startsWith("polygon-") && (
           <section className="mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
@@ -389,7 +411,7 @@ export default function InteractiveLessonPage() {
 
         {step.type === "teacher_summary" && (
           <div className="space-y-5">
-            {lesson.id === POLYGON_ANGLES_LESSON_ID ? <VisualLessonMap /> : (
+            {lesson.id === POLYGON_ANGLES_LESSON_ID && activity ? <ActivityGuide activity={activity} tried={triedStepIds.includes(step.id)} onTry={markTried}><VisualLessonMap /></ActivityGuide> : (
               <section className="rounded-3xl border border-cyan-200 bg-cyan-50 p-5 sm:p-7">
                 <p className="text-sm font-black text-cyan-700">خريطة المهارات</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -427,6 +449,7 @@ export default function InteractiveLessonPage() {
       <main dir="rtl" className="flex min-h-screen items-center justify-center bg-slate-50 p-6 text-center">
         <div><h1 className="text-2xl font-black">الدرس غير متاح بعد</h1><p className="mt-2 text-slate-600">لن نعرض صفحة فارغة. عد إلى فهرس المادة واختر درسًا متاحًا.</p><Link href="/" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-cyan-800 px-5 font-black text-white">العودة إلى شارف</Link></div>
       </main>
+
     );
   }
 
@@ -549,6 +572,19 @@ export default function InteractiveLessonPage() {
         />}
       </main>
 
+      <ActivityReminder open={showActivityReminder} onOpenChange={setShowActivityReminder} pending={pendingActivities}
+        onRestoreFocus={() => restoreReminderFocus.current()}
+        onReview={(activity) => {
+          restoreReminderFocus.current = () => undefined;
+          setShowActivityReminder(false);
+          openLearningSection(activity.stepIndex);
+        }}
+        onContinue={() => {
+          restoreReminderFocus.current = () => requestAnimationFrame(() => document.querySelector<HTMLElement>("[role='tab'][data-state='active']")?.focus());
+          setShowActivityReminder(false);
+          selectTab("assessment", true);
+          window.scrollTo({ top: 0 });
+        }} />
       <Link href="/" className="fixed bottom-4 left-4 hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-lg hover:text-cyan-800 xl:flex" aria-label="العودة للرئيسية"><ChevronLeft className="h-5 w-5" /></Link>
     </Tabs>
   );

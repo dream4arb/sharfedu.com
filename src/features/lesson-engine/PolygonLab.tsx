@@ -116,7 +116,7 @@ export function PolygonLab({
               </button>
             </div>
           ) : (
-            <button type="button" onClick={divide} data-testid="button-split-polygon" className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 font-black text-slate-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200">
+            <button type="button" onClick={divide} data-activity-primary data-testid="button-split-polygon" className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 font-black text-slate-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200">
               <Play className="h-5 w-5" /> قسّم المضلع
             </button>
           )}

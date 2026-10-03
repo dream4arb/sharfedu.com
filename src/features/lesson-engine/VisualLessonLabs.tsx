@@ -167,7 +167,7 @@ export function FormulaDiscoveryLab() {
           <p className="mt-1 font-black" dir="ltr">S = ({sides} − 2) × 180° {stage === 3 ? `= ${sum}°` : ""}</p>
         </div>
         {stage < 3 ? (
-          <button type="button" onClick={() => setStage((value) => Math.min(3, value + 1))} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 font-black text-slate-950 sm:w-auto"><Play className="h-5 w-5" />{stageLabels[stage]}</button>
+          <button type="button" data-activity-primary onClick={() => setStage((value) => Math.min(3, value + 1))} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 font-black text-slate-950 sm:w-auto"><Play className="h-5 w-5" />{stageLabels[stage]}</button>
         ) : (
           <button type="button" onClick={() => setStage(0)} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/20 px-5 font-black sm:w-auto"><RotateCcw className="h-5 w-5" />أعد المشهد</button>
         )}
@@ -231,7 +231,7 @@ export function MissingAngleLab() {
             {stage === 3 && <><p className="text-sm text-emerald-300">المتبقي هو الزاوية المجهولة</p><p className="mt-1 text-3xl font-black" dir="ltr">360° − 315° = 45°</p></>}
           </div>
 
-          <button type="button" onClick={() => stage < 3 ? setStage(stage + 1) : setStage(0)} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-violet-700 px-5 font-black text-white hover:bg-violet-800">
+          <button type="button" data-activity-primary onClick={() => stage < 3 ? setStage(stage + 1) : setStage(0)} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-violet-700 px-5 font-black text-white hover:bg-violet-800">
             {stage < 3 ? <><Play className="h-5 w-5" />{labels[stage]}</> : <><RotateCcw className="h-5 w-5" />أعد المشهد</>}
           </button>
         </div>
@@ -274,7 +274,7 @@ export function ExteriorTurnLab() {
             <p className="mt-2 text-3xl font-black tabular-nums" dir="ltr">{turns} × {angle}° = {turns * angle}°</p>
             {turns === sides && <p className="mt-3 flex items-center justify-center gap-2 font-black text-emerald-300"><Check className="h-5 w-5" />اكتملت دورة 360°</p>}
           </div>
-          <button type="button" onClick={() => setTurns((value) => value < sides ? value + 1 : 0)} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 font-black text-white hover:bg-emerald-800">
+          <button type="button" data-activity-primary onClick={() => setTurns((value) => value < sides ? value + 1 : 0)} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 font-black text-white hover:bg-emerald-800">
             {turns < sides ? <><ChevronLeft className="h-5 w-5" />انتقل إلى الرأس التالي</> : <><RotateCcw className="h-5 w-5" />أعد الجولة</>}
           </button>
         </div>
