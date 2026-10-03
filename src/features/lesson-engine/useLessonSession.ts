@@ -5,6 +5,7 @@ import type {
   LessonQuestionDefinition,
   SkillMasterySnapshot,
 } from "@shared/lesson-engine/types";
+import { getInitialLessonStepIndex } from "./lessonNavigation";
 
 export interface QuestionProgress {
   questionId: string;
@@ -22,6 +23,7 @@ interface StoredLessonSession {
   sessionId: string;
   stepIndex: number;
   unlockedStepIndex: number;
+  visitedStepIds: string[];
   startedAt: string;
   completedAt?: string;
   questions: Record<string, QuestionProgress>;
@@ -47,11 +49,13 @@ export interface LessonAnalyticsEvent {
 }
 
 function createSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
+  const initialStepIndex = getInitialLessonStepIndex(lesson);
   return {
     lessonVersion: lesson.version,
     sessionId: crypto.randomUUID(),
-    stepIndex: 0,
-    unlockedStepIndex: 0,
+    stepIndex: initialStepIndex,
+    unlockedStepIndex: initialStepIndex,
+    visitedStepIds: [lesson.steps[initialStepIndex].id],
     startedAt: new Date().toISOString(),
     questions: {},
   };
@@ -64,9 +68,20 @@ function loadSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
     if (!raw) return createSession(lesson);
     const parsed = JSON.parse(raw) as StoredLessonSession;
     if (parsed.lessonVersion !== lesson.version || !parsed.sessionId) return createSession(lesson);
+    const stepIndex = Number.isInteger(parsed.stepIndex)
+      ? Math.max(0, Math.min(parsed.stepIndex, lesson.steps.length - 1))
+      : getInitialLessonStepIndex(lesson);
+    const unlockedStepIndex = Math.min(lesson.steps.length - 1, Math.max(stepIndex, parsed.unlockedStepIndex ?? stepIndex));
+    const validStepIds = new Set(lesson.steps.map((step) => step.id));
     return {
       ...parsed,
-      unlockedStepIndex: Math.max(parsed.stepIndex, parsed.unlockedStepIndex ?? parsed.stepIndex),
+      stepIndex,
+      unlockedStepIndex,
+      // Older sessions were sequential. Preserve their answers and visited content.
+      visitedStepIds: Array.isArray(parsed.visitedStepIds)
+        ? Array.from(new Set([...parsed.visitedStepIds.filter((id) => validStepIds.has(id)), lesson.steps[stepIndex].id]))
+        : lesson.steps.slice(0, unlockedStepIndex + 1).map((step) => step.id),
+      questions: parsed.questions ?? {},
     };
   } catch {
     return createSession(lesson);
@@ -103,6 +118,7 @@ export function useLessonSession(lesson: InteractiveLessonDefinition) {
       ...session,
       stepIndex: nextStepIndex,
       unlockedStepIndex: Math.max(session.unlockedStepIndex ?? session.stepIndex, nextStepIndex),
+      visitedStepIds: Array.from(new Set([...session.visitedStepIds, lesson.steps[nextStepIndex].id])),
     });
   }, [lesson.steps.length, persist, session]);
 

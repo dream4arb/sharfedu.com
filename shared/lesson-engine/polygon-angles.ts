@@ -372,6 +372,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     },
     {
       id: "warmup",
+      skillIds: ["triangle-angle-sum"],
       type: "warmup",
       visualKind: "polygon-pattern",
       eyebrow: "الفكرة في صور",
@@ -380,6 +381,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     },
     {
       id: "discover",
+      skillIds: ["polygon-triangulation"],
       type: "polygon_discovery",
       visualKind: "polygon-discovery",
       eyebrow: "مختبر الأشكال",
@@ -388,6 +390,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     },
     {
       id: "formula",
+      skillIds: ["interior-angle-formula"],
       type: "concept",
       visualKind: "polygon-formula",
       eyebrow: "ابنِ القانون",
@@ -401,6 +404,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     },
     {
       id: "worked-example",
+      skillIds: ["unknown-angle"],
       type: "worked_example",
       visualKind: "polygon-missing-angle",
       eyebrow: "الزاوية المجهولة",
@@ -412,6 +416,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
     },
     {
       id: "exterior",
+      skillIds: ["exterior-angles"],
       type: "concept",
       visualKind: "polygon-exterior",
       eyebrow: "دورة خارجية",

@@ -67,6 +67,7 @@ export interface LessonStepDefinition {
   formula?: string;
   formulaLabel?: string;
   questionIds?: string[];
+  skillIds?: string[];
   visualKind?:
     | "polygon-pattern"
     | "polygon-discovery"

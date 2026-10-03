@@ -39,6 +39,9 @@ import {
   RealNumberSetsLab,
 } from "./RealNumberVisualLabs";
 import { setPageMeta } from "@/lib/seo";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { buildLessonTabs, getLessonTabId, getReviewStepIndex, type LessonTabId } from "./lessonNavigation";
 
 export default function InteractiveLessonPage() {
   const { lessonId: requestedLessonId } = useParams<{ lessonId?: string }>();
@@ -62,8 +65,26 @@ export default function InteractiveLessonPage() {
   const [playedVideoIds, setPlayedVideoIds] = useState<string[]>([]);
   const assessmentEventSent = useRef(false);
   const currentStep = lesson.steps[session.stepIndex];
+  const lessonTabs = useMemo(() => buildLessonTabs(lesson), [lesson]);
+  const activeTabId = getLessonTabId(currentStep);
+  const activeTabIndex = lessonTabs.findIndex((tab) => tab.id === activeTabId);
+  const learningTab = lessonTabs.find((tab) => tab.id === "learn")!;
+  const assessmentStep = lesson.steps.find((step) => step.type === "assessment");
+  const reportStepIndex = lesson.steps.findIndex((step) => step.type === "report");
+  const lastLearningStep = useRef(learningTab.stepIndexes[0]);
+  if (activeTabId === "learn") lastLearningStep.current = session.stepIndex;
   const selectedVideo = lessonVideos[selectedVideoIndex] ?? lessonVideos[0];
-  const progress = Math.round(((session.unlockedStepIndex + 1) / lesson.steps.length) * 100);
+  const assessmentQuestions = useMemo(() => (assessmentStep?.questionIds ?? lesson.assessmentQuestionIds)
+    .map((id) => questionMap[id]).filter(Boolean), [assessmentStep, lesson.assessmentQuestionIds, questionMap]);
+  const answeredCount = assessmentQuestions.filter((question) => (session.questions[question.id]?.attempts ?? 0) > 0).length;
+  const assessmentComplete = assessmentQuestions.length > 0 && answeredCount === assessmentQuestions.length;
+  const showReport = activeTabId === "assessment" && currentStep.type === "report" && assessmentComplete;
+  const contentSteps = lesson.steps.filter((step) => step.type !== "assessment" && step.type !== "report");
+  const visitedContentCount = contentSteps.filter((step) => session.visitedStepIds.includes(step.id)).length;
+  const progress = session.completedAt ? 100 : Math.round(
+    (visitedContentCount / Math.max(1, contentSteps.length)) * 75
+    + (answeredCount / Math.max(1, assessmentQuestions.length)) * 25,
+  );
 
   useEffect(() => {
     setPageMeta({
@@ -72,19 +93,6 @@ export default function InteractiveLessonPage() {
       keywords: `${lesson.title}, ${lesson.subject}, ${lesson.grade}, درس تفاعلي`,
     });
   }, [lesson.grade, lesson.subject, lesson.title]);
-
-  const currentQuestions = useMemo(() => (currentStep.questionIds ?? [])
-    .map((id) => questionMap[id])
-    .filter(Boolean), [currentStep, questionMap]);
-
-  const stepComplete = useMemo(() => {
-    if (currentStep.type === "video") return lessonVideos.length === 0 || playedVideoIds.length > 0;
-    if (!currentQuestions.length) return true;
-    if (currentStep.type === "assessment") {
-      return currentQuestions.every((question) => (session.questions[question.id]?.attempts ?? 0) > 0);
-    }
-    return currentQuestions.every((question) => session.questions[question.id]?.correct === true);
-  }, [currentQuestions, currentStep.type, session.questions, playedVideoIds]);
 
   function selectVideo(index: number) {
     setSelectedVideoIndex(index);
@@ -114,12 +122,12 @@ export default function InteractiveLessonPage() {
   }, [currentStep.id, emitEvent, session.sessionId]);
 
   useEffect(() => {
-    if (currentStep.type === "assessment" && stepComplete && !assessmentEventSent.current) {
+    if (activeTabId === "assessment" && assessmentComplete && !assessmentEventSent.current) {
       assessmentEventSent.current = true;
       emitEvent({ name: "assessment_completed" });
     }
-    if (currentStep.type === "report") completeLesson();
-  }, [completeLesson, currentStep.type, emitEvent, stepComplete]);
+    if (showReport) completeLesson();
+  }, [completeLesson, activeTabId, emitEvent, assessmentComplete, showReport]);
 
   useEffect(() => {
     if (currentStep.type !== "official_book") return;
@@ -129,16 +137,26 @@ export default function InteractiveLessonPage() {
     emitEvent({ name: "book_opened", stepId: currentStep.id, metadata: { pages: lesson.curriculumSource.lessonPages?.length ?? 0 } });
   }, [currentStep.id, currentStep.type, emitEvent, session.sessionId]);
 
-  function next() {
-    if (!stepComplete || session.stepIndex >= lesson.steps.length - 1) return;
-    setStepIndex(session.stepIndex + 1);
+  function selectTab(tabId: LessonTabId) {
+    const tab = lessonTabs.find((item) => item.id === tabId);
+    if (!tab || !tab.stepIndexes.length) return;
+    const nextStepIndex = tabId === "learn" ? lastLearningStep.current
+      : tabId === "assessment" && session.completedAt && assessmentComplete ? reportStepIndex
+      : tab.stepIndexes[0];
+    setStepIndex(nextStepIndex >= 0 ? nextStepIndex : tab.stepIndexes[0]);
+  }
+
+  function navigateTab(direction: -1 | 1) {
+    const nextTab = lessonTabs[activeTabIndex + direction];
+    if (!nextTab) return;
+    selectTab(nextTab.id);
     window.scrollTo({ top: 0 });
   }
 
-  function previous() {
-    if (session.stepIndex === 0) return;
-    setStepIndex(session.stepIndex - 1);
-    window.scrollTo({ top: 0 });
+  function showResults() {
+    if (!assessmentComplete || reportStepIndex < 0) return;
+    setStepIndex(reportStepIndex);
+    requestAnimationFrame(() => document.getElementById("lesson-result")?.focus());
   }
 
   function handleVisualAction(action: TutorVisualAction) {
@@ -150,17 +168,21 @@ export default function InteractiveLessonPage() {
   }
 
   function reviewSkill(skillId: string) {
-    const stepIndex = lesson.steps.findIndex((step) => step.questionIds?.some((questionId) => questionMap[questionId]?.skillId === skillId));
-    setStepIndex(stepIndex >= 0 ? stepIndex : 0);
+    const stepIndex = getReviewStepIndex(lesson, skillId);
+    setStepIndex(stepIndex >= 0 ? stepIndex : learningTab.stepIndexes[0]);
     window.scrollTo({ top: 0 });
   }
 
-  function renderStep(step: LessonStepDefinition) {
+  function renderStep(step: LessonStepDefinition, showHeading = true) {
+    // Graded questions live only in the final tab, not in the learning sections.
+    const stepQuestions = step.type === "assessment" ? assessmentQuestions : [];
     return (
       <>
         <div className="mb-6">
-          <p className="text-sm font-black text-cyan-700">{step.eyebrow}</p>
-          <h1 className="mt-2 text-3xl font-black leading-tight text-slate-950 sm:text-4xl" data-testid="lesson-step-title">{step.title}</h1>
+          {showHeading && <>
+            <p className="text-sm font-black text-cyan-700">{lessonTabs[activeTabIndex].title}</p>
+            <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{step.title}</h1>
+          </>}
           {step.tutorMessage && (
             <div className="mt-4 flex gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4 leading-7 text-cyan-950">
               <Sparkles className="mt-1 h-5 w-5 shrink-0 text-cyan-700" />
@@ -188,7 +210,7 @@ export default function InteractiveLessonPage() {
             <section className="rounded-3xl bg-gradient-to-l from-cyan-800 to-slate-900 p-6 text-white sm:p-8">
               <p className="text-sm font-bold text-cyan-200">طريقة التعلم</p>
               <h2 className="mt-2 text-2xl font-black">افهم، شاهد، حرّك، ثم طبّق</h2>
-              <p className="mt-3 max-w-2xl leading-8 text-slate-200">تبدأ بشرح واضح، ثم تستطيع مراجعة صفحات الدرس في كتاب الوزارة، وبعدها تختار شرح الفيديو الأنسب لك. تتابع بأنشطة رسم وحركة بلا درجات، ثم يأتي اختبار واحد بتغذية راجعة مرتبطة بنوع الخطأ.</p>
+              <p className="mt-3 max-w-2xl leading-8 text-slate-200">راجع الدرس من كتاب الوزارة، واختر شرح الفيديو الأنسب لك. هنا تجد الشرح والأنشطة البصرية مجتمعة بلا درجات، ثم تنتقل إلى اختبار واحد ونتيجته في المكان نفسه.</p>
             </section>
           </div>
         )}
@@ -221,14 +243,14 @@ export default function InteractiveLessonPage() {
 
         {step.type === "assessment" && (
           <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-4 leading-7 text-violet-950">
-            <p className="flex items-center gap-2 font-black"><ListChecks className="h-5 w-5" /> {currentQuestions.length} أسئلة تغطي مهارات الدرس</p>
-            <p className="mt-1 text-sm">أجب من دون تلميحات. يمكنك تصحيح إجابتك، لكن التقرير سيأخذ عدد المحاولات في الحسبان.</p>
+            <p className="flex items-center gap-2 font-black"><ListChecks className="h-5 w-5" /> {stepQuestions.length} أسئلة تغطي مهارات الدرس</p>
+            <p className="mt-1 text-sm">أجب بنفسك من دون تلميحات. يمكنك تصحيح إجابتك، وسيأخذ التقرير عدد المحاولات في الحسبان.</p>
           </div>
         )}
 
-        {currentQuestions.length > 0 && (
+        {stepQuestions.length > 0 && (
           <div className="space-y-4">
-            {currentQuestions.map((question) => (
+            {stepQuestions.map((question) => (
               <QuestionCard
                 key={question.id}
                 question={question}
@@ -249,7 +271,7 @@ export default function InteractiveLessonPage() {
                     <p className="text-sm font-black text-cyan-700">اختر الشرح الأنسب لك</p>
                     <h2 className="mt-1 text-xl font-black text-slate-950">{lessonVideos.length} {lessonVideos.length === 1 ? "شرح متاح" : "شروحات متاحة"}</h2>
                   </div>
-                  {playedVideoIds.length > 0 && <p className="text-sm font-bold text-emerald-700">شاهدت {playedVideoIds.length} من {lessonVideos.length}</p>}
+                  {playedVideoIds.length > 0 && <p className="text-sm font-bold text-emerald-700">شغّلت {playedVideoIds.length} من {lessonVideos.length}</p>}
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="group" aria-label="شروحات الفيديو المتاحة">
                   {lessonVideos.map((video, index) => {
@@ -268,7 +290,7 @@ export default function InteractiveLessonPage() {
                           <img src={thumbnailUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
                           <span className="absolute inset-0 flex items-center justify-center bg-slate-950/35"><PlayCircle className="h-10 w-10 text-white" /></span>
                           {video.source === "hosted" && <span className="absolute right-2 top-2 rounded-full bg-cyan-700 px-2 py-1 text-xs font-black text-white">شرح شارف</span>}
-                          {played && <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2 py-1 text-xs font-black text-white">شاهدته</span>}
+                          {played && <span className="absolute left-2 top-2 rounded-full bg-emerald-600 px-2 py-1 text-xs font-black text-white">شغّلته</span>}
                         </span>
                         <span className="block p-3">
                           <span className="block text-xs font-black text-cyan-700">الشرح {index + 1}</span>
@@ -331,7 +353,7 @@ export default function InteractiveLessonPage() {
               <div className="p-5">
                 <h2 className="font-black text-slate-900">{selectedVideo?.title}</h2>
                 <p className="mt-1 text-sm text-slate-500">{selectedVideo?.channelName}{selectedVideo?.duration ? ` · ${selectedVideo.duration}` : ""}</p>
-                <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-sm leading-6 text-cyan-950">أثناء المشاهدة، دوّن الفكرة التي أصبحت أوضح لك. بعد تشغيل أحد الشروحات ستتمكن من الانتقال إلى النشاط التالي.</p>
+                <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-sm leading-6 text-cyan-950">تابع الشرح بالسرعة المناسبة لك، ثم انتقل إلى «الشرح التفاعلي» لتجربة الأفكار بنفسك. يمكنك العودة إلى الفيديو في أي وقت.</p>
               </div>
           </section>
         )}
@@ -380,7 +402,7 @@ export default function InteractiveLessonPage() {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen overflow-x-hidden bg-[#f7fafb] text-slate-900">
+    <Tabs value={activeTabId} onValueChange={(value) => selectTab(value as LessonTabId)} dir="rtl" className="min-h-screen overflow-x-hidden bg-[#f7fafb] text-slate-900">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-4 py-3 sm:px-6">
           <Link href="/" className="flex shrink-0 items-center gap-2 font-black text-cyan-800" aria-label="العودة إلى منصة شارف">
@@ -394,46 +416,95 @@ export default function InteractiveLessonPage() {
           </div>
           <span className="hidden rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 sm:inline">يحفظ التقدم تلقائيًا</span>
         </div>
-        <div className="h-1.5 bg-slate-100" role="progressbar" aria-label="تقدم الدرس" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+        <div className="h-1.5 bg-slate-100" role="progressbar" aria-label="تقدم تصفح الدرس والاختبار" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
           <div className="h-full bg-gradient-to-l from-cyan-600 to-emerald-500 transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
       </header>
 
       <div className="border-b border-slate-200 bg-white/80">
-        <nav className="mx-auto flex max-w-[1500px] gap-2 overflow-x-auto px-4 py-3 sm:px-6" aria-label="مراحل الدرس">
-          {lesson.steps.map((step, index) => (
-            <button
-              key={step.id}
-              type="button"
-              onClick={() => { if (index <= session.unlockedStepIndex) setStepIndex(index); }}
-              disabled={index > session.unlockedStepIndex}
-              aria-current={index === session.stepIndex ? "step" : undefined}
-              className={`min-h-9 shrink-0 rounded-full px-3 text-xs font-bold transition ${
-                index === session.stepIndex ? "bg-cyan-800 text-white" : index <= session.unlockedStepIndex ? "bg-cyan-50 text-cyan-800 hover:bg-cyan-100" : "bg-slate-100 text-slate-400"
-              }`}
+        <nav className="mx-auto max-w-[1500px] px-4 py-3 sm:px-6" aria-label="أقسام الدرس">
+          <TabsList className="grid h-auto grid-cols-2 items-stretch gap-2 rounded-none bg-transparent p-0 sm:grid-cols-4" aria-label="تبويبات الدرس">
+          {lessonTabs.map((tab, index) => (
+            <TabsTrigger
+              key={tab.id}
+              value={tab.id}
+              disabled={!tab.stepIndexes.length}
+              className="min-h-12 min-w-0 gap-2 whitespace-normal rounded-2xl border border-slate-200 bg-white px-3 py-2 text-center text-xs font-bold leading-5 text-slate-600 hover:bg-cyan-50 data-[state=active]:border-cyan-800 data-[state=active]:bg-cyan-800 data-[state=active]:text-white data-[state=active]:shadow-none sm:text-sm"
             >
-              {index < session.unlockedStepIndex && <Check className="ml-1 inline h-3.5 w-3.5" />}{index + 1}. {step.eyebrow}
-            </button>
+              <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100/20">{index + 1}</span>
+              <span>{tab.title}</span>
+            </TabsTrigger>
           ))}
+          </TabsList>
         </nav>
       </div>
 
       <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start lg:py-8">
         <article className="min-w-0">
-          {renderStep(currentStep)}
+          {lessonTabs.map((tab) => (
+            <TabsContent key={tab.id} value={tab.id} className="mt-0 min-w-0">
+              {tab.id === "book" || tab.id === "video" ? tab.stepIndexes.map((index) => <div key={lesson.steps[index].id}>{renderStep(lesson.steps[index])}</div>) : null}
 
-          {currentStep.type !== "report" && (
+              {tab.id === "learn" && <>
+                <div className="mb-5">
+                  <p className="text-sm font-black text-cyan-700">الشرح التفاعلي</p>
+                  <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">افهم الدرس وجرّب أفكاره</h1>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">الشرح والأمثلة والأنشطة مجتمعة هنا. افتح قسمًا لتتعلمه، ثم انتقل إلى الاختبار عندما تكون مستعدًا.</p>
+                </div>
+                <Accordion type="single" value={currentStep.id} onValueChange={(id) => {
+                  const index = lesson.steps.findIndex((step) => step.id === id);
+                  if (learningTab.stepIndexes.includes(index)) setStepIndex(index);
+                }} className="space-y-3">
+                  {tab.stepIndexes.map((index, sectionIndex) => {
+                    const step = lesson.steps[index];
+                    return <AccordionItem key={step.id} value={step.id} className="rounded-2xl border border-slate-200 bg-white data-[state=open]:border-cyan-200" data-testid={`learning-section-${step.id}`}>
+                      <AccordionTrigger className="gap-3 rounded-2xl px-4 text-right hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700 sm:px-5">
+                        <span className="flex min-w-0 items-center gap-3">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-sm font-black text-cyan-800" aria-hidden="true">{sectionIndex + 1}</span>
+                          <span className="min-w-0">
+                            <span className="block text-xs font-bold text-cyan-700">{step.eyebrow.replace(/^\d+\.\s*/, "")}</span>
+                            <span className="mt-1 block text-sm font-black leading-6 text-slate-900 sm:text-base">{step.title}</span>
+                          </span>
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent forceMount hidden={currentStep.id !== step.id} className="px-3 pb-4 sm:px-5" >
+                        {renderStep(step, false)}
+                      </AccordionContent>
+                    </AccordionItem>;
+                  })}
+                </Accordion>
+              </>}
+
+              {tab.id === "assessment" && assessmentStep && <>
+                {showReport ? <>
+                  <section id="lesson-result" tabIndex={-1} className="rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700" data-testid="lesson-result">
+                    <p className="text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>
+                    <h1 className="mb-6 mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">نتيجتك وما تحتاج إلى مراجعته</h1>
+                    <MasteryReport lesson={lesson} mastery={mastery} onReview={reviewSkill} />
+                  </section>
+                  <details className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+                    <summary className="cursor-pointer rounded-lg py-2 font-black text-cyan-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700">راجع إجابات الاختبار</summary>
+                    <div className="mt-4">{renderStep(assessmentStep, false)}</div>
+                  </details>
+                </> : renderStep(assessmentStep)}
+              </>}
+            </TabsContent>
+          ))}
+
             <footer className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5">
-              {!stepComplete && <p className="mb-3 text-center text-sm font-bold text-amber-700">{currentStep.type === "video" ? "شغّل الفيديو التعليمي للانتقال إلى النشاط التالي." : `أكمل ${currentStep.type === "assessment" ? "جميع إجابات الاختبار" : "التحقق الحالي"} للانتقال إلى الخطوة التالية.`}</p>}
-              <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={previous} disabled={session.stepIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>
-                <span className="hidden text-sm font-bold text-slate-500 sm:inline">{session.stepIndex + 1} من {lesson.steps.length}</span>
-                <button type="button" onClick={next} disabled={!stepComplete} className="flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-35" data-testid="button-next-step">
-                  {currentStep.type === "assessment" ? "اعرض تقريري" : "الخطوة التالية"}<ArrowLeft className="h-5 w-5" />
-                </button>
+              {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600" role="status">أجبت عن {answeredCount} من {assessmentQuestions.length}. {assessmentComplete ? "نتيجتك جاهزة للعرض هنا." : "أجب عن جميع الأسئلة لإظهار نتيجتك."}</p>}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <button type="button" onClick={() => navigateTab(-1)} disabled={activeTabIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>
+                <span className="hidden text-sm font-bold text-slate-500 sm:inline">{activeTabIndex + 1} من 4</span>
+                {activeTabId === "assessment" ? !showReport && (
+                  <button type="button" onClick={showResults} disabled={!assessmentComplete} className="flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-35" data-testid="button-show-results">اعرض نتيجتي<ArrowLeft className="h-5 w-5" /></button>
+                ) : (
+                  <button type="button" onClick={() => navigateTab(1)} className="flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-cyan-800" data-testid="button-next-step">
+                    {activeTabId === "learn" ? "ابدأ اختبار الدرس" : lessonTabs[activeTabIndex + 1].title}<ArrowLeft className="h-5 w-5" />
+                  </button>
+                )}
               </div>
             </footer>
-          )}
         </article>
 
         <TutorPanel
@@ -447,6 +518,6 @@ export default function InteractiveLessonPage() {
       </main>
 
       <Link href="/" className="fixed bottom-4 left-4 hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-lg hover:text-cyan-800 xl:flex" aria-label="العودة للرئيسية"><ChevronLeft className="h-5 w-5" /></Link>
-    </div>
+    </Tabs>
   );
 }
