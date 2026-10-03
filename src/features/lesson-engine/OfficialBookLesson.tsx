@@ -1,7 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  ArrowLeft,
-  ArrowRight,
   BookOpenText,
   Download,
   ExternalLink,
@@ -20,8 +18,28 @@ const zoomLevels = [100, 125, 150];
 
 export function OfficialBookLesson({ source, onPageViewed }: OfficialBookLessonProps) {
   const excerpt = source.lessonExcerpt;
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [zoomIndex, setZoomIndex] = useState(0);
+  const pageListRef = useRef<HTMLDivElement>(null);
+  const viewedPages = useRef(new Set<number>());
+  const pageViewedCallback = useRef(onPageViewed);
+  pageViewedCallback.current = onPageViewed;
+
+  useEffect(() => {
+    const pageList = pageListRef.current;
+    if (!pageList || !excerpt) return;
+    viewedPages.current.clear();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const pageNumber = Number((entry.target as HTMLElement).dataset.bookPage);
+        if (viewedPages.current.has(pageNumber)) continue;
+        viewedPages.current.add(pageNumber);
+        pageViewedCallback.current?.(pageNumber);
+      }
+    }, { threshold: 0.1 });
+    pageList.querySelectorAll("[data-book-page]").forEach((page) => observer.observe(page));
+    return () => observer.disconnect();
+  }, [excerpt]);
 
   if (!excerpt?.pages.length) {
     return (
@@ -37,14 +55,7 @@ export function OfficialBookLesson({ source, onPageViewed }: OfficialBookLessonP
   }
 
   const pages = excerpt.pages;
-  const selectedPage = pages[selectedIndex];
   const zoom = zoomLevels[zoomIndex];
-
-  function selectPage(index: number) {
-    const nextIndex = Math.max(0, Math.min(index, pages.length - 1));
-    setSelectedIndex(nextIndex);
-    onPageViewed?.(pages[nextIndex].pageNumber);
-  }
 
   return (
     <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white" aria-labelledby="official-book-heading">
@@ -68,15 +79,7 @@ export function OfficialBookLesson({ source, onPageViewed }: OfficialBookLessonP
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 sm:px-5">
-        <div className="flex items-center gap-2" aria-label="التنقل بين صفحات الدرس">
-          <button type="button" onClick={() => selectPage(selectedIndex - 1)} disabled={selectedIndex === 0} className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 text-sm font-black text-slate-700 disabled:opacity-35">
-            <ArrowRight className="h-4 w-4" /> السابقة
-          </button>
-          <span className="min-w-24 text-center text-sm font-black text-slate-700" aria-live="polite">صفحة {selectedPage.pageNumber}</span>
-          <button type="button" onClick={() => selectPage(selectedIndex + 1)} disabled={selectedIndex === pages.length - 1} className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 text-sm font-black text-slate-700 disabled:opacity-35">
-            التالية <ArrowLeft className="h-4 w-4" />
-          </button>
-        </div>
+        <p className="text-sm font-bold leading-6 text-slate-700">عرض متصل · {pages.length} صفحات كاملة، مرّر للأسفل لمتابعة الدرس.</p>
 
         <div className="flex items-center gap-2" aria-label="تكبير صفحة الكتاب">
           <button type="button" onClick={() => setZoomIndex((index) => Math.max(0, index - 1))} disabled={zoomIndex === 0} aria-label="تصغير الصفحة" className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 disabled:opacity-35"><Minus className="h-5 w-5" /></button>
@@ -85,40 +88,27 @@ export function OfficialBookLesson({ source, onPageViewed }: OfficialBookLessonP
         </div>
       </div>
 
-      <div className="overflow-auto bg-slate-200/70 p-3 sm:p-5" data-testid="official-book-page-viewer">
-        <figure className="mx-auto" style={{ width: `${zoom}%`, maxWidth: zoom === 100 ? "900px" : "none" }}>
-          <img
-            key={selectedPage.imageUrl}
-            src={selectedPage.imageUrl}
-            alt={selectedPage.alt}
-            width={1417}
-            height={1826}
-            decoding="async"
-            className="h-auto w-full rounded-xl bg-white shadow-lg ring-1 ring-slate-300"
-          />
-          <figcaption className="sr-only">{selectedPage.alt}</figcaption>
-        </figure>
+      <div ref={pageListRef} className="space-y-8 bg-slate-100 p-3 sm:space-y-10 sm:p-6" data-testid="official-book-page-viewer">
+        {pages.map((page, index) => (
+          <div key={page.pageNumber} className="overflow-x-auto rounded-2xl" data-testid={`book-page-${page.pageNumber}`}>
+            <figure data-book-page={page.pageNumber} className="mx-auto overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-sm" style={{ width: `${zoom}%`, maxWidth: zoom === 100 ? "900px" : "none" }}>
+              <figcaption className="border-b border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700">صفحة {page.pageNumber} <span className="mr-2 font-normal text-slate-500">· {index + 1} من {pages.length}</span></figcaption>
+              <img
+                src={page.imageUrl}
+                alt={page.alt}
+                width={1417}
+                height={1826}
+                loading={index === 0 ? "eager" : "lazy"}
+                decoding="async"
+                className="block h-auto w-full bg-white"
+              />
+            </figure>
+          </div>
+        ))}
       </div>
 
       <div className="border-t border-slate-200 p-4 sm:p-5">
-        <ul className="flex gap-3 overflow-x-auto pb-2" aria-label="صفحات درس زوايا المضلع">
-          {pages.map((page, index) => (
-            <li key={page.pageNumber} className="shrink-0">
-              <button
-                type="button"
-                onClick={() => selectPage(index)}
-                aria-current={index === selectedIndex ? "page" : undefined}
-                aria-label={`اعرض صفحة ${page.pageNumber}`}
-                className={`w-20 overflow-hidden rounded-xl border-2 bg-white p-1 transition ${index === selectedIndex ? "border-cyan-700 ring-4 ring-cyan-100" : "border-slate-200 hover:border-cyan-300"}`}
-              >
-                <img src={page.imageUrl} alt="" loading="lazy" width={70} height={90} className="aspect-[.776] w-full rounded-md object-cover object-top" />
-                <span className="mt-1 block text-xs font-black text-slate-700">ص {page.pageNumber}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <a href={excerpt.pdfUrl} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-center font-black text-white hover:bg-cyan-800">
             نسخة صفحات الدرس <Download className="h-5 w-5" />
           </a>

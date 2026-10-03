@@ -13,6 +13,7 @@
     "check": "tsc",
     "quality:lesson": "npx tsx script/validate-lesson-content.ts",
     "test:lesson-navigation": "npx tsx script/test-lesson-navigation.ts",
+    "test:lesson-presentation": "npx tsx script/test-lesson-presentation.ts",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {

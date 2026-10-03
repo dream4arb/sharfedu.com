@@ -39,9 +39,9 @@ import {
   RealNumberSetsLab,
 } from "./RealNumberVisualLabs";
 import { setPageMeta } from "@/lib/seo";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buildLessonTabs, getLessonTabId, getReviewStepIndex, type LessonTabId } from "./lessonNavigation";
+import { lessonPresentation } from "./lessonPresentation";
 
 export default function InteractiveLessonPage() {
   const { lessonId: requestedLessonId } = useParams<{ lessonId?: string }>();
@@ -73,6 +73,11 @@ export default function InteractiveLessonPage() {
   const reportStepIndex = lesson.steps.findIndex((step) => step.type === "report");
   const lastLearningStep = useRef(learningTab.stepIndexes[0]);
   if (activeTabId === "learn") lastLearningStep.current = session.stepIndex;
+  const currentStepIndexRef = useRef(session.stepIndex);
+  currentStepIndexRef.current = session.stepIndex;
+  const setStepIndexRef = useRef(setStepIndex);
+  setStepIndexRef.current = setStepIndex;
+  const layoutWidth = lessonPresentation.showTutor ? "max-w-[1500px]" : "max-w-[1280px]";
   const selectedVideo = lessonVideos[selectedVideoIndex] ?? lessonVideos[0];
   const assessmentQuestions = useMemo(() => (assessmentStep?.questionIds ?? lesson.assessmentQuestionIds)
     .map((id) => questionMap[id]).filter(Boolean), [assessmentStep, lesson.assessmentQuestionIds, questionMap]);
@@ -137,6 +142,22 @@ export default function InteractiveLessonPage() {
     emitEvent({ name: "book_opened", stepId: currentStep.id, metadata: { pages: lesson.curriculumSource.lessonPages?.length ?? 0 } });
   }, [currentStep.id, currentStep.type, emitEvent, session.sessionId]);
 
+  useEffect(() => {
+    if (activeTabId !== "learn") return;
+    // Expanded sections count as visited when reached, not merely when mounted.
+    const observer = new IntersectionObserver((entries) => {
+      const visibleHeading = entries.filter((entry) => entry.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (!visibleHeading) return;
+      const index = Number((visibleHeading.target as HTMLElement).dataset.learningStepIndex);
+      if (index === currentStepIndexRef.current) return;
+      currentStepIndexRef.current = index;
+      setStepIndexRef.current(index);
+    }, { rootMargin: "0px 0px -35% 0px", threshold: 0.5 });
+    document.querySelectorAll("[data-learning-step-index]").forEach((heading) => observer.observe(heading));
+    return () => observer.disconnect();
+  }, [activeTabId, lesson.id]);
+
   function selectTab(tabId: LessonTabId) {
     const tab = lessonTabs.find((item) => item.id === tabId);
     if (!tab || !tab.stepIndexes.length) return;
@@ -162,15 +183,22 @@ export default function InteractiveLessonPage() {
   function handleVisualAction(action: TutorVisualAction) {
     if (action.type !== "show_polygon") return;
     const discoveryIndex = lesson.steps.findIndex((step) => step.type === "polygon_discovery");
-    if (discoveryIndex >= 0) setStepIndex(discoveryIndex);
+    if (discoveryIndex >= 0) openLearningSection(discoveryIndex);
     setVisualAction({ ...action });
-    requestAnimationFrame(() => window.scrollTo({ top: 0 }));
+  }
+
+  function openLearningSection(index: number) {
+    setStepIndex(index);
+    requestAnimationFrame(() => {
+      const section = document.getElementById(`learning-section-${lesson.steps[index].id}`);
+      section?.scrollIntoView({ block: "start" });
+      section?.focus({ preventScroll: true });
+    });
   }
 
   function reviewSkill(skillId: string) {
     const stepIndex = getReviewStepIndex(lesson, skillId);
-    setStepIndex(stepIndex >= 0 ? stepIndex : learningTab.stepIndexes[0]);
-    window.scrollTo({ top: 0 });
+    openLearningSection(stepIndex >= 0 ? stepIndex : learningTab.stepIndexes[0]);
   }
 
   function renderStep(step: LessonStepDefinition, showHeading = true) {
@@ -178,7 +206,7 @@ export default function InteractiveLessonPage() {
     const stepQuestions = step.type === "assessment" ? assessmentQuestions : [];
     return (
       <>
-        <div className="mb-6">
+        {(showHeading || step.tutorMessage) && <div className="mb-6">
           {showHeading && <>
             <p className="text-sm font-black text-cyan-700">{lessonTabs[activeTabIndex].title}</p>
             <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{step.title}</h1>
@@ -189,7 +217,7 @@ export default function InteractiveLessonPage() {
               <p><strong>شارف:</strong> {step.tutorMessage}</p>
             </div>
           )}
-        </div>
+        </div>}
 
         {step.type === "objectives" && (
           <div className="space-y-5">
@@ -404,7 +432,7 @@ export default function InteractiveLessonPage() {
   return (
     <Tabs value={activeTabId} onValueChange={(value) => selectTab(value as LessonTabId)} dir="rtl" className="min-h-screen overflow-x-hidden bg-[#f7fafb] text-slate-900">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-[1500px] items-center gap-3 px-4 py-3 sm:px-6">
+        <div className={`mx-auto flex ${layoutWidth} items-center gap-3 px-4 py-3 sm:px-6`}>
           <Link href="/" className="flex shrink-0 items-center gap-2 font-black text-cyan-800" aria-label="العودة إلى منصة شارف">
             <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-800 text-white">ش</span>
             <span className="hidden sm:inline">شارف</span>
@@ -422,7 +450,7 @@ export default function InteractiveLessonPage() {
       </header>
 
       <div className="border-b border-slate-200 bg-white/80">
-        <nav className="mx-auto max-w-[1500px] px-4 py-3 sm:px-6" aria-label="أقسام الدرس">
+        <nav className={`mx-auto ${layoutWidth} px-4 py-3 sm:px-6`} aria-label="أقسام الدرس">
           <TabsList className="grid h-auto grid-cols-2 items-stretch gap-2 rounded-none bg-transparent p-0 sm:grid-cols-4" aria-label="تبويبات الدرس">
           {lessonTabs.map((tab, index) => (
             <TabsTrigger
@@ -439,7 +467,7 @@ export default function InteractiveLessonPage() {
         </nav>
       </div>
 
-      <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start lg:py-8">
+      <main className={`mx-auto grid ${layoutWidth} gap-6 px-4 py-6 sm:px-6 lg:items-start lg:py-8 ${lessonPresentation.showTutor ? "lg:grid-cols-[minmax(0,1fr)_390px]" : "grid-cols-1"}`}>
         <article className="min-w-0">
           {lessonTabs.map((tab) => (
             <TabsContent key={tab.id} value={tab.id} className="mt-0 min-w-0">
@@ -449,30 +477,35 @@ export default function InteractiveLessonPage() {
                 <div className="mb-5">
                   <p className="text-sm font-black text-cyan-700">الشرح التفاعلي</p>
                   <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">افهم الدرس وجرّب أفكاره</h1>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">الشرح والأمثلة والأنشطة مجتمعة هنا. افتح قسمًا لتتعلمه، ثم انتقل إلى الاختبار عندما تكون مستعدًا.</p>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">جميع أقسام الشرح مفتوحة ومرتبة تحت بعضها. تابعها بالترتيب، وجرّب الرسومات والأنشطة، ثم انتقل إلى الاختبار عندما تكون مستعدًا.</p>
                 </div>
-                <Accordion type="single" value={currentStep.id} onValueChange={(id) => {
-                  const index = lesson.steps.findIndex((step) => step.id === id);
-                  if (learningTab.stepIndexes.includes(index)) setStepIndex(index);
-                }} className="space-y-3">
+                <div className="space-y-8 sm:space-y-10" data-testid="learning-section-stack">
                   {tab.stepIndexes.map((index, sectionIndex) => {
                     const step = lesson.steps[index];
-                    return <AccordionItem key={step.id} value={step.id} className="rounded-2xl border border-slate-200 bg-white data-[state=open]:border-cyan-200" data-testid={`learning-section-${step.id}`}>
-                      <AccordionTrigger className="gap-3 rounded-2xl px-4 text-right hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700 sm:px-5">
-                        <span className="flex min-w-0 items-center gap-3">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-sm font-black text-cyan-800" aria-hidden="true">{sectionIndex + 1}</span>
-                          <span className="min-w-0">
-                            <span className="block text-xs font-bold text-cyan-700">{step.eyebrow.replace(/^\d+\.\s*/, "")}</span>
-                            <span className="mt-1 block text-sm font-black leading-6 text-slate-900 sm:text-base">{step.title}</span>
-                          </span>
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent forceMount hidden={currentStep.id !== step.id} className="px-3 pb-4 sm:px-5" >
+                    return <section
+                      key={step.id}
+                      id={`learning-section-${step.id}`}
+                      tabIndex={-1}
+                      aria-labelledby={`learning-title-${step.id}`}
+                      className="scroll-mt-6 overflow-hidden rounded-3xl border-2 border-slate-200 bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700"
+                      data-testid={`learning-section-${step.id}`}
+                      onFocusCapture={() => {
+                        if (currentStepIndexRef.current !== index) setStepIndexRef.current(index);
+                      }}
+                    >
+                      <header className="flex items-center gap-3 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 p-4 sm:gap-4 sm:p-6" data-learning-step-index={index}>
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-800 text-lg font-black text-white" aria-hidden="true">{sectionIndex + 1}</span>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-cyan-700">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
+                          <h2 id={`learning-title-${step.id}`} className="mt-1 text-lg font-black leading-7 text-slate-950 sm:text-xl">{step.title}</h2>
+                        </div>
+                      </header>
+                      <div className="p-3 sm:p-6">
                         {renderStep(step, false)}
-                      </AccordionContent>
-                    </AccordionItem>;
+                      </div>
+                    </section>;
                   })}
-                </Accordion>
+                </div>
               </>}
 
               {tab.id === "assessment" && assessmentStep && <>
@@ -507,14 +540,14 @@ export default function InteractiveLessonPage() {
             </footer>
         </article>
 
-        <TutorPanel
+        {lessonPresentation.showTutor && <TutorPanel
           lesson={lesson}
           currentStepId={currentStep.id}
           mastery={mastery}
           questions={session.questions}
           onVisualAction={handleVisualAction}
           onTutorQuestion={() => emitEvent({ name: "tutor_question", stepId: currentStep.id })}
-        />
+        />}
       </main>
 
       <Link href="/" className="fixed bottom-4 left-4 hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-lg hover:text-cyan-800 xl:flex" aria-label="العودة للرئيسية"><ChevronLeft className="h-5 w-5" /></Link>
