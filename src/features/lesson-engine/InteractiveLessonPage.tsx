@@ -476,7 +476,7 @@ export default function InteractiveLessonPage() {
 
               {tab.id === "learn" && <>
                 <div className="mb-5">
-                  <h1 className="text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">شرح الدرس</h1>
+                  <h1 className="text-center text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">شرح الدرس</h1>
                 </div>
                 <div className="space-y-8 sm:space-y-10" data-testid="learning-section-stack">
                   {tab.stepIndexes.map((index, sectionIndex) => {
