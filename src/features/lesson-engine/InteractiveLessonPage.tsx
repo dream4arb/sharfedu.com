@@ -206,7 +206,7 @@ export default function InteractiveLessonPage() {
     const stepQuestions = step.type === "assessment" ? assessmentQuestions : [];
     return (
       <>
-        {(showHeading || step.tutorMessage) && <div className="mb-6">
+        {step.type !== "official_book" && (showHeading || step.tutorMessage) && <div className="mb-6">
           {showHeading && <>
             <p className="text-sm font-black text-cyan-700">{lessonTabs[activeTabIndex].title}</p>
             <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{step.title}</h1>

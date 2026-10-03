@@ -18,6 +18,12 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.equal((html.match(/<img /g) ?? []).length, pages.length, "No duplicate thumbnail images");
   assert.equal((html.match(/loading="eager"/g) ?? []).length, 1, "Only the first page loads eagerly");
   assert.equal((html.match(/loading="lazy"/g) ?? []).length, pages.length - 1);
+  const firstPagePosition = html.indexOf("data-book-page=");
+  const sourceDetailsPosition = html.indexOf('data-testid="official-book-source-details"');
+  assert.ok(sourceDetailsPosition > firstPagePosition, "Detailed source attribution comes after the pages");
+  assert.ok(!html.includes("المرجع الرسمي للدرس"), "No redundant introductory heading");
+  assert.ok(!html.includes("مرّر للأسفل لمتابعة الدرس"), "No redundant scrolling instructions");
+  assert.ok(html.includes('data-testid="official-book-toolbar"'), "Compact toolbar retains zoom and official link");
   let previousPosition = -1;
   for (const page of pages) {
     const position = html.indexOf(`data-book-page="${page.pageNumber}"`);
