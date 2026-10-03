@@ -493,12 +493,10 @@ export default function InteractiveLessonPage() {
                         if (currentStepIndexRef.current !== index) setStepIndexRef.current(index);
                       }}
                     >
-                      <header className="flex items-center gap-3 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 p-4 sm:gap-4 sm:p-6" data-learning-step-index={index}>
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-800 text-lg font-black text-white" aria-hidden="true">{sectionIndex + 1}</span>
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-cyan-700">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
-                          <h2 id={`learning-title-${step.id}`} className="mt-1 text-lg font-black leading-7 text-slate-950 sm:text-xl">{step.title}</h2>
-                        </div>
+                      <header className="grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center gap-x-3 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 p-4 sm:gap-x-4 sm:p-6" data-learning-step-index={index}>
+                        <span className="row-span-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-800 text-lg font-black text-white" aria-hidden="true">{sectionIndex + 1}</span>
+                        <p className="col-span-2 min-w-0 text-xs font-bold text-cyan-700">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
+                        <h2 id={`learning-title-${step.id}`} className="col-start-2 row-start-2 mt-1 min-w-0 text-center text-lg font-black leading-7 text-slate-950 sm:text-xl">{step.title}</h2>
                       </header>
                       <div className="p-3 sm:p-6">
                         {renderStep(step, false)}
