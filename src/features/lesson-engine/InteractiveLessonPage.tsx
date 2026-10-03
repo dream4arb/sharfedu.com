@@ -201,20 +201,21 @@ export default function InteractiveLessonPage() {
     openLearningSection(stepIndex >= 0 ? stepIndex : learningTab.stepIndexes[0]);
   }
 
-  function renderStep(step: LessonStepDefinition, showHeading = true) {
+  function renderStep(step: LessonStepDefinition, showHeading = true, showTutorMessage = true) {
     // Graded questions live only in the final tab, not in the learning sections.
     const stepQuestions = step.type === "assessment" ? assessmentQuestions : [];
+    const tutorMessage = showTutorMessage ? step.tutorMessage : undefined;
     return (
       <>
-        {step.type !== "official_book" && (showHeading || step.tutorMessage) && <div className="mb-6">
+        {step.type !== "official_book" && (showHeading || tutorMessage) && <div className="mb-6">
           {showHeading && <>
             <p className="text-sm font-black text-cyan-700">{lessonTabs[activeTabIndex].title}</p>
             <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{step.title}</h1>
           </>}
-          {step.tutorMessage && (
+          {tutorMessage && (
             <div className="mt-4 flex gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4 leading-7 text-cyan-950">
               <Sparkles className="mt-1 h-5 w-5 shrink-0 text-cyan-700" />
-              <p><strong>شارف:</strong> {step.tutorMessage}</p>
+              <p><strong>شارف:</strong> {tutorMessage}</p>
             </div>
           )}
         </div>}
@@ -475,9 +476,7 @@ export default function InteractiveLessonPage() {
 
               {tab.id === "learn" && <>
                 <div className="mb-5">
-                  <p className="text-sm font-black text-cyan-700">الشرح التفاعلي</p>
-                  <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">افهم الدرس وجرّب أفكاره</h1>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">جميع أقسام الشرح مفتوحة ومرتبة تحت بعضها. تابعها بالترتيب، وجرّب الرسومات والأنشطة، ثم انتقل إلى الاختبار عندما تكون مستعدًا.</p>
+                  <h1 className="text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">شرح الدرس</h1>
                 </div>
                 <div className="space-y-8 sm:space-y-10" data-testid="learning-section-stack">
                   {tab.stepIndexes.map((index, sectionIndex) => {
@@ -493,13 +492,15 @@ export default function InteractiveLessonPage() {
                         if (currentStepIndexRef.current !== index) setStepIndexRef.current(index);
                       }}
                     >
-                      <header className="grid grid-cols-[2.75rem_minmax(0,1fr)_2.75rem] items-center gap-x-3 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 p-4 sm:gap-x-4 sm:p-6" data-learning-step-index={index}>
-                        <span className="row-span-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-800 text-lg font-black text-white" aria-hidden="true">{sectionIndex + 1}</span>
-                        <p className="col-span-2 min-w-0 text-xs font-bold text-cyan-700">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
-                        <h2 id={`learning-title-${step.id}`} className="col-start-2 row-start-2 mt-1 min-w-0 text-center text-lg font-black leading-7 text-slate-950 sm:text-xl">{step.title}</h2>
+                      <header className="flex flex-col items-center gap-2 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 p-4 sm:p-6" data-learning-step-index={index}>
+                        <div className="flex max-w-full flex-wrap items-center justify-center gap-3" data-testid={`learning-meta-${step.id}`}>
+                          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-800 text-lg font-black text-white" aria-hidden="true">{sectionIndex + 1}</span>
+                          <p className="min-w-0 text-center text-xs font-bold text-cyan-700">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
+                        </div>
+                        <h2 id={`learning-title-${step.id}`} className="min-w-0 text-center text-lg font-black leading-7 text-slate-950 sm:text-xl">{step.title}</h2>
                       </header>
                       <div className="p-3 sm:p-6">
-                        {renderStep(step, false)}
+                        {renderStep(step, false, step.type !== "objectives")}
                       </div>
                     </section>;
                   })}
