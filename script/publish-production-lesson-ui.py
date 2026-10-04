@@ -21,7 +21,9 @@ def main():
   shutil.copy2(PUBLIC/'index.html',BACKUP/'index.html')
   if (PUBLIC/'pdf.worker.min.mjs').is_file():shutil.copy2(PUBLIC/'pdf.worker.min.mjs',BACKUP/'pdf.worker.min.mjs')
   with tarfile.open(bundle,'r:gz') as archive:
-   members=archive.getmembers()
+   all_members=archive.getmembers()
+   if any(not (m.isfile() or m.isdir()) for m in all_members):raise ValueError('Non-regular archive member')
+   members=[m for m in all_members if m.isfile()]
    for member in members:
     name=member.name
     if not member.isfile() or name.startswith('/') or '..' in Path(name).parts or not (name.startswith(('assets/','lesson-books/')) or name in ('index.html','pdf.worker.min.mjs')):raise ValueError('Unsafe archive member: '+name)
