@@ -62,7 +62,11 @@ assert.ok(page.includes('content !== "introduction" && <>'), "Explanation sectio
 assert.ok(page.includes('learningSections.map(({ step, index, content, sectionNumber })'), "Every section uses the new continuous numbering");
 assert.ok(page.includes('className="p-5 text-center" data-testid="lesson-video-caption"'), "Selected video title and teacher name are centered together");
 assert.ok(page.includes('data-testid="button-restart-assessment"') && page.includes('onClick={restartTest}'));
-assert.ok(page.indexOf('data-testid="assessment-answer-count"') < page.indexOf('{showReport ?'), "Answered count is above the exam/result content");
+const stepHeading = page.slice(page.indexOf('data-testid="lesson-step-heading"'), page.indexOf('{tutorMessage &&'));
+assert.ok(stepHeading.indexOf('data-testid="assessment-answer-count"') > stepHeading.indexOf('data-testid="lesson-step-title"'), "Answered count is directly below the lesson title");
+assert.ok(stepHeading.includes('className="mt-3 text-center text-sm font-bold text-slate-600"') && stepHeading.includes('step.type === "assessment" && <p'),
+  "Exam counter is centered, live and shown only with the exam heading");
+assert.equal(page.match(/data-testid="assessment-answer-count"/g)?.length, 1, "No duplicate counter remains above the heading");
 assert.ok(page.includes('questionNumber={questionIndex + 1}') && page.includes('totalQuestions={stepQuestions.length}'), "Every exam and review card receives its current question position");
 assert.ok(page.includes('if (cancelled || activeTabRef.current !== "learn") return;'), "Queued reading-observer callbacks cannot override a selected exam tab");
 assert.ok(page.includes('if (activeTabRef.current !== "learn") return;'), "Queued section focus cannot override a later tab choice");

@@ -247,6 +247,7 @@ export default function InteractiveLessonPage() {
           {showHeading && <div className={step.type === "video" || step.type === "assessment" ? "text-center" : undefined} data-testid="lesson-step-heading">
             {step.type !== "assessment" && <p className="text-sm font-black text-cyan-700">{lessonTabs[activeTabIndex].title}</p>}
             <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{step.type === "assessment" ? lesson.title : step.title}</h1>
+            {step.type === "assessment" && <p className="mt-3 text-center text-sm font-bold text-slate-600" role="status" aria-live="polite" aria-atomic="true" data-testid="assessment-answer-count">أجبت عن {answeredCount} من {assessmentQuestions.length}</p>}
           </div>}
           {tutorMessage && (
             <div className="studio-note mt-4 flex gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4 leading-7 text-cyan-950">
@@ -476,8 +477,7 @@ export default function InteractiveLessonPage() {
               </>}
 
               {tab.id === "assessment" && assessmentStep && <div id="lesson-assessment-start" tabIndex={-1} className="focus-visible:outline-none" data-testid="assessment-tab-content">
-                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                  {!showReport && <p className="text-sm font-bold text-slate-600" role="status" aria-live="polite" aria-atomic="true" data-testid="assessment-answer-count">أجبت عن {answeredCount} من {assessmentQuestions.length}</p>}
+                <div className="mb-5 flex flex-wrap items-center justify-end gap-3">
                   <button type="button" onClick={restartTest} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-cyan-800 bg-white px-5 font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100" data-testid="button-restart-assessment"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة الاختبار</button>
                 </div>
                 {showReport ? <>
