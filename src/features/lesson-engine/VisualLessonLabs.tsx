@@ -63,7 +63,7 @@ export function PolygonPatternExplorer() {
   const [sides, setSides] = useState(3);
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="pattern-title">
+    <section className="studio-lab rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="pattern-title">
       <div className="flex items-start gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-100 text-cyan-800"><Shapes className="h-6 w-6" /></span>
         <div>
@@ -87,11 +87,11 @@ export function PolygonPatternExplorer() {
         ))}
       </div>
 
-      <div className="mt-5 grid items-center gap-5 rounded-3xl bg-slate-50 p-4 md:grid-cols-[minmax(0,1fr)_250px]">
-        <div className="mx-auto aspect-[7/6] w-full max-w-[430px]">
+      <div className="studio-workspace mt-5 grid items-center gap-5 rounded-3xl bg-slate-50 p-4 md:grid-cols-[minmax(0,1fr)_250px]">
+        <div className="studio-canvas mx-auto aspect-[7/6] w-full max-w-[430px]">
           <PolygonDrawing sides={sides} split />
         </div>
-        <div className="rounded-2xl bg-slate-950 p-5 text-white" aria-live="polite">
+        <div className="studio-readout rounded-2xl bg-slate-950 p-5 text-white" aria-live="polite">
           <p className="text-sm font-bold text-cyan-200">ما يظهر أمامك</p>
           <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-white/10 p-3">
             <span>الأضلاع</span><strong className="text-2xl tabular-nums">{sides}</strong>
@@ -120,7 +120,7 @@ export function FormulaDiscoveryLab() {
   }
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="formula-lab-title">
+    <section className="studio-lab rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="formula-lab-title">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-black text-cyan-700">ابنِ القانون بيدك</p>
@@ -134,14 +134,14 @@ export function FormulaDiscoveryLab() {
         </div>
       </div>
 
-      <div className="mt-5 grid items-center gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="rounded-3xl bg-gradient-to-b from-cyan-50 to-white p-3">
+      <div className="studio-workspace mt-5 grid items-center gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="studio-canvas rounded-3xl bg-gradient-to-b from-cyan-50 to-white p-3">
           <div className="mx-auto aspect-[7/6] w-full max-w-[430px]">
             <PolygonDrawing sides={sides} split={stage >= 1} />
           </div>
         </div>
 
-        <div className="space-y-3" aria-live="polite">
+        <div className="studio-formula-stages space-y-3" aria-live="polite">
           <div className={`flex items-center gap-3 rounded-2xl border p-4 transition ${stage >= 0 ? "border-cyan-300 bg-cyan-50" : "border-slate-200"}`}>
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-800 font-black text-white">{sides}</span>
             <span><strong className="block text-slate-950">عدد الأضلاع</strong><span className="text-sm text-slate-600">هذه قيمة n</span></span>
@@ -161,7 +161,7 @@ export function FormulaDiscoveryLab() {
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col items-center justify-between gap-3 rounded-2xl bg-slate-950 p-4 text-white sm:flex-row">
+      <div className="studio-equation-bar mt-5 flex flex-col items-center justify-between gap-3 rounded-2xl bg-slate-950 p-4 text-white sm:flex-row">
         <div className="text-center sm:text-right">
           <p className="text-sm font-bold text-cyan-200" dir="ltr">S = (n − 2) × 180°</p>
           <p className="mt-1 font-black" dir="ltr">S = ({sides} − 2) × 180° {stage === 3 ? `= ${sum}°` : ""}</p>
@@ -180,13 +180,13 @@ export function MissingAngleLab() {
   const [stage, setStage] = useState(0);
   const labels = ["أظهر الزوايا المعروفة", "اجمع القطع", "أكمل الدائرة"];
   const known = [
-    { value: 135, color: "bg-cyan-600" },
-    { value: 90, color: "bg-violet-600" },
-    { value: 90, color: "bg-amber-500" },
+    { value: 135, color: "bg-cyan-700" },
+    { value: 90, color: "bg-violet-700" },
+    { value: 90, color: "bg-amber-700" },
   ];
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="missing-angle-title">
+    <section className="studio-lab rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="missing-angle-title">
       <div className="flex items-start gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-violet-100 text-violet-800"><Sparkles className="h-6 w-6" /></span>
         <div>
@@ -196,8 +196,8 @@ export function MissingAngleLab() {
         </div>
       </div>
 
-      <div className="mt-5 grid items-center gap-6 lg:grid-cols-2">
-        <div className="rounded-3xl border border-slate-100 bg-slate-50 p-4">
+      <div className="studio-workspace mt-5 grid items-center gap-6 lg:grid-cols-2">
+        <div className="studio-canvas rounded-3xl border border-slate-100 bg-slate-50 p-4">
           <svg viewBox="20 90 250 150" className="mx-auto aspect-[5/3] w-full max-w-[500px]" role="img" aria-label="رباعي زواياه تسعون وتسعون ومئة وخمس وثلاثون وزاوية مجهولة">
             <polygon points="45,220 245,220 145,120 45,120" fill="#f5f3ff" stroke="#6d28d9" strokeWidth="5" strokeLinejoin="round" />
             <path d="M 45 190 A 30 30 0 0 1 75 220 L 45 220 Z" fill={stage >= 1 ? "#f59e0b" : "#e2e8f0"} />
@@ -220,11 +220,11 @@ export function MissingAngleLab() {
               {known.map((angle, index) => (
                 <div key={`${angle.value}-${index}`} className={`${stage >= 1 ? angle.color : "bg-slate-300"} flex items-center justify-center border-r border-white/40 font-black text-white transition-colors duration-500`} style={{ width: `${(angle.value / 360) * 100}%` }}>{stage >= 1 ? `${angle.value}°` : ""}</div>
               ))}
-              <div className={`${stage >= 3 ? "bg-emerald-600" : "bg-white"} flex items-center justify-center font-black transition-colors duration-500`} style={{ width: `${(45 / 360) * 100}%` }}><span className={stage >= 3 ? "text-white" : "text-emerald-700"}>{stage >= 3 ? "45°" : "؟"}</span></div>
+              <div className={`${stage >= 3 ? "bg-emerald-700" : "bg-white"} flex items-center justify-center font-black transition-colors duration-500`} style={{ width: `${(45 / 360) * 100}%` }}><span className={stage >= 3 ? "text-white" : "text-emerald-700"}>{stage >= 3 ? "45°" : "؟"}</span></div>
             </div>
           </div>
 
-          <div className="mt-4 rounded-2xl bg-slate-950 p-5 text-center text-white" aria-live="polite">
+          <div className="studio-readout mt-4 rounded-2xl bg-slate-950 p-5 text-center text-white" aria-live="polite">
             {stage === 0 && <p className="font-bold text-slate-300">ابدأ بإظهار الزوايا التي نعرفها.</p>}
             {stage === 1 && <p className="text-xl font-black" dir="ltr">135° + 90° + 90°</p>}
             {stage === 2 && <><p className="text-sm text-slate-300">الممتلئ من الشريط</p><p className="mt-1 text-3xl font-black" dir="ltr">315°</p></>}
@@ -251,7 +251,7 @@ export function ExteriorTurnLab() {
   }
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="exterior-title">
+    <section className="studio-lab rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="exterior-title">
       <div className="flex items-start gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800"><Route className="h-6 w-6" /></span>
         <div>
@@ -261,15 +261,15 @@ export function ExteriorTurnLab() {
         </div>
       </div>
 
-      <div className="mt-5 grid items-center gap-5 md:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="rounded-3xl bg-emerald-50 p-3">
+      <div className="studio-workspace mt-5 grid items-center gap-5 md:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="studio-canvas rounded-3xl bg-emerald-50 p-3">
           <div className="mx-auto aspect-[7/6] w-full max-w-[430px]"><PolygonDrawing sides={sides} split={false} highlightedVertices={turns} /></div>
         </div>
         <div>
           <div className="grid grid-cols-4 gap-1 rounded-2xl bg-slate-100 p-1" role="group" aria-label="اختر المضلع المنتظم">
             {[3, 4, 5, 6].map((count) => <button key={count} type="button" onClick={() => chooseSides(count)} aria-pressed={sides === count} className={`min-h-11 rounded-xl font-black ${sides === count ? "bg-white text-emerald-800 shadow-sm" : "text-slate-600"}`}>{count}</button>)}
           </div>
-          <div className="mt-4 rounded-2xl bg-slate-950 p-5 text-center text-white" aria-live="polite">
+          <div className="studio-readout mt-4 rounded-2xl bg-slate-950 p-5 text-center text-white" aria-live="polite">
             <p className="text-sm text-slate-300">توقفت عند {turns} من {sides} رؤوس</p>
             <p className="mt-2 text-3xl font-black tabular-nums" dir="ltr">{turns} × {angle}° = {turns * angle}°</p>
             {turns === sides && <p className="mt-3 flex items-center justify-center gap-2 font-black text-emerald-300"><Check className="h-5 w-5" />اكتملت دورة 360°</p>}
@@ -316,7 +316,7 @@ export function VisualLessonMap() {
   const styles = recapClasses[active.color];
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="lesson-map-title">
+    <section className="studio-lab studio-map rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="lesson-map-title">
       <p className="text-sm font-black text-cyan-700">خريطة بصرية قبل الاختبار</p>
       <h2 id="lesson-map-title" className="mt-1 text-xl font-black text-slate-950">اختر المسار الذي تريد تثبيته</h2>
       <div className="mt-5 grid gap-2 sm:grid-cols-3" role="tablist" aria-label="مسارات ملخص الدرس">

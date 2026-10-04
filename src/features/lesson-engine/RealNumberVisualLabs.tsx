@@ -29,11 +29,11 @@ export function RealNumberSetsLab() {
   const selected = numberExamples.find((example) => example.id === selectedId) ?? numberExamples[0];
 
   return (
-    <section className="mb-5 overflow-hidden rounded-3xl border border-slate-200 bg-white">
+    <section className="studio-lab studio-number-lab mb-5 overflow-hidden rounded-3xl border border-slate-200 bg-white">
       <div className="border-b border-slate-200 bg-gradient-to-l from-cyan-50 to-white p-5 sm:p-6">
         <p className="text-sm font-black text-cyan-700">تفاعل بلا درجات</p>
         <h2 className="mt-1 text-xl font-black">اختر عددًا، ثم راقب الصناديق التي تضيء</h2>
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="اختر عددًا لاستكشاف مجموعاته">
+        <div className="studio-number-options mt-4 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="اختر عددًا لاستكشاف مجموعاته">
           {numberExamples.map((example) => (
             <button key={example.id} type="button" onClick={() => setSelectedId(example.id)} aria-pressed={example.id === selected.id} className={`min-h-12 min-w-16 shrink-0 rounded-xl border px-4 text-lg font-black transition ${example.id === selected.id ? "border-cyan-700 bg-cyan-800 text-white ring-4 ring-cyan-100" : "border-slate-200 bg-white text-slate-700 hover:border-cyan-300"}`} dir="ltr">{example.label}</button>
           ))}
@@ -58,7 +58,7 @@ export function RealNumberSetsLab() {
           </div>
         </div>
 
-        <aside className="flex flex-col justify-center rounded-3xl bg-slate-950 p-6 text-center text-white">
+        <aside className="studio-readout flex flex-col justify-center rounded-3xl bg-slate-950 p-6 text-center text-white">
           <span className="text-5xl font-black" dir="ltr">{selected.label}</span>
           <p className="mt-4 leading-7 text-slate-300">{selected.note}</p>
           <div className="mt-5 flex flex-wrap justify-center gap-2" dir="ltr">
@@ -80,7 +80,7 @@ export function DecimalPatternLab() {
   const [selectedId, setSelectedId] = useState<string>(decimalExamples[0].id);
   const selected = decimalExamples.find((item) => item.id === selectedId) ?? decimalExamples[0];
   return (
-    <section className="mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
+    <section className="studio-lab mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
       <div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-violet-800"><Repeat2 className="h-6 w-6" /></span><div><p className="text-sm font-black text-violet-700">شاهد البصمة</p><h2 className="text-xl font-black">النهاية والتكرار هما المفتاح</h2></div></div>
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
         {decimalExamples.map((item) => (
@@ -89,7 +89,7 @@ export function DecimalPatternLab() {
           </button>
         ))}
       </div>
-      <div className="mt-5 overflow-hidden rounded-2xl bg-slate-950 p-5 text-white sm:p-6">
+      <div className="studio-readout mt-5 overflow-hidden rounded-2xl bg-slate-950 p-5 text-white sm:p-6">
         <p className="text-center text-3xl font-black tracking-wider text-cyan-200" dir="ltr">{selected.pattern}</p>
         <div className="mx-auto mt-4 h-1.5 max-w-md overflow-hidden rounded-full bg-white/10"><div key={selected.id} className="h-full w-full origin-right animate-[pulse_1.6s_ease-in-out_infinite] rounded-full bg-cyan-400" /></div>
         <div className="mt-5 grid gap-3 text-center sm:grid-cols-2"><div className="rounded-xl bg-white/10 p-3"><span className="block text-xs text-slate-300">النتيجة</span><strong className="text-lg text-white">{selected.result}</strong></div><div className="rounded-xl bg-white/10 p-3"><span className="block text-xs text-slate-300">لماذا؟</span><strong className="text-sm text-white">{selected.reason}</strong></div></div>
@@ -116,7 +116,7 @@ export function OperationPropertiesLab() {
   }
 
   return (
-    <section className="mb-5 overflow-hidden rounded-3xl border border-slate-200 bg-white">
+    <section className="studio-lab studio-number-lab mb-5 overflow-hidden rounded-3xl border border-slate-200 bg-white">
       <div className="border-b border-slate-200 p-5 sm:p-6">
         <p className="text-sm font-black text-amber-700">مختبر حركة</p>
         <h2 className="mt-1 text-xl font-black">لاحظ ما يتغير وما يبقى ثابتًا</h2>
@@ -124,7 +124,7 @@ export function OperationPropertiesLab() {
           {propertyExamples.map((item) => <button key={item.id} type="button" onClick={() => select(item.id)} aria-pressed={selected.id === item.id} className={`min-h-12 rounded-xl border px-3 font-black ${selected.id === item.id ? "border-amber-500 bg-amber-50 text-amber-950 ring-4 ring-amber-100" : "border-slate-200 text-slate-600"}`}>{item.title}</button>)}
         </div>
       </div>
-      <div className="grid items-center gap-5 bg-slate-50 p-5 sm:p-7 lg:grid-cols-[1fr_auto_1fr]">
+      <div className="studio-workspace grid items-center gap-5 bg-slate-50 p-5 sm:p-7 lg:grid-cols-[1fr_auto_1fr]">
         <div className={`rounded-2xl border-2 bg-white p-6 text-center text-2xl font-black transition-all duration-500 ${swapped ? "border-emerald-400 opacity-70" : "border-cyan-500 shadow-md"}`} dir="ltr">{selected.before}</div>
         <button type="button" data-activity-primary onClick={() => setSwapped((value) => !value)} className="mx-auto flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-cyan-800"><Play className="h-5 w-5" /> حرّك</button>
         <div className={`rounded-2xl border-2 bg-white p-6 text-center text-2xl font-black transition-all duration-500 ${swapped ? "border-emerald-500 shadow-md ring-4 ring-emerald-100" : "border-slate-200 opacity-55"}`} dir="ltr">{selected.after}</div>
@@ -146,9 +146,9 @@ export function RationalNumberLineLab() {
   const selected = rationalLinePoints.find((point) => point.id === selectedId) ?? rationalLinePoints[0];
   const position = ((selected.value + 2) / 4) * 100;
   return (
-    <section className="mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
+    <section className="studio-lab mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
       <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm font-black text-cyan-700">خط حيّ</p><h2 className="mt-1 text-xl font-black">اختر كسرًا وشاهد مكانه ومسافته من الصفر</h2></div><span className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-600">لا توجد درجات هنا</span></div>
-      <div className="mt-5 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="أعداد نسبية على خط الأعداد">
+      <div className="studio-number-options mt-5 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="أعداد نسبية على خط الأعداد">
         {rationalLinePoints.map((point) => <button key={point.id} type="button" onClick={() => setSelectedId(point.id)} aria-pressed={selected.id === point.id} className={`min-h-12 min-w-20 shrink-0 rounded-xl border px-4 text-lg font-black ${selected.id === point.id ? "border-cyan-700 bg-cyan-800 text-white ring-4 ring-cyan-100" : "border-slate-200 text-slate-700"}`} dir="ltr">{point.label}</button>)}
       </div>
       <div className="mt-10 overflow-hidden rounded-3xl bg-slate-950 px-6 pb-7 pt-12 text-white sm:px-10">
@@ -174,9 +174,9 @@ export function FractionDecimalMachine() {
   const selected = fractionConversions.find((item) => item.id === selectedId) ?? fractionConversions[0];
   function select(id: string) { setSelectedId(id); setStage(0); }
   return (
-    <section className="mb-5 overflow-hidden rounded-3xl border border-slate-200 bg-white">
+    <section className="studio-lab studio-number-lab mb-5 overflow-hidden rounded-3xl border border-slate-200 bg-white">
       <div className="border-b border-slate-200 p-5 sm:p-6"><p className="text-sm font-black text-violet-700">آلة التحويل</p><h2 className="mt-1 text-xl font-black">اضغط «التالي» لترى ما يحدث بين الكسر والعشري</h2><div className="mt-4 flex gap-2 overflow-x-auto">{fractionConversions.map((item) => <button key={item.id} type="button" onClick={() => select(item.id)} className={`min-h-11 min-w-20 shrink-0 rounded-xl border px-4 font-black ${selected.id === item.id ? "border-violet-600 bg-violet-50 text-violet-900" : "border-slate-200"}`} dir="ltr">{item.fraction}</button>)}</div></div>
-      <div className="grid items-center gap-4 bg-slate-50 p-5 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:p-7">
+      <div className="studio-workspace studio-conversion grid items-center gap-4 bg-slate-50 p-5 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:p-7">
         <div className="rounded-2xl border-2 border-cyan-300 bg-white p-6 text-center"><span className="block text-xs font-bold text-slate-500">الكسر</span><strong className="mt-2 block text-3xl" dir="ltr">{selected.fraction}</strong></div>
         <ArrowLeftRight className={`mx-auto h-7 w-7 text-violet-600 transition ${stage >= 1 ? "opacity-100" : "opacity-20"}`} />
         <div className={`rounded-2xl border-2 bg-white p-6 text-center transition duration-500 ${stage >= 1 ? "border-violet-400 opacity-100" : "border-slate-200 opacity-30"}`}><span className="block text-xs font-bold text-slate-500">حوّل خط الكسر إلى قسمة</span><strong className="mt-2 block text-2xl" dir="ltr">{selected.division}</strong></div>

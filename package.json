@@ -15,6 +15,7 @@
     "test:lesson-navigation": "npx tsx script/test-lesson-navigation.ts",
     "test:lesson-presentation": "npx tsx script/test-lesson-presentation.ts",
     "test:lesson-activities": "npx tsx script/test-lesson-activities.tsx",
+    "test:learning-studio": "npx tsx script/test-learning-studio.tsx",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {

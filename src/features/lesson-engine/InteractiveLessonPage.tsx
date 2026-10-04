@@ -18,7 +18,9 @@ import { POLYGON_ANGLES_LESSON_ID } from "@shared/lesson-engine/polygon-angles";
 import { getRegisteredLesson, lessonRegistry } from "@shared/lesson-engine/registry";
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
-import { LessonIntroduction } from "./LessonIntroduction";
+import { StudioLessonIntroduction } from "./StudioLessonIntroduction";
+import { LearningSection } from "./LearningStudio";
+import "./learningStudio.css";
 import { OfficialBookLesson } from "./OfficialBookLesson";
 import { PolygonLab } from "./PolygonLab";
 import { QuestionCard } from "./QuestionCard";
@@ -233,7 +235,7 @@ export default function InteractiveLessonPage() {
             <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{step.title}</h1>
           </>}
           {tutorMessage && (
-            <div className="mt-4 flex gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4 leading-7 text-cyan-950">
+            <div className="studio-note mt-4 flex gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4 leading-7 text-cyan-950">
               <Sparkles className="mt-1 h-5 w-5 shrink-0 text-cyan-700" />
               <p><strong>شارف:</strong> {tutorMessage}</p>
             </div>
@@ -242,8 +244,8 @@ export default function InteractiveLessonPage() {
 
         {step.type === "objectives" && (
           <div className="space-y-5">
-            <LessonIntroduction introduction={lesson.introduction} />
-            <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
+            <StudioLessonIntroduction introduction={lesson.introduction} />
+            <section className="studio-objectives rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
               <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
                 <span className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2"><Clock3 className="h-4 w-4" /> نحو {lesson.estimatedMinutes} دقيقة</span>
                 <span className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2"><GraduationCap className="h-4 w-4" /> {lesson.grade}</span>
@@ -256,7 +258,7 @@ export default function InteractiveLessonPage() {
                 ))}
               </ul>
             </section>
-            <section className="rounded-3xl bg-gradient-to-l from-cyan-800 to-slate-900 p-6 text-white sm:p-8">
+            <section className="studio-learning-method rounded-3xl bg-gradient-to-l from-cyan-800 to-slate-900 p-6 text-white sm:p-8">
               <p className="text-sm font-bold text-cyan-200">طريقة التعلم</p>
               <h2 className="mt-2 text-2xl font-black">افهم، شاهد، حرّك، ثم طبّق</h2>
               <p className="mt-3 max-w-2xl leading-8 text-slate-200">راجع الدرس من كتاب الوزارة، واختر شرح الفيديو الأنسب لك. هنا تجد الشرح والأنشطة البصرية مجتمعة بلا درجات، ثم تنتقل إلى اختبار واحد ونتيجته في المكان نفسه.</p>
@@ -274,7 +276,7 @@ export default function InteractiveLessonPage() {
         {step.visualKind && activity && <ActivityGuide activity={activity} tried={triedStepIds.includes(step.id)} onTry={markTried}>{visuals[step.visualKind]}</ActivityGuide>}
 
         {step.body && !step.visualKind?.startsWith("polygon-") && (
-          <section className="mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
+          <section className="studio-prose-block mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
             <ul className="space-y-3">
               {step.body.map((paragraph) => <li key={paragraph} className="flex gap-3 text-lg leading-8 text-slate-800"><span className="mt-3 h-2 w-2 shrink-0 rounded-full bg-cyan-600" />{paragraph}</li>)}
             </ul>
@@ -413,7 +415,7 @@ export default function InteractiveLessonPage() {
                 </div>
               </section>
             )}
-            <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
+            <section className="studio-summary rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
               <div className="flex items-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المحتوى</h2></div>
               <p className="mt-2 text-sm font-bold text-emerald-700">{lesson.teacherSummary.attribution}</p>
               <ol className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -483,38 +485,20 @@ export default function InteractiveLessonPage() {
       <main className={`mx-auto grid ${layoutWidth} gap-6 px-4 py-6 sm:px-6 lg:items-start lg:py-8 ${lessonPresentation.showTutor ? "lg:grid-cols-[minmax(0,1fr)_390px]" : "grid-cols-1"}`}>
         <article className="min-w-0">
           {lessonTabs.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id} className="mt-0 min-w-0">
+            <TabsContent key={tab.id} value={tab.id} className={`mt-0 min-w-0 ${tab.id === "learn" ? "lesson-studio" : ""}`}>
               {tab.id === "book" || tab.id === "video" ? tab.stepIndexes.map((index) => <div key={lesson.steps[index].id}>{renderStep(lesson.steps[index])}</div>) : null}
 
               {tab.id === "learn" && <>
-                <div className="mb-5">
-                  <h1 className="text-center text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">شرح الدرس</h1>
+                <div className="studio-page-heading">
+                  <h1 data-testid="lesson-step-title">شرح الدرس</h1>
                 </div>
-                <div className="space-y-8 sm:space-y-10" data-testid="learning-section-stack">
+                <div className="studio-section-stack" data-testid="learning-section-stack">
                   {tab.stepIndexes.map((index, sectionIndex) => {
                     const step = lesson.steps[index];
-                    return <section
-                      key={step.id}
-                      id={`learning-section-${step.id}`}
-                      tabIndex={-1}
-                      aria-labelledby={`learning-title-${step.id}`}
-                      className="scroll-mt-6 overflow-hidden rounded-3xl border-2 border-slate-200 bg-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700"
-                      data-testid={`learning-section-${step.id}`}
-                      onFocusCapture={() => {
+                    return <LearningSection key={step.id} step={step} index={index} sectionNumber={sectionIndex + 1}
+                      onFocus={() => {
                         if (currentStepIndexRef.current !== index) setStepIndexRef.current(index);
-                      }}
-                    >
-                      <header className="flex items-center justify-center gap-2 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 px-2 py-4 sm:gap-4 sm:p-6" data-learning-step-index={index}>
-                        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3" data-testid={`learning-meta-${step.id}`}>
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-cyan-800 text-xs font-black text-white sm:h-11 sm:w-11 sm:rounded-2xl sm:text-lg" aria-hidden="true">{sectionIndex + 1}</span>
-                          <p className="sr-only whitespace-nowrap text-center text-xs font-bold text-cyan-700 sm:not-sr-only">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
-                        </div>
-                        <h2 id={`learning-title-${step.id}`} className="whitespace-nowrap text-center text-xs font-black leading-6 text-slate-950 sm:text-xl sm:leading-7">{step.title}</h2>
-                      </header>
-                      <div className="p-3 sm:p-6">
-                        {renderStep(step, false, step.type !== "objectives")}
-                      </div>
-                    </section>;
+                      }}>{renderStep(step, false, step.type !== "objectives")}</LearningSection>;
                   })}
                 </div>
               </>}
@@ -535,7 +519,7 @@ export default function InteractiveLessonPage() {
             </TabsContent>
           ))}
 
-            <footer className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5">
+            <footer className={`mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 ${activeTabId === "learn" ? "studio-footer" : ""}`}>
               {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600" role="status">أجبت عن {answeredCount} من {assessmentQuestions.length}. {assessmentComplete ? "نتيجتك جاهزة للعرض هنا." : "أجب عن جميع الأسئلة لإظهار نتيجتك."}</p>}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <button type="button" onClick={() => navigateTab(-1)} disabled={activeTabIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>

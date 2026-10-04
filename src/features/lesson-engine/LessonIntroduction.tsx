@@ -12,7 +12,7 @@ function regularPolygonPoints(sides: number, radius = 46, center = 60) {
   });
 }
 
-function PolygonExample({ label, sides, triangles, angleSum }: LessonIntroductionDefinition["examples"][number]) {
+export function PolygonExample({ label, sides, triangles, angleSum }: LessonIntroductionDefinition["examples"][number]) {
   const points = regularPolygonPoints(sides);
   const pointString = points.map((point) => `${point.x},${point.y}`).join(" ");
   const diagonals = points.slice(2, -1);

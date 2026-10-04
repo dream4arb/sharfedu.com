@@ -41,7 +41,7 @@ export function PolygonLab({
   }
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="polygon-lab-title">
+    <section className="studio-lab rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="polygon-lab-title">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-bold text-cyan-700">سبورة تفاعلية</p>
@@ -64,15 +64,15 @@ export function PolygonLab({
         </div>
       </div>
 
-      <div className="mt-5 grid items-center gap-5 md:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="relative mx-auto aspect-square w-full max-w-[390px] rounded-3xl bg-gradient-to-b from-cyan-50 to-white p-3">
+      <div className="studio-workspace mt-5 grid items-center gap-5 md:grid-cols-[minmax(0,1fr)_220px]">
+        <div className="studio-canvas relative mx-auto aspect-square w-full max-w-[390px] rounded-3xl bg-gradient-to-b from-cyan-50 to-white p-3">
           <svg
             viewBox="0 0 300 300"
             className="h-full w-full"
             role="img"
             aria-labelledby="polygon-title polygon-desc"
           >
-            <title id="polygon-title">مضلع مكوّن من {sides} أضلاع</title>
+            <title id="polygon-title">{`مضلع مكوّن من ${sides} أضلاع`}</title>
             <desc id="polygon-desc">
               {split ? `مقسّم من رأس واحد إلى ${sides - 2} مثلثات` : "اضغط زر تقسيم المضلع لإظهار المثلثات"}
             </desc>
@@ -103,7 +103,7 @@ export function PolygonLab({
           </svg>
         </div>
 
-        <div className="rounded-2xl bg-slate-950 p-5 text-white" aria-live="polite">
+        <div className="studio-readout rounded-2xl bg-slate-950 p-5 text-white" aria-live="polite">
           <p className="text-sm text-slate-300">عدد الأضلاع</p>
           <p className="mt-1 text-3xl font-black tabular-nums" dir="ltr">n = {sides}</p>
           {split ? (
