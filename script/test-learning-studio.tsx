@@ -22,6 +22,8 @@ for (const { lesson } of Object.values(lessonRegistry)) {
     assert.ok(html.includes(`aria-labelledby="learning-title-${step.id}"`));
     assert.ok(html.includes(`data-learning-step-index="${index}"`));
     assert.ok(html.includes(step.title), "Original section titles remain intact");
+    assert.ok(html.indexOf('class="studio-section-meta"') < html.indexOf('class="studio-section-title"'),
+      "Section number and label precede the title in every lesson section");
     assert.ok(!/hidden|<details|<summary/.test(html.replace('aria-hidden="true"', "")), "Every section stays open");
     assert.notEqual(step.type, "assessment", "No exam in explanation tab");
   }
@@ -82,6 +84,10 @@ assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is 
 assert.ok(page.includes('data-testid="lesson-step-title">شرح درس {lesson.title}</h1>'),
   "The interactive explanation heading includes the current lesson name");
 const css = readFileSync(new URL("../src/features/lesson-engine/learningStudio.css", import.meta.url), "utf8");
+const sectionHeadingCss = css.match(/\.lesson-studio \.studio-section-head\s*\{([^}]+)\}/)?.[1] ?? "";
+assert.ok(sectionHeadingCss.includes("flex-direction: column") && sectionHeadingCss.includes("align-items: center") && sectionHeadingCss.includes("text-align: center"),
+  "Every section has centered metadata above its centered title");
+assert.ok(!/\.studio-section-label\s*\{[^}]*clip:/.test(css), "Section labels remain visible on mobile");
 assert.ok(css.includes("prefers-reduced-motion"));
 assert.ok(css.includes("focus-visible"));
 assert.ok(!css.includes("sharaf-activity-glow"));
