@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { getLessonActivities, getPendingActivities, readTriedActivities } from "../src/features/lesson-engine/lessonActivities";
 import { ActivityGuide } from "../src/features/lesson-engine/ActivityGuide";
+import { ActivityReminder } from "../src/features/lesson-engine/ActivityReminder";
 
 for (const { lesson } of Object.values(lessonRegistry)) {
   const activities = getLessonActivities(lesson);
@@ -27,14 +28,26 @@ for (const { lesson } of Object.values(lessonRegistry)) {
     activity: first, tried, onTry: () => undefined,
     children: createElement("button", { type: "button" }, "تجربة"),
   }));
-  assert.ok(render(false).includes("جرّب بنفسك"));
-  assert.ok(render(true).includes("جرّبت النشاط"));
-  assert.ok(render(false).includes(`aria-describedby="activity-instruction-${first.stepId}"`));
-  assert.ok(render(false).includes(first.instruction));
-  console.log(`PASS ${lesson.id}: ${activities.length} activity guides, validated independent progress, descriptive labels`);
+  for (const tried of [false, true]) {
+    const html = render(tried);
+    assert.ok(!html.includes("جرّب بنفسك") && !html.includes("جرّبت النشاط"));
+    assert.ok(!html.includes(first.instruction), "No repeated instruction strip");
+    assert.ok(html.includes(`aria-label="نشاط: ${first.title}"`));
+    assert.ok(html.includes(`data-activity-tried="${tried}"`));
+    assert.ok(html.includes('<button type="button">تجربة</button>'), "Activity controls remain intact");
+  }
+  console.log(`PASS ${lesson.id}: ${activities.length} activities retain tracking without visible guide strips`);
 }
 
 const css = readFileSync(new URL("../src/index.css", import.meta.url), "utf8");
-assert.match(css, /animation: sharaf-activity-glow 1\.15s ease-in-out 2;/);
-assert.match(css, /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.sharaf-activity-glow \{ animation: none; \}/);
-console.log("PASS cues have two finite highlights and respect reduced motion");
+assert.ok(!css.includes("sharaf-activity-glow"), "Rejected attention animation is removed");
+const reminder = (pendingCount: number) => renderToStaticMarkup(createElement(ActivityReminder, { pendingCount }));
+assert.equal(reminder(0), "");
+assert.equal(reminder(-1), "");
+assert.ok(reminder(1).includes("يمكنك تجربتها أو بدء الاختبار مباشرة"));
+assert.ok(!/dialog|<button|<svg/.test(reminder(6)), "Reminder is plain inline text, not an overlay or extra control");
+const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.ok(!/showActivityReminder|skipActivityReminder|restoreReminderFocus|remindedLessons/.test(page));
+assert.match(page, /activeTabId === "learn" && !assessmentComplete && <ActivityReminder pendingCount=\{pendingActivities.length\}/);
+assert.match(page, /data-testid="next-step-area"[\s\S]*<ActivityReminder[\s\S]*data-testid="button-next-step"/);
+console.log("PASS quiet conditional reminder beside the exam button, no animation or navigation gate");

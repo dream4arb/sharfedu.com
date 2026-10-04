@@ -55,9 +55,6 @@ export default function InteractiveLessonPage() {
   const activities = useMemo(() => getLessonActivities(lesson), [lesson]);
   const { triedStepIds, markTried } = useActivityProgress(lesson, activities);
   const pendingActivities = getPendingActivities(activities, triedStepIds);
-  const [showActivityReminder, setShowActivityReminder] = useState(false);
-  const remindedLessons = useRef(new Set<string>());
-  const restoreReminderFocus = useRef<() => void>(() => undefined);
   const questionMap = registered.questionMap;
   const lessonVideos = (lesson.videos ?? []).slice(0, 4);
   const {
@@ -168,17 +165,9 @@ export default function InteractiveLessonPage() {
     return () => observer.disconnect();
   }, [activeTabId, lesson.id]);
 
-  function selectTab(tabId: LessonTabId, skipActivityReminder = false) {
+  function selectTab(tabId: LessonTabId) {
     const tab = lessonTabs.find((item) => item.id === tabId);
     if (!tab || !tab.stepIndexes.length) return false;
-    if (tabId === "assessment" && activeTabId !== "assessment" && !assessmentComplete
-      && pendingActivities.length > 0 && !skipActivityReminder && !remindedLessons.current.has(lesson.id)) {
-      remindedLessons.current.add(lesson.id);
-      const origin = document.activeElement;
-      restoreReminderFocus.current = () => { if (origin instanceof HTMLElement && origin.isConnected) origin.focus(); };
-      setShowActivityReminder(true);
-      return false;
-    }
     const nextStepIndex = tabId === "learn" ? lastLearningStep.current
       : tabId === "assessment" && session.completedAt && assessmentComplete ? reportStepIndex
       : tab.stepIndexes[0];
@@ -554,9 +543,12 @@ export default function InteractiveLessonPage() {
                 {activeTabId === "assessment" ? !showReport && (
                   <button type="button" onClick={showResults} disabled={!assessmentComplete} className="flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-35" data-testid="button-show-results">اعرض نتيجتي<ArrowLeft className="h-5 w-5" /></button>
                 ) : (
-                  <button type="button" onClick={() => navigateTab(1)} className="flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-cyan-800" data-testid="button-next-step">
-                    {activeTabId === "learn" ? "ابدأ اختبار الدرس" : lessonTabs[activeTabIndex + 1].title}<ArrowLeft className="h-5 w-5" />
-                  </button>
+                  <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-4 gap-y-2" data-testid="next-step-area">
+                    {activeTabId === "learn" && !assessmentComplete && <ActivityReminder pendingCount={pendingActivities.length} />}
+                    <button type="button" onClick={() => navigateTab(1)} className="flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-cyan-800" data-testid="button-next-step">
+                      {activeTabId === "learn" ? "ابدأ اختبار الدرس" : lessonTabs[activeTabIndex + 1].title}<ArrowLeft className="h-5 w-5" />
+                    </button>
+                  </div>
                 )}
               </div>
             </footer>
@@ -572,19 +564,6 @@ export default function InteractiveLessonPage() {
         />}
       </main>
 
-      <ActivityReminder open={showActivityReminder} onOpenChange={setShowActivityReminder} pending={pendingActivities}
-        onRestoreFocus={() => restoreReminderFocus.current()}
-        onReview={(activity) => {
-          restoreReminderFocus.current = () => undefined;
-          setShowActivityReminder(false);
-          openLearningSection(activity.stepIndex);
-        }}
-        onContinue={() => {
-          restoreReminderFocus.current = () => requestAnimationFrame(() => document.querySelector<HTMLElement>("[role='tab'][data-state='active']")?.focus());
-          setShowActivityReminder(false);
-          selectTab("assessment", true);
-          window.scrollTo({ top: 0 });
-        }} />
       <Link href="/" className="fixed bottom-4 left-4 hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-lg hover:text-cyan-800 xl:flex" aria-label="العودة للرئيسية"><ChevronLeft className="h-5 w-5" /></Link>
     </Tabs>
   );
