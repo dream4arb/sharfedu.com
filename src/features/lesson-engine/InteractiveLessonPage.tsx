@@ -312,7 +312,6 @@ export default function InteractiveLessonPage() {
               <div className="p-5">
                 <h2 className="font-black text-slate-900">{selectedVideo?.title}</h2>
                 <p className="mt-1 text-sm text-slate-500">{selectedVideo?.channelName}{selectedVideo?.duration ? ` · ${selectedVideo.duration}` : ""}</p>
-                <p className="mt-3 rounded-xl bg-cyan-50 p-3 text-sm leading-6 text-cyan-950">تابع الشرح بالسرعة المناسبة لك، ثم انتقل إلى «الشرح التفاعلي» لتجربة الأفكار بنفسك. يمكنك العودة إلى الفيديو في أي وقت.</p>
               </div>
               <div data-testid="lesson-video-options" className="border-t border-slate-200 p-5 sm:p-6">
                 <div className="flex flex-wrap items-end justify-between gap-2">
