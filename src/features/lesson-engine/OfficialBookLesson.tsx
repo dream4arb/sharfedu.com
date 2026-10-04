@@ -115,7 +115,7 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
   return (
     <section ref={readerRef} className={isFullscreen ? "fixed inset-0 z-[100] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-white" : "overflow-hidden rounded-3xl border border-slate-200 bg-white"} aria-labelledby="official-book-heading" data-testid="official-book-reader" data-fullscreen={isFullscreen}>
       <div className={`${isFullscreen ? "sticky top-0 z-10 " : ""}grid grid-cols-1 items-center gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-5 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]`} data-testid="official-book-toolbar">
-        <h1 id="official-book-heading" className="min-w-0 text-center text-sm font-black leading-6 text-slate-900 md:col-start-2 md:row-start-1">صفحة درس {lessonTitle}</h1>
+        <h1 id="official-book-heading" className="min-w-0 text-center text-2xl font-black leading-tight text-slate-950 sm:text-3xl md:col-start-2 md:row-start-1">{lessonTitle}</h1>
 
         <button ref={fullscreenButtonRef} type="button" onClick={toggleFullscreen} aria-pressed={isFullscreen} className="inline-flex min-h-11 items-center justify-center justify-self-center gap-2 rounded-xl border border-slate-300 px-3 text-sm font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700 md:col-start-1 md:row-start-1 md:justify-self-start" data-testid="book-fullscreen-toggle">
           {isFullscreen ? <Minimize className="h-5 w-5" aria-hidden="true" /> : <Maximize className="h-5 w-5" aria-hidden="true" />}

@@ -41,7 +41,9 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.ok(!html.includes("كتاب الوزارة"), "Redundant official-book link is removed from the toolbar");
   assert.match(html, /id="official-book-heading" class="[^"]*text-center[^"]*md:col-start-2/, "Book heading is centered in the balanced toolbar");
   assert.ok(html.includes("الكتاب كاملًا من المصدر"), "The official full-book link remains in the source footer");
-  assert.ok(html.includes(`صفحة درس ${lesson.title}`), "Book toolbar names the current lesson");
+  assert.match(html, new RegExp(`id="official-book-heading"[^>]*>${lesson.title}</h1>`), "Book heading contains only the current lesson name");
+  assert.ok(!html.includes("صفحة درس"), "Book heading has no redundant prefix");
+  assert.match(html, /id="official-book-heading" class="[^"]*text-2xl[^\"]*sm:text-3xl/, "Book title uses the same large responsive typography as the video title");
   let previousPosition = -1;
   for (const page of pages) {
     const position = html.indexOf(`data-book-page="${page.pageNumber}"`);
