@@ -463,7 +463,7 @@ export default function InteractiveLessonPage() {
 
               {tab.id === "learn" && <>
                 <div className="studio-page-heading">
-                  <h1 data-testid="lesson-step-title">شرح درس {lesson.title}</h1>
+                  <h1 data-testid="lesson-step-title">{lesson.title}</h1>
                 </div>
                 <LearningSectionNavigation sections={learningSections} onNavigate={openLearningSection} />
                 <div className="studio-section-stack" data-testid="learning-section-stack">

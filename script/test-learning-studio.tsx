@@ -55,6 +55,8 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.ok(page.includes('<h1 data-testid="lesson-step-title">{lesson.title}</h1>'), "Interactive explanation heading contains only the current lesson name");
+assert.ok(!page.includes("شرح درس {lesson.title}"), "Interactive heading excludes the redundant explanation prefix");
 assert.ok(page.includes('content !== "objectives" && <StudioLessonIntroduction'), "Goals section excludes the explanation");
 assert.ok(page.includes('content !== "introduction" && <>'), "Explanation section excludes goals and learning-method content");
 assert.ok(page.includes('learningSections.map(({ step, index, content, sectionNumber })'), "Every section uses the new continuous numbering");
@@ -110,7 +112,7 @@ assert.ok(page.indexOf('data-testid="lesson-video-player"') < page.indexOf('data
 assert.ok(page.includes('step.type === "video" ? "text-center" : undefined'),
   "Only the video tab heading and label are centered");
 assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is scoped to learning tab");
-assert.ok(page.includes('data-testid="lesson-step-title">شرح درس {lesson.title}</h1>'),
+assert.ok(page.includes('data-testid="lesson-step-title">{lesson.title}</h1>'),
   "The interactive explanation heading includes the current lesson name");
 const css = readFileSync(new URL("../src/features/lesson-engine/learningStudio.css", import.meta.url), "utf8");
 const sectionHeadingCss = css.match(/\.lesson-studio \.studio-section-head\s*\{([^}]+)\}/)?.[1] ?? "";
