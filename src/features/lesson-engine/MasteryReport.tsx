@@ -39,7 +39,7 @@ export function MasteryReport({
           <div>
             <p className="flex items-center gap-2 text-sm font-bold text-cyan-300"><CheckCircle2 className="h-5 w-5" /> أكملت درس {lesson.title}</p>
             <h2 className="mt-3 text-3xl font-black sm:text-4xl">مستوى الإتقان الحالي</h2>
-            <p className="mt-3 max-w-xl leading-7 text-slate-300">هذا التقرير مبني على إجاباتك في اختبار الدرس وعدد المحاولات في كل مهارة.</p>
+            <p className="mt-3 max-w-xl leading-7 text-slate-300">هذا التقرير مبني على إجاباتك الصحيحة في اختبار الدرس. عند تصحيح الإجابة تحصل على درجتها كاملة، دون خصم للمحاولات السابقة.</p>
           </div>
           <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full border-[10px] border-cyan-400/25 bg-white/5">
             <div className="text-center"><span className="block text-4xl font-black tabular-nums">{overall}%</span><span className="text-xs text-slate-300">الإجمالي</span></div>

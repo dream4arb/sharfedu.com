@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { getGeminiClient, getGeminiModel } from "../lib/gemini";
 import { lessonAttempts, productEvents, skillMastery } from "@shared/schema";
-import { calculateAttemptMastery, gradeLessonQuestion } from "@shared/lesson-engine/grade";
+import { calculateAttemptMastery, calculateSkillMastery, gradeLessonQuestion } from "@shared/lesson-engine/grade";
 import { POLYGON_ANGLES_LESSON_ID } from "@shared/lesson-engine/polygon-angles";
 import { REAL_NUMBER_PROPERTIES_LESSON_ID } from "@shared/lesson-engine/real-number-properties";
 import { RATIONAL_NUMBERS_LESSON_ID } from "@shared/lesson-engine/rational-numbers";
@@ -382,11 +382,7 @@ router.post("/lesson-engine/attempt", writeLimiter, async (req, res) => {
       eq(lessonAttempts.lessonId, parsed.data.lessonId),
       eq(lessonAttempts.skillId, question.skillId),
     ));
-    const bestByQuestion = new Map<string, number>();
-    for (const row of skillRows) bestByQuestion.set(row.questionId, Math.max(bestByQuestion.get(row.questionId) ?? 0, row.masteryScore));
-    const score = bestByQuestion.size
-      ? Math.round([...bestByQuestion.values()].reduce((total, item) => total + item, 0) / bestByQuestion.size)
-      : 0;
+    const score = calculateSkillMastery(skillRows);
     const snapshot = {
       score,
       attempts: skillRows.length,
@@ -433,7 +429,16 @@ router.get("/lesson-engine/progress/:lessonId", async (req, res) => {
     eq(skillMastery.userId, req.user.id),
     eq(skillMastery.lessonId, req.params.lessonId),
   ));
-  return res.json({ lessonId: req.params.lessonId, skills: rows });
+  // Recalculate historical penalized scores from answer evidence without deleting history.
+  const attempts = await db.select().from(lessonAttempts).where(and(
+    eq(lessonAttempts.userId, req.user.id),
+    eq(lessonAttempts.lessonId, req.params.lessonId),
+  ));
+  const skills = rows.map((row) => {
+    const skillAttempts = attempts.filter((attempt) => attempt.skillId === row.skillId);
+    return { ...row, score: skillAttempts.length ? calculateSkillMastery(skillAttempts) : row.score };
+  });
+  return res.json({ lessonId: req.params.lessonId, skills });
 });
 
 export default router;

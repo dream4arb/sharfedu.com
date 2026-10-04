@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { calculateAttemptMastery } from "@shared/lesson-engine/grade";
+import { calculateAttemptMastery, calculateSkillMastery } from "@shared/lesson-engine/grade";
 import type {
   InteractiveLessonDefinition,
   LessonQuestionDefinition,
@@ -81,7 +81,11 @@ function loadSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
       visitedStepIds: Array.isArray(parsed.visitedStepIds)
         ? Array.from(new Set([...parsed.visitedStepIds.filter((id) => validStepIds.has(id)), lesson.steps[stepIndex].id]))
         : lesson.steps.slice(0, unlockedStepIndex + 1).map((step) => step.id),
-      questions: parsed.questions ?? {},
+      // Preserve saved answers and history while upgrading the old penalty-based scores.
+      questions: Object.fromEntries(Object.entries(parsed.questions ?? {}).map(([id, progress]) => [id, {
+        ...progress,
+        score: progress.correct ? 100 : 0,
+      }])),
     };
   } catch {
     return createSession(lesson);
@@ -187,9 +191,7 @@ export function useLessonSession(lesson: InteractiveLessonDefinition) {
 
   const mastery = useMemo<SkillMasterySnapshot[]>(() => lesson.skills.map((skill) => {
     const results = Object.values(session.questions).filter((result) => result.skillId === skill.id);
-    const score = results.length
-      ? Math.round(results.reduce((total, result) => total + result.score, 0) / results.length)
-      : 0;
+    const score = calculateSkillMastery(results);
     return {
       skillId: skill.id,
       score,

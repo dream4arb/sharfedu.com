@@ -285,7 +285,6 @@ export default function InteractiveLessonPage() {
         {step.type === "assessment" && (
           <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-4 leading-7 text-violet-950">
             <p className="flex items-center gap-2 font-black"><ListChecks className="h-5 w-5" /> {stepQuestions.length} أسئلة تغطي مهارات الدرس</p>
-            <p className="mt-1 text-sm">أجب بنفسك من دون تلميحات. يمكنك تصحيح إجابتك، وسيأخذ التقرير عدد المحاولات في الحسبان.</p>
           </div>
         )}
 

@@ -37,6 +37,7 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.ok(!page.includes("أجب بنفسك من دون تلميحات") && !page.includes("سيأخذ التقرير عدد المحاولات في الحسبان"), "Old penalty instructions are removed");
 assert.ok(!page.includes("loadedVideoId") && !page.includes("playSelectedVideo"), "Video is no longer gated behind a custom play screen");
 assert.ok(page.includes('<LessonVideoPlayer key={selectedVideo.id}'), "Switching videos remounts the native player immediately");
 const video = lessonRegistry["l-mm6el08l"].lesson.videos![0];

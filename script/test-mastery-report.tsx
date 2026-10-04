@@ -4,6 +4,26 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { MasteryReport } from "../src/features/lesson-engine/MasteryReport";
 import { getReviewStepIndex } from "../src/features/lesson-engine/lessonNavigation";
+import { calculateAttemptMastery, calculateSkillMastery } from "../shared/lesson-engine/grade";
+
+for (const attemptNumber of [1, 2, 3, 10, 1000]) {
+  for (const hintsUsed of [0, 1, 10]) {
+    assert.equal(calculateAttemptMastery({ correct: true, attemptNumber, hintsUsed }), 100);
+    assert.equal(calculateAttemptMastery({ correct: false, attemptNumber, hintsUsed }), 0);
+  }
+}
+assert.equal(calculateSkillMastery([
+  { questionId: "q1", correct: false }, { questionId: "q1", correct: false },
+  { questionId: "q1", correct: true },
+]), 100, "A correct retry earns full credit; earlier wrong attempts do not count against it");
+assert.equal(calculateSkillMastery([
+  { questionId: "q1", correct: true }, { questionId: "q1", correct: false },
+]), 100, "Previously earned credit is not lost");
+assert.equal(calculateSkillMastery([
+  { questionId: "q1", correct: false }, { questionId: "q1", correct: true },
+  { questionId: "q2", correct: false },
+]), 50, "Uncorrected questions still need review, without duplicate attempt weighting");
+assert.equal(calculateSkillMastery([]), 0);
 
 for (const { lesson } of Object.values(lessonRegistry)) {
   const cases = [

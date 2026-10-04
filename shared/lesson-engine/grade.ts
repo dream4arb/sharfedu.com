@@ -97,8 +97,16 @@ export function calculateAttemptMastery(input: {
   attemptNumber: number;
   hintsUsed: number;
 }): number {
-  if (!input.correct) return 0;
-  const retryPenalty = Math.max(0, input.attemptNumber - 1) * 12;
-  const hintPenalty = input.hintsUsed * 8;
-  return Math.max(55, Math.round(100 - retryPenalty - hintPenalty));
+  // Attempts and hints are learning history, not deductions from the final grade.
+  return input.correct ? 100 : 0;
+}
+
+export function calculateSkillMastery(attempts: ReadonlyArray<{ questionId: string; correct: boolean }>): number {
+  const bestByQuestion = new Map<string, number>();
+  for (const attempt of attempts) {
+    bestByQuestion.set(attempt.questionId, Math.max(bestByQuestion.get(attempt.questionId) ?? 0, attempt.correct ? 100 : 0));
+  }
+  return bestByQuestion.size
+    ? Math.round([...bestByQuestion.values()].reduce((sum, score) => sum + score, 0) / bestByQuestion.size)
+    : 0;
 }
