@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import InteractiveLessonPage from "@/features/lesson-engine/InteractiveLessonPage";
+import { isPublishedLesson } from "@/features/lesson-engine/publishedLessons";
 import { useAuth } from "@/hooks/use-auth";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { useCmsTabContent } from "@/hooks/use-cms-tab-content";
@@ -360,11 +362,14 @@ export default function Lesson() {
 
   // محتوى CMS من جدول cms_content حسب lesson_id و tab_type (استخدام lessonId من params)
   const lessonIdFromParams = params.lessonId;
-  const { content: cmsLessonContent } = useCmsTabContent(lessonIdFromParams, "lesson");
-  const { content: cmsVideoContent } = useCmsTabContent(lessonIdFromParams, "video");
-  const { content: cmsSummaryContent } = useCmsTabContent(lessonIdFromParams, "summary");
+  // The approved lesson engine replaces the retired CMS lesson renderers.
+  const legacyContentEnabled = false;
+  const legacyLessonId = legacyContentEnabled ? lessonIdFromParams : undefined;
+  const { content: cmsLessonContent } = useCmsTabContent(legacyLessonId, "lesson");
+  const { content: cmsVideoContent } = useCmsTabContent(legacyLessonId, "video");
+  const { content: cmsSummaryContent } = useCmsTabContent(legacyLessonId, "summary");
   const [educationRefreshTrigger, setEducationRefreshTrigger] = useState(0);
-  const { content: cmsEducationContent, setContent: setCmsEducationContent } = useCmsTabContent(lessonIdFromParams, "education", educationRefreshTrigger);
+  const { content: cmsEducationContent, setContent: setCmsEducationContent } = useCmsTabContent(legacyLessonId, "education", educationRefreshTrigger);
 
   const [hasSsaContent, setHasSsaContent] = useState<boolean | null>(null);
   const [loadingSsa, setLoadingSsa] = useState(false);
@@ -373,7 +378,7 @@ export default function Lesson() {
   const [hasLessonPdf, setHasLessonPdf] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!lessonIdFromParams) {
+    if (!legacyContentEnabled || !lessonIdFromParams) {
       setHasLessonPdf(null);
       return;
     }
@@ -389,7 +394,7 @@ export default function Lesson() {
 
   useEffect(() => {
     // إذا كان زر إعادة التوليد قد ضُغط، لا نتدخل — الـ polling سيتولى الأمر
-    if (isRegenerating) return;
+    if (!legacyContentEnabled || isRegenerating) return;
 
     if (!lessonIdFromParams || activeTab !== "ssa") {
       setHasSsaContent(null);
@@ -442,7 +447,7 @@ export default function Lesson() {
   }, [lessonIdFromParams, activeTab, cmsEducationContent, hasLessonPdf, isRegenerating]);
 
   useEffect(() => {
-    if (!ssaGenerating || !lessonIdFromParams) return;
+    if (!legacyContentEnabled || !ssaGenerating || !lessonIdFromParams) return;
     const interval = setInterval(() => {
       fetch(`/api/content/lesson/${encodeURIComponent(lessonIdFromParams)}/ssa-status`)
         .then((r) => r.json())
@@ -626,7 +631,7 @@ export default function Lesson() {
   const metadataFetchedRef = useRef("");
 
   useEffect(() => {
-    if (!currentLesson) return;
+    if (!legacyContentEnabled || !currentLesson) return;
 
     const fetchKey = `${currentLessonId}|${currentVideoUrl}|${additionalVideosKey}|${cmsVideoDataValue}`;
     if (metadataFetchedRef.current === fetchKey) return;
@@ -811,7 +816,7 @@ export default function Lesson() {
 
   // Auto-track video watching - complete after 30 seconds (أو مدة الفيديو إذا كانت أقل)
   useEffect(() => {
-    if (!lessonId || activeTab !== "video" || isTabCompleted(subjectId, lessonId, "video")) return;
+    if (!legacyContentEnabled || !lessonId || activeTab !== "video" || isTabCompleted(subjectId, lessonId, "video")) return;
     
     const videoDuration = getVideoDurationMinutes(currentLesson?.duration || "5 دقيقة");
     const requiredSeconds = Math.min(45, Math.max(30, videoDuration * 20)); // 30–45 ثانية
@@ -833,7 +838,7 @@ export default function Lesson() {
   // Auto-track lesson tab: PDF scroll أو 45 ثانية عند عدم وجود PDF
   const effectiveLessonPdfUrl = (cmsLessonContent?.contentType === "pdf" && cmsLessonContent?.dataValue) || currentLesson?.pdfUrl;
   useEffect(() => {
-    if (!lessonId || activeTab !== "lesson" || isTabCompleted(subjectId, lessonId, "lesson")) return;
+    if (!legacyContentEnabled || !lessonId || activeTab !== "lesson" || isTabCompleted(subjectId, lessonId, "lesson")) return;
 
     // عند عدم وجود PDF: إكمال تلقائي بعد 30 ثانية
     if (!effectiveLessonPdfUrl) {
@@ -912,7 +917,7 @@ export default function Lesson() {
 
   // Load Education HTML content when tab is active (من API المحتوى — ينعكس فوراً مع لوحة التحكم)
   useEffect(() => {
-    if (activeTab !== "education" || !currentLesson) {
+    if (!legacyContentEnabled || activeTab !== "education" || !currentLesson) {
       setEducationContent("");
       setEducationRawHtml(null);
       return;
@@ -1824,7 +1829,7 @@ export default function Lesson() {
               </div>
               
               {/* Sticky Tab Navigation - Only show when lesson is selected */}
-              {currentLesson && (
+              {currentLesson && !isPublishedLesson(params.lessonId) && (
                 <div className="flex items-center justify-center gap-2 px-4 pb-3 bg-white/95 dark:bg-card/95 backdrop-blur-lg">
                   <div className="flex items-center gap-1 p-1.5 bg-accent/50 rounded-xl">
                     {tabs.map((tab) => {
@@ -1870,7 +1875,7 @@ export default function Lesson() {
                 autoDescription={`درس ${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} مادة ${subjectName || ""}${gradeShort ? ` ${gradeShort}` : ""}${currentSemesterName ? ` ${currentSemesterName}` : ""} - شرح الدرس والملخصات والاختبارات على منصة شارف التعليمية`}
                 autoKeywords={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""}, ${subjectName || ""}, منصة شارف`}
               />
-              {user?.role === "admin" && (
+              {legacyContentEnabled && user?.role === "admin" && !isPublishedLesson(params.lessonId) && (
                 <div className="flex justify-start px-1 pb-4 mt-2">
                   <Button
                     variant="outline"
@@ -2011,549 +2016,13 @@ export default function Lesson() {
                 </motion.div>
               ) : (
                 <>
-              {/* Test Content */}
-              {activeTest ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50">
-                    {/* Test Header */}
-                    <div className="flex items-center justify-between mb-8">
-                      <div>
-                        <h2 className="text-2xl font-bold mb-2">{activeTest.title}</h2>
-                        <p className="text-muted-foreground">
-                          {activeTest.subject} - {activeTest.grade} - {activeTest.semester}
-                        </p>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setActiveTest(null);
-                          setTestAnswers({});
-                          setShowTestResults(false);
-                        }}
-                        className="gap-2"
-                      >
-                        <X className="w-4 h-4" />
-                        إغلاق الاختبار
-                      </Button>
-                    </div>
-
-                    {/* Test Questions */}
-                    {!showTestResults ? (
-                      <div className="space-y-8">
-                        {activeTest.multipleChoice.map((q, qIndex) => (
-                          <div key={q.id} className="p-6 bg-accent/30 rounded-xl border border-border/30">
-                            <div className="flex items-start gap-4 mb-4">
-                              <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">
-                                {qIndex + 1}
-                              </div>
-                              <div className="flex-1">
-                                <h3 className="font-bold text-lg mb-2">{q.questionText}</h3>
-                                {q.hasGeometricShape && q.shapeImageUrl && (
-                                  <div className="mb-4 p-3 bg-white dark:bg-gray-800 rounded-xl border-2 border-blue-300 dark:border-blue-600 shadow-sm">
-                                    <img 
-                                      src={q.shapeImageUrl} 
-                                      alt="الشكل الهندسي"
-                                      className="max-w-full h-auto max-h-48 object-contain mx-auto rounded-lg"
-                                      data-testid={`shape-image-${q.id}`}
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                              {Object.entries(q.options).map(([key, value]) => (
-                                <button
-                                  key={key}
-                                  onClick={() => setTestAnswers(prev => ({ ...prev, [q.id]: key }))}
-                                  data-testid={`option-${q.id}-${key}`}
-                                  className={`
-                                    relative p-5 rounded-md border text-center font-semibold text-lg
-                                    min-h-[70px] flex items-center justify-center
-                                    ${testAnswers[q.id] === key
-                                      ? "border-primary bg-primary text-white"
-                                      : "border-border bg-card hover-elevate"
-                                    }
-                                  `}
-                                >
-                                  <span className="absolute top-2 right-3 text-xs font-bold opacity-60">
-                                    {key.toUpperCase()}
-                                  </span>
-                                  {value}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-
-                        {/* True/False Questions */}
-                        {activeTest.trueFalse && activeTest.trueFalse.length > 0 && (
-                          <div className="mt-8">
-                            <h3 className="text-xl font-bold mb-4">ضعي كلمة (صح) أو (خطأ)</h3>
-                            <div className="space-y-4">
-                              {activeTest.trueFalse.map((tf, tfIndex) => (
-                                <div key={tf.id} className="p-4 bg-accent/30 rounded-xl border border-border/30">
-                                  <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold shrink-0 text-sm">
-                                      {tfIndex + 1}
-                                    </div>
-                                    <p className="flex-1 font-medium">{tf.statement}</p>
-                                    <div className="flex gap-2">
-                                      <button
-                                        onClick={() => setTestAnswers(prev => ({ ...prev, [`tf-${tf.id}`]: 'true' }))}
-                                        className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                                          testAnswers[`tf-${tf.id}`] === 'true'
-                                            ? "border-emerald-500 bg-emerald-100 text-emerald-700"
-                                            : "border-border/50 hover:border-emerald-300"
-                                        }`}
-                                      >
-                                        صح
-                                      </button>
-                                      <button
-                                        onClick={() => setTestAnswers(prev => ({ ...prev, [`tf-${tf.id}`]: 'false' }))}
-                                        className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                                          testAnswers[`tf-${tf.id}`] === 'false'
-                                            ? "border-rose-500 bg-rose-100 text-rose-700"
-                                            : "border-border/50 hover:border-rose-300"
-                                        }`}
-                                      >
-                                        خطأ
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Submit Button */}
-                        <div className="flex justify-center mt-8">
-                          <Button 
-                            size="lg"
-                            className="gap-2 px-8"
-                            onClick={() => {
-                              let correct = 0;
-                              activeTest.multipleChoice.forEach(q => {
-                                if (testAnswers[q.id] === q.correctAnswer) correct++;
-                              });
-                              if (activeTest.trueFalse) {
-                                activeTest.trueFalse.forEach(tf => {
-                                  const userAnswer = testAnswers[`tf-${tf.id}`];
-                                  if ((userAnswer === 'true' && tf.correctAnswer) || (userAnswer === 'false' && !tf.correctAnswer)) {
-                                    correct++;
-                                  }
-                                });
-                              }
-                              const total = activeTest.multipleChoice.length + (activeTest.trueFalse?.length || 0);
-                              setTestScore(correct);
-                              setShowTestResults(true);
-                            }}
-                          >
-                            <CheckCircle className="w-5 h-5" />
-                            تسليم الاختبار
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      /* Test Results */
-                      <div className="text-center">
-                        <div className={`mb-8 p-8 rounded-2xl ${
-                          testScore >= (activeTest.multipleChoice.length + (activeTest.trueFalse?.length || 0)) * 0.6
-                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-400"
-                            : "bg-rose-100 dark:bg-rose-900/30 border-2 border-rose-400"
-                        }`}>
-                          <div className={`text-5xl font-black mb-4 ${
-                            testScore >= (activeTest.multipleChoice.length + (activeTest.trueFalse?.length || 0)) * 0.6
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : "text-rose-600 dark:text-rose-400"
-                          }`}>
-                            {testScore} / {activeTest.multipleChoice.length + (activeTest.trueFalse?.length || 0)}
-                          </div>
-                          <p className="text-lg font-bold">
-                            {testScore >= (activeTest.multipleChoice.length + (activeTest.trueFalse?.length || 0)) * 0.6
-                              ? "أحسنت! نتيجة ممتازة"
-                              : "حاولي مرة أخرى"}
-                          </p>
-                          <p className="text-muted-foreground mt-2">
-                            النسبة: {Math.round((testScore / (activeTest.multipleChoice.length + (activeTest.trueFalse?.length || 0))) * 100)}%
-                          </p>
-                        </div>
-
-                        {/* Show correct answers */}
-                        <div className="text-right space-y-4">
-                          <h3 className="font-bold text-xl mb-4">الإجابات الصحيحة:</h3>
-                          {activeTest.multipleChoice.map((q, i) => (
-                            <div key={q.id} className={`p-4 rounded-xl border-2 ${
-                              testAnswers[q.id] === q.correctAnswer
-                                ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/20"
-                                : "border-rose-400 bg-rose-50 dark:bg-rose-900/20"
-                            }`}>
-                              <div className="flex items-center gap-3">
-                                <span className="font-bold">{i + 1}.</span>
-                                <span className="flex-1">{q.questionText}</span>
-                                <span className={`px-3 py-1 rounded-full text-sm font-bold ${
-                                  testAnswers[q.id] === q.correctAnswer
-                                    ? "bg-emerald-200 text-emerald-800"
-                                    : "bg-rose-200 text-rose-800"
-                                }`}>
-                                  الإجابة: {q.correctAnswer.toUpperCase()}) {q.options[q.correctAnswer]}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="flex justify-center gap-4 mt-8">
-                          <Button 
-                            variant="outline"
-                            onClick={() => {
-                              setTestAnswers({});
-                              setShowTestResults(false);
-                              setTestScore(0);
-                            }}
-                            className="gap-2"
-                          >
-                            <RotateCcw className="w-4 h-4" />
-                            إعادة الاختبار
-                          </Button>
-                          <Button 
-                            onClick={() => {
-                              setActiveTest(null);
-                              setTestAnswers({});
-                              setShowTestResults(false);
-                            }}
-                          >
-                            العودة للدروس
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
+              {isPublishedLesson(lessonIdFromParams) ? (
+                <InteractiveLessonPage key={lessonIdFromParams} embedded lessonId={lessonIdFromParams} />
               ) : (
-              <AnimatePresence mode="wait">
-                {/* Video Tab Content */}
-                {activeTab === "video" && (
-                  <motion.div
-                    key="video"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {/* Lesson Info + Video Player + قائمة الفيديوهات — الكل داخل مستطيل واحد */}
-                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50 mb-8">
-                      <div className="text-center mb-6">
-                        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white mb-4">
-                          <Video className="w-8 h-8" />
-                        </div>
-                        <h2 className="text-xl font-bold mb-2">{getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}</h2>
-                      </div>
-
-                      {(() => {
-                        const allVideosFromCms = cmsVideoUrls.length > 0 ? cmsVideoUrls.map(url => ({ url })) : [];
-                        const legacyMain = currentLesson?.videoUrl;
-                        const legacyOthers = (currentLesson?.additionalVideos || []).map(v => ({ url: v.url, title: v.title, channelName: v.channelName, duration: v.duration }));
-                        const videoList = allVideosFromCms.length > 0 ? allVideosFromCms : legacyMain ? [{ url: legacyMain, title: "", channelName: "", duration: "" }, ...legacyOthers] : legacyOthers;
-                        return (
-                          <VideoTabContent
-                            videos={videoList}
-                            metadata={videoMetadata}
-                            lessonTitle={currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "فيديو تعليمي"}
-                          />
-                        );
-                      })()}
-                    </div>
-
-                    {/* Auto Video Progress Tracker */}
-                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50 mb-8">
-                      <div className="flex items-center justify-between gap-2">
-                        <div>
-                          <h3 className="font-bold text-lg mb-1">تتبع المشاهدة التلقائي</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {isTabCompleted(subjectId, lessonId, "video") 
-                              ? "تم تسجيل مشاهدتك للفيديو ✓" 
-                              : `استمر في المشاهدة... (${Math.floor(videoWatchTime / 60)}:${(videoWatchTime % 60).toString().padStart(2, '0')})`
-                            }
-                          </p>
-                        </div>
-                        {isTabCompleted(subjectId, lessonId, "video") ? (
-                          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                            <Check className="w-5 h-5" />
-                            <span className="font-bold">+33.3%</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            <span className="font-bold">جاري التتبع...</span>
-                          </div>
-                        )}
-                      </div>
-                      {!isTabCompleted(subjectId, lessonId, "video") && (
-                        <div className="mt-4">
-                          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-sky-400 to-emerald-400 transition-all duration-1000"
-                              style={{ width: `${Math.min((videoWatchTime / 120) * 100, 100)}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* الملخص Tab Content - PDF */}
-                {activeTab === "summary" && (
-                  <motion.div
-                    key="summary"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full"
-                  >
-                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50 mb-8">
-                      <div className="text-center mb-4 sm:mb-6">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white mb-3 sm:mb-4">
-                          <FileText className="w-6 h-6 sm:w-8 sm:h-8" />
-                        </div>
-                        <h2 className="text-lg sm:text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الملخص"}</h2>
-                      </div>
-                      {(() => {
-                        const summaryPdfUrl = (cmsSummaryContent?.contentType === "pdf" && cmsSummaryContent?.dataValue)
-                          ? cmsSummaryContent.dataValue
-                          : currentLesson?.summaryPdfUrl;
-                        return summaryPdfUrl ? (
-                          <PdfCanvasViewer
-                            url={summaryPdfUrl}
-                            title={currentLesson ? `${currentLesson.title} - الملخص PDF` : "ملخص الدرس - PDF"}
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                            <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                            <p className="text-lg font-semibold mb-2">ملف PDF للملخص</p>
-                            <p className="text-sm">سيتم إضافة ملف الملخص (PDF) قريباً</p>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Education Tab Content */}
-                {activeTab === "education" && (
-                  <motion.div
-                    key="education"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full min-h-[500px]"
-                  >
-                    {loadingEducation ? (
-                      <div className="bg-white dark:bg-card rounded-2xl p-4 sm:p-8 shadow-sm border border-border/50">
-                        <div className="flex items-center justify-center py-12">
-                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                          <span className="mr-3 text-muted-foreground">جاري تحميل المحتوى التعليمي...</span>
-                        </div>
-                      </div>
-                    ) : educationRawHtml ? (
-                      <div className="w-full rounded-2xl overflow-x-auto sm:overflow-hidden border border-border/50 bg-white dark:bg-card shadow-sm" style={{ WebkitOverflowScrolling: 'touch' }}>
-                        <iframe
-                          srcDoc={educationRawHtml}
-                          sandbox="allow-scripts allow-same-origin"
-                          title="المحتوى التعليمي"
-                          className="w-full border-0 block"
-                          scrolling="no"
-                          style={{ minHeight: "700px", minWidth: "700px", overflow: "hidden" }}
-                          onLoad={(e) => {
-                            const iframe = e.currentTarget;
-                            const resize = () => {
-                              try {
-                                const doc = iframe.contentDocument;
-                                if (!doc) return;
-                                const body = doc.body;
-                                const html = doc.documentElement;
-                                if (!body || !html) return;
-                                const h = Math.max(
-                                  body.scrollHeight, body.offsetHeight,
-                                  html.scrollHeight, html.offsetHeight
-                                );
-                                if (h > 100) iframe.style.height = h + 60 + "px";
-                              } catch (_) {}
-                            };
-                            resize();
-                            const t1 = setTimeout(resize, 500);
-                            const t2 = setTimeout(resize, 1500);
-                            const t3 = setTimeout(resize, 3000);
-                            const obs = new MutationObserver(resize);
-                            try {
-                              if (iframe.contentDocument?.body) {
-                                obs.observe(iframe.contentDocument.body, { childList: true, subtree: true, attributes: true });
-                              }
-                            } catch (_) {}
-                            iframe.addEventListener("beforeunload", () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); obs.disconnect(); }, { once: true });
-                          }}
-                        />
-                      </div>
-                    ) : educationContent && educationContent.trim().length > 0 ? (
-                      <div 
-                        ref={educationContainerRef}
-                        className="w-full education-sandbox"
-                        style={{ 
-                          display: 'block',
-                          height: 'auto'
-                        }}
-                        dangerouslySetInnerHTML={{ __html: educationContent }}
-                      />
-                    ) : (
-                      <div className="bg-white dark:bg-card rounded-2xl p-4 sm:p-8 shadow-sm border border-border/50">
-                        <div className="text-center py-12">
-                          <GraduationCap className="w-16 h-16 mx-auto mb-4 text-purple-500 opacity-50" />
-                          <p className="text-muted-foreground">لا يوجد محتوى تعليمي متاح حالياً</p>
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Lesson PDF Tab Content */}
-                {activeTab === "lesson" && (
-                  <motion.div
-                    key="lesson"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full min-h-[70vh]"
-                  >
-                    <div className="bg-white dark:bg-card rounded-2xl p-3 sm:p-6 shadow-sm border border-border/50">
-                      <div className="text-center mb-4 sm:mb-6">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white mb-3 sm:mb-4">
-                          <BookOpenCheck className="w-6 h-6 sm:w-8 sm:h-8" />
-                        </div>
-                        <h2 className="text-lg sm:text-xl font-bold mb-2">{currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : "الدرس"}</h2>
-                      </div>
-                      
-                      {(() => {
-                        const pdfUrl = (cmsLessonContent?.contentType === "pdf" && cmsLessonContent?.dataValue)
-                          ? cmsLessonContent.dataValue
-                          : currentLesson?.pdfUrl;
-                        return pdfUrl ? (
-                          <PdfCanvasViewer
-                            url={pdfUrl}
-                            title={currentLesson ? `${getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)} - PDF` : "شرح الدرس PDF"}
-                          />
-                        ) : (
-                          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                            <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                            <p className="text-lg font-semibold mb-2">ملف PDF للدرس</p>
-                            <p className="text-sm">سيتم عرض ملف الشرح هنا</p>
-                          </div>
-                        );
-                      })()}
-
-                      {/* Auto Lesson Reading Tracker */}
-                      <div className="mt-6 p-4 rounded-xl border border-border/50 bg-accent/30">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-bold mb-1">تتبع القراءة التلقائي</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {isTabCompleted(subjectId, lessonId, "lesson") 
-                                ? "تم تسجيل قراءتك للدرس ✓" 
-                                : "استمر في القراءة لمدة دقيقتين..."
-                              }
-                            </p>
-                          </div>
-                          {isTabCompleted(subjectId, lessonId, "lesson") ? (
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-sm">
-                              <Check className="w-4 h-4" />
-                              <span className="font-bold">+33.3%</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 text-sm">
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              <span className="font-bold">جاري التتبع...</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* SSA Tab Content - درس النسبة يستخدم اختبار تفاعلي React */}
-                {activeTab === "ssa" && (
-                  <motion.div
-                    key="ssa"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full"
-                  >
-                    {!currentLesson ? (
-                      <div className="py-12 text-center text-muted-foreground" data-testid="ssa-no-lesson">يرجى اختيار درس من القائمة الجانبية</div>
-                    ) : hasLessonPdf === false ? (
-                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50" data-testid="ssa-no-pdf">
-                        <div className="text-center py-12">
-                          <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/40" />
-                          {user?.role === "admin" ? (
-                            <>
-                              <p className="text-lg font-bold text-muted-foreground mb-2">لا يوجد ملف PDF في تبويب الدرس</p>
-                              <p className="text-sm text-muted-foreground">قم بإضافة ملف PDF للدرس أولاً ليتم توليد المحتوى التفاعلي تلقائياً بواسطة شارف AI</p>
-                            </>
-                          ) : (
-                            <>
-                              <p className="text-lg font-bold text-muted-foreground mb-2">المحتوى قيد الإعداد</p>
-                              <p className="text-sm text-muted-foreground">سيتم إضافة محتوى شارف AI التفاعلي لهذا الدرس قريباً</p>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    ) : currentLesson.id === "5-1" ? (
-                      <PolygonAnglesQuizSSA />
-                    ) : ssaGenerating ? (
-                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50" data-testid="ssa-generating">
-                        <div className="flex flex-col items-center justify-center py-12">
-                          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-cyan-500 flex items-center justify-center text-white">
-                            <Sparkles className="w-8 h-8 animate-pulse" />
-                          </div>
-                          <p className="text-lg font-bold mb-2">شارف AI يُعدّ الدرس...</p>
-                          <p className="text-sm text-muted-foreground mb-4">جاري تحليل ملف PDF وتوليد المحتوى التفاعلي</p>
-                          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                        </div>
-                      </div>
-                    ) : loadingSsa ? (
-                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50">
-                        <div className="flex items-center justify-center py-12">
-                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                          <span className="mr-3 text-muted-foreground">جاري تحميل المحتوى...</span>
-                        </div>
-                      </div>
-                    ) : hasSsaContent ? (
-                      <SsaIframe
-                        src={`/api/content/lesson/${currentLesson.id}/ssa-html`}
-                        lessonId={currentLesson.id}
-                      />
-                    ) : (
-                      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-border/50" data-testid="ssa-empty">
-                        <div className="text-center py-12">
-                          <Sparkles className="w-16 h-16 mx-auto mb-4 text-primary/50" />
-                          <p className="text-lg font-bold text-muted-foreground mb-2">لم يتم توليد المحتوى بعد</p>
-                          <p className="text-sm text-muted-foreground">سيتم توليد المحتوى تلقائياً عند إضافة ملف PDF للدرس</p>
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-
-              </AnimatePresence>
+                <section className="rounded-2xl border border-border/50 bg-white p-8 text-center" data-testid="lesson-content-pending">
+                  <h2 className="text-2xl font-bold">{getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}</h2>
+                  <p className="mt-3 text-muted-foreground">سيُضاف محتوى هذا الدرس قريبًا.</p>
+                </section>
               )}
 
               {currentLesson && lessonIdFromParams && (
