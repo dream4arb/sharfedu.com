@@ -22,6 +22,7 @@ import { StudioLessonIntroduction } from "./StudioLessonIntroduction";
 import { LearningSection } from "./LearningStudio";
 import "./learningStudio.css";
 import { OfficialBookLesson } from "./OfficialBookLesson";
+import { LessonVideoPlayer } from "./LessonVideoPlayer";
 import { PolygonLab } from "./PolygonLab";
 import { QuestionCard } from "./QuestionCard";
 import { TutorPanel } from "./TutorPanel";
@@ -70,7 +71,6 @@ export default function InteractiveLessonPage() {
   } = useLessonSession(lesson);
   const [visualAction, setVisualAction] = useState<TutorVisualAction | null>(null);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
-  const [loadedVideoId, setLoadedVideoId] = useState<string | null>(null);
   const [playedVideoIds, setPlayedVideoIds] = useState<string[]>([]);
   const assessmentEventSent = useRef(false);
   const currentStep = lesson.steps[session.stepIndex];
@@ -110,12 +110,10 @@ export default function InteractiveLessonPage() {
 
   function selectVideo(index: number) {
     setSelectedVideoIndex(index);
-    setLoadedVideoId(null);
   }
 
-  function playSelectedVideo() {
+  function recordVideoStarted() {
     if (!selectedVideo) return;
-    setLoadedVideoId(selectedVideo.id);
     setPlayedVideoIds((ids) => ids.includes(selectedVideo.id) ? ids : [...ids, selectedVideo.id]);
     emitEvent({
       name: "video_started",
@@ -309,50 +307,8 @@ export default function InteractiveLessonPage() {
         {step.type === "video" && (
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
               <div data-testid="lesson-video-player" className="aspect-video bg-slate-950">
-                {selectedVideo && loadedVideoId === selectedVideo.id ? (
-                  selectedVideo.source === "hosted" ? (
-                    <video
-                      className="h-full w-full"
-                      controls
-                      playsInline
-                      autoPlay
-                      preload="metadata"
-                      poster={selectedVideo.thumbnailUrl}
-                      aria-label={selectedVideo.title}
-                    >
-                      <source src={selectedVideo.url} type="video/mp4" />
-                      {selectedVideo.captionsUrl && (
-                        <track
-                          kind="subtitles"
-                          src={selectedVideo.captionsUrl}
-                          srcLang="ar"
-                          label="العربية"
-                          default
-                        />
-                      )}
-                      متصفحك لا يدعم تشغيل الفيديو.
-                    </video>
-                  ) : (
-                    <iframe
-                      className="h-full w-full"
-                      src={selectedVideo.url}
-                      title={selectedVideo.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  )
-                ) : (
-                  <button
-                    type="button"
-                    onClick={playSelectedVideo}
-                    disabled={!selectedVideo}
-                    className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_center,_#164e63,_#020617_70%)] text-white"
-                  >
-                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-cyan-800"><PlayCircle className="h-9 w-9" /></span>
-                    <span className="px-5 text-center text-lg font-black">شغّل {selectedVideo?.title ?? "الفيديو"}</span>
-                    <span className="text-sm text-slate-300">الشرح {selectedVideoIndex + 1} من {lessonVideos.length}</span>
-                  </button>
-                )}
+                {selectedVideo ? <LessonVideoPlayer key={selectedVideo.id} video={selectedVideo} onStarted={recordVideoStarted} />
+                  : <p className="flex h-full items-center justify-center p-5 text-center text-white">لا يتوفر شرح مرئي لهذا الدرس حاليًا.</p>}
               </div>
               <div className="p-5">
                 <h2 className="font-black text-slate-900">{selectedVideo?.title}</h2>

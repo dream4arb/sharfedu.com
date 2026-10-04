@@ -6,6 +6,7 @@ import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { buildLessonTabs } from "../src/features/lesson-engine/lessonNavigation";
 import { LearningSection } from "../src/features/lesson-engine/LearningStudio";
 import { QuestionCard } from "../src/features/lesson-engine/QuestionCard";
+import { LessonVideoPlayer, youtubePlayerUrl } from "../src/features/lesson-engine/LessonVideoPlayer";
 import { PolygonLab } from "../src/features/lesson-engine/PolygonLab";
 import { FormulaDiscoveryLab, MissingAngleLab, ExteriorTurnLab } from "../src/features/lesson-engine/VisualLessonLabs";
 
@@ -36,6 +37,22 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.ok(!page.includes("loadedVideoId") && !page.includes("playSelectedVideo"), "Video is no longer gated behind a custom play screen");
+assert.ok(page.includes('<LessonVideoPlayer key={selectedVideo.id}'), "Switching videos remounts the native player immediately");
+const video = lessonRegistry["l-mm6el08l"].lesson.videos![0];
+const playerUrl = new URL(youtubePlayerUrl(video.url, "https://staging.example.com"));
+assert.equal(playerUrl.hostname, "www.youtube-nocookie.com", "Privacy-enhanced embed host remains unchanged");
+assert.equal(playerUrl.searchParams.get("autoplay"), "0");
+assert.equal(playerUrl.searchParams.get("enablejsapi"), "1");
+assert.equal(playerUrl.searchParams.get("origin"), "https://staging.example.com");
+assert.equal(playerUrl.searchParams.get("rel"), "0");
+let playbackCallbacks = 0;
+const hosted = renderToStaticMarkup(createElement(LessonVideoPlayer, {
+  video: { ...video, source: "hosted", url: "/test.mp4", captionsUrl: "/test.vtt" }, onStarted: () => { playbackCallbacks++; },
+}));
+assert.ok(hosted.includes("<video") && hosted.includes("controls") && hosted.includes("<track"));
+assert.ok(!hosted.includes("autoplay"), "Hosted video does not autoplay either");
+assert.equal(playbackCallbacks, 0, "Opening a player is not counted as playback");
 const reportSection = page.slice(page.indexOf('<section id="lesson-result"'));
 assert.ok(reportSection.indexOf('data-testid="assessment-answer-review"') < reportSection.indexOf('<MasteryReport'),
   "Answer review is above mastery and recommendations in the result section");
