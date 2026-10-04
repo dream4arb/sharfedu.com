@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useFourTabProgress } from "./use-four-tab-progress";
+import { isPublishedLesson } from "@/features/lesson-engine/publishedLessons";
+import { tabCompletionPercent, type CompletionTabId, type FourTabProgress } from "@shared/lesson-engine/tab-progress";
 
 type TabType = "lesson" | "video" | "questions" | "tests";
 
@@ -20,6 +23,10 @@ interface ApiProgressItem {
 }
 
 interface LessonProgress {
+  fourTabProgress: FourTabProgress;
+  setLessonTabCompleted: (subject: string, id: string, tab: CompletionTabId, completed: boolean) => void;
+  getCompletedLessonTabs: (subject: string, id: string) => CompletionTabId[];
+  progressReady: boolean;
   completedTabs: Record<string, Record<string, TabProgress>>;
   markTabComplete: (subjectSlug: string, lessonId: string, tab: TabType, score?: number) => void;
   hydrateFromApi: (items: ApiProgressItem[]) => void;
@@ -30,7 +37,7 @@ interface LessonProgress {
   isCompleted: (subjectSlug: string, lessonId: string) => boolean;
   markComplete: (subjectSlug: string, lessonId: string) => void;
   markIncomplete: (subjectSlug: string, lessonId: string) => void;
-  getProgress: (subjectSlug: string, totalLessons: number) => { completed: number; percentage: number };
+  getProgress: (subjectSlug: string, totalLessons: number, lessonIds?: string[]) => { completed: number; percentage: number };
 }
 
 const LessonProgressContext = createContext<LessonProgress | null>(null);
@@ -49,7 +56,9 @@ const PROGRESS_PER_TAB = 33.33; // For lesson and video tabs
 const QUESTIONS_PROGRESS_MAX = 33.34; // For questions tab (to ensure total = 100%)
 
 export function LessonProgressProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const { fourTabProgress, setLessonTabCompleted, progressReady } = useFourTabProgress(user?.id, isLoading);
+  const getCompletedLessonTabs = (subject: string, id: string) => fourTabProgress[subject]?.[id]?.completedTabs ?? [];
   const [completedTabs, setCompletedTabs] = useState<Record<string, Record<string, TabProgress>>>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -77,7 +86,7 @@ export function LessonProgressProvider({ children }: { children: ReactNode }) {
       for (const item of items) {
         const { subjectSlug, lessonId, lessonCompleted, videoCompleted, questionsScore } = item;
         const subjectProgress = next[subjectSlug] || {};
-        const lessonProgress = subjectProgress[lessonId] || { ...defaultTabProgress };
+        const lessonProgress = { ...(subjectProgress[lessonId] || defaultTabProgress) };
         if (lessonCompleted) lessonProgress.lesson = true;
         if (videoCompleted) lessonProgress.video = true;
         if (questionsScore != null) {
@@ -173,6 +182,9 @@ export function LessonProgressProvider({ children }: { children: ReactNode }) {
   };
 
   const getLessonProgress = (subjectSlug: string, lessonId: string) => {
+    if (isPublishedLesson(lessonId) || fourTabProgress[subjectSlug]?.[lessonId]) {
+      return tabCompletionPercent(getCompletedLessonTabs(subjectSlug, lessonId));
+    }
     const tabs = completedTabs[subjectSlug]?.[lessonId];
     if (!tabs) return 0;
     
@@ -223,33 +235,21 @@ export function LessonProgressProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const getProgress = (subjectSlug: string, totalLessons: number) => {
+  const getProgress = (subjectSlug: string, totalLessons: number, lessonIds?: string[]) => {
     const subjectProgress = completedTabs[subjectSlug] || {};
-    let totalProgress = 0;
-    
-    for (const lessonId in subjectProgress) {
-      const tabs = subjectProgress[lessonId];
-      let lessonTotal = 0;
-      if (tabs.lesson) lessonTotal += PROGRESS_PER_TAB;
-      if (tabs.video) lessonTotal += PROGRESS_PER_TAB;
-      lessonTotal += tabs.questions; // 0-33.34
-      // Note: tests tab is not included in the 3 main tabs
-      totalProgress += lessonTotal;
-    }
+    const ids = [...new Set(lessonIds ?? [...Object.keys(subjectProgress), ...Object.keys(fourTabProgress[subjectSlug] ?? {})])];
+    const totalProgress = ids.reduce((sum, id) => sum + getLessonProgress(subjectSlug, id), 0);
     
     const maxProgress = totalLessons * 100;
-    const percentage = maxProgress > 0 ? Math.round((totalProgress / maxProgress) * 100) : 0;
-    const completed = Object.keys(subjectProgress).filter(lessonId => {
-      const tabs = subjectProgress[lessonId];
-      // Check if all 3 main tabs are completed (lesson, video, questions)
-      return tabs.lesson && tabs.video && tabs.questions >= QUESTIONS_PROGRESS_MAX;
-    }).length;
+    const percentage = maxProgress > 0 ? Math.min(100, Math.round((totalProgress / maxProgress) * 100)) : 0;
+    const completed = ids.filter(id => isCompleted(subjectSlug, id)).length;
     
     return { completed, percentage };
   };
 
   return (
     <LessonProgressContext.Provider value={{ 
+      fourTabProgress, setLessonTabCompleted, getCompletedLessonTabs, progressReady,
       completedTabs, 
       markTabComplete, 
       markTabIncomplete, 

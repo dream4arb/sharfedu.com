@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { calculateAttemptMastery, calculateSkillMastery } from "@shared/lesson-engine/grade";
 import type {
   InteractiveLessonDefinition,
@@ -79,8 +79,7 @@ export function restartLessonAssessment(lesson: InteractiveLessonDefinition, ses
   };
 }
 
-function loadSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
-  const key = `sharaf:lesson-engine:${lesson.id}`;
+function loadSession(lesson: InteractiveLessonDefinition, key: string): StoredLessonSession {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return createSession(lesson);
@@ -110,13 +109,19 @@ function loadSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
   }
 }
 
-export function useLessonSession(lesson: InteractiveLessonDefinition, remoteLogging = true) {
-  const storageKey = `sharaf:lesson-engine:${lesson.id}`;
-  const [session, setSession] = useState<StoredLessonSession>(() => loadSession(lesson));
+export function useLessonSession(lesson: InteractiveLessonDefinition, remoteLogging = true, ownerId?: string) {
+  // Do not award a signed-in student completion from another person's local quiz answers.
+  // Keep the existing guest key/history; authenticated histories are scoped to their owner.
+  const storageKey = `sharaf:lesson-engine:${lesson.id}${ownerId ? `:user:${ownerId}` : ""}`;
+  const [saved, setSaved] = useState(() => ({ storageKey, session: loadSession(lesson, storageKey) }));
+  const session = useMemo(() => saved.storageKey === storageKey ? saved.session : loadSession(lesson, storageKey), [saved, storageKey, lesson]);
+  useEffect(() => {
+    if (saved.storageKey !== storageKey) setSaved({ storageKey, session });
+  }, [saved.storageKey, storageKey, session]);
 
   const persist = useCallback((next: StoredLessonSession) => {
-    setSession(next);
-    localStorage.setItem(storageKey, JSON.stringify(next));
+    setSaved({ storageKey, session: next });
+    try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch { /* Continue in memory. */ }
   }, [storageKey]);
 
   const emitEvent = useCallback((event: LessonAnalyticsEvent) => {

@@ -336,7 +336,7 @@ export default function Lesson() {
   const { user } = useAuth();
   const [structureVersion, setStructureVersion] = useState(0);
   const { displayStructure, lessonTitles: lessonTitlesFromApi } = usePublicStructure(structureVersion);
-  const { isCompleted, markComplete, markIncomplete, getProgress, markTabComplete, isTabCompleted, getLessonProgress, completedTabs } = useLessonProgress();
+  const { isCompleted, markComplete, markIncomplete, getProgress, markTabComplete, isTabCompleted, getLessonProgress, completedTabs, fourTabProgress, getCompletedLessonTabs } = useLessonProgress();
   const params = useParams<{ stage: string; subject: string; lessonId?: string }>();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>("lesson");
@@ -613,7 +613,7 @@ export default function Lesson() {
   let completedCount = 0;
   let progress = 0;
   try {
-    const progressData = getProgress(subjectId, lessons.length);
+    const progressData = getProgress(subjectId, lessons.length, lessons.map(lesson => lesson.id));
     completedCount = progressData.completed || 0;
     progress = progressData.percentage || 0;
   } catch (error) {
@@ -1212,6 +1212,7 @@ export default function Lesson() {
   // Save progress to database when it changes
   useEffect(() => {
     if (!user?.id || !lessonId) return; // Only save if user is logged in and lesson is selected
+    if (!legacyContentEnabled || isPublishedLesson(lessonId) || fourTabProgress[subjectId]?.[lessonId]) return;
     
     const lessonProg = getLessonProgress(subjectId, lessonId);
     const tabs = {
@@ -1242,7 +1243,7 @@ export default function Lesson() {
       console.error("Failed to save progress to database:", error);
       // Silently fail - localStorage backup is still working
     });
-  }, [user?.id, subjectId, lessonId, getLessonProgress, isTabCompleted, completedTabs]);
+  }, [user?.id, subjectId, lessonId, getLessonProgress, isTabCompleted, completedTabs, fourTabProgress]);
 
   const getTotalLessonsInSemester = (semester: typeof semesters[0]) => {
     if ('chapters' in semester && semester.chapters) {
@@ -1545,7 +1546,7 @@ export default function Lesson() {
                                         const lessonProgRounded = Math.round(lessonProg);
                                         const lessonCompleted = lessonProgRounded >= 100;
                                         return (
-                                          <SidebarMenuItem key={`${chapter.id}-${lesson.id}`}>
+                                          <SidebarMenuItem key={`${chapter.id}-${lesson.id}`} className="list-none">
                                             <SidebarMenuButton
                                               asChild
                                               isActive={isActive}
@@ -1735,7 +1736,7 @@ export default function Lesson() {
                         const lessonProgRounded = Math.round(lessonProg);
                         const lessonCompleted = lessonProgRounded >= 100;
                         return (
-                          <SidebarMenuItem key={lesson.id}>
+                          <SidebarMenuItem key={lesson.id} className="list-none">
                             <SidebarMenuButton
                               asChild
                               isActive={isActive}
@@ -1797,7 +1798,9 @@ export default function Lesson() {
                     <span className="text-xs sm:text-sm text-muted-foreground">
                       {Math.round(getLessonProgress(subjectId, lessonId))}%
                     </span>
-                    <Button
+                    {!legacyContentEnabled ? <span className={`inline-flex min-h-9 items-center gap-1.5 rounded-xl border px-3 text-xs sm:text-sm ${isCompleted(subjectId, lessonId) ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-border text-muted-foreground"}`} data-testid="lesson-completion-status" role="status">
+                      {isCompleted(subjectId, lessonId) ? <><CheckCircle className="w-4 h-4" />مكتمل</> : <>أكملت {getCompletedLessonTabs(subjectId, lessonId).length} من 4</>}
+                    </span> : <Button
                       variant={isCompleted(subjectId, lessonId) ? "default" : "outline"}
                       onClick={handleMarkComplete}
                       className="gap-1.5 text-xs sm:text-sm px-2.5 sm:px-4"
@@ -1815,7 +1818,7 @@ export default function Lesson() {
                           <span className="hidden sm:inline">تم الإكمال</span>
                         </>
                       )}
-                    </Button>
+                    </Button>}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 shrink-0 invisible">
@@ -2017,7 +2020,7 @@ export default function Lesson() {
               ) : (
                 <>
               {isPublishedLesson(lessonIdFromParams) ? (
-                <InteractiveLessonPage key={lessonIdFromParams} embedded lessonId={lessonIdFromParams} />
+                <InteractiveLessonPage key={lessonIdFromParams} embedded lessonId={lessonIdFromParams} progressSubjectSlug={subjectId} />
               ) : (
                 <section className="rounded-2xl border border-border/50 bg-white p-8 text-center" data-testid="lesson-content-pending">
                   <h2 className="text-2xl font-bold">{getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}</h2>

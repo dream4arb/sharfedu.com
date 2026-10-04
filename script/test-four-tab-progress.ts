@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { COMPLETION_TABS, fourTabApiFields, mergeFourTabProgress, readFourTabCompletion, readFourTabProgress, tabCompletionPercent, updateTabCompletion, type FourTabCompletion } from '../shared/lesson-engine/tab-progress';
+
+let record: FourTabCompletion | undefined;
+assert.equal(tabCompletionPercent(undefined), 0);
+for (const [index, tab] of COMPLETION_TABS.entries()) {
+  record = updateTabCompletion(record, tab, true, index + 1);
+  assert.equal(tabCompletionPercent(record.completedTabs), (index + 1) * 25);
+  assert.equal(updateTabCompletion(record, tab, true, 99), record, 'Repeated completion is idempotent');
+  const fields = fourTabApiFields(record);
+  assert.equal(Number(fields.totalProgress), (index + 1) * 25);
+  assert.deepEqual(readFourTabCompletion(fields.questionsProgress), record, 'API text column round-trips all four flags');
+}
+assert.equal(tabCompletionPercent(['assessment', 'book', 'video', 'learn', 'book']), 100);
+const reset = updateTabCompletion(record, 'assessment', false, 20);
+assert.equal(tabCompletionPercent(reset.completedTabs), 75, 'Restart keeps the other three tabs');
+assert.deepEqual(reset.completedTabs, ['book', 'video', 'learn']);
+const complete = updateTabCompletion(reset, 'assessment', true, 30);
+assert.equal(tabCompletionPercent(complete.completedTabs), 100);
+assert.equal(fourTabApiFields(reset).questionsScore, 0);
+assert.equal(fourTabApiFields(complete).questionsScore, 100);
+assert.equal(readFourTabCompletion('0'), null, 'Legacy quiz score is not four-tab completion');
+assert.equal(readFourTabCompletion('{broken'), null);
+assert.equal(readFourTabCompletion({ ...complete, completedTabs: ['fake'] }), null);
+assert.equal(readFourTabCompletion({ ...complete, updatedAt: NaN }), null);
+const before = { math: { polygon: record!, unrelated: reset } };
+const after = { math: { polygon: reset } };
+assert.deepEqual(mergeFourTabProgress(before, after).math.polygon, reset, 'Newer restart wins, not union');
+assert.deepEqual(mergeFourTabProgress(after, before).math.polygon, reset, 'Older server completion cannot restore the reset tab');
+assert.deepEqual(mergeFourTabProgress(before, after).math.unrelated, reset);
+assert.deepEqual(readFourTabProgress(JSON.stringify(before)), before);
+const page = readFileSync('src/features/lesson-engine/InteractiveLessonPage.tsx', 'utf8');
+assert.ok(page.includes('assessmentComplete && progressReady') && page.includes('"assessment", true'), 'All checked answers complete assessment regardless of grade');
+assert.ok(page.includes('"assessment", false'), 'Retest clears assessment completion');
+assert.ok(page.includes('direction === 1 && activeTabId !== "assessment"'), 'Next confirms only the current content tab');
+assert.ok(page.includes('data-testid="button-complete-lesson-tab"'));
+const provider = readFileSync('src/hooks/use-four-tab-progress.ts', 'utf8');
+assert.ok(provider.includes('${userId ?? "guest"}'), 'Guest and student records are isolated');
+assert.ok(provider.includes('hydratedKey !== storageKey'), 'No server write before successful hydration');
+assert.ok(provider.includes('writeQueue.current.catch'), 'Writes are serialized against stale completion overwrites');
+assert.ok(readFileSync('src/pages/Lesson.tsx', 'utf8').includes('if (!legacyContentEnabled || isPublishedLesson(lessonId)'), 'Legacy writer cannot overwrite the new model');
+console.log('PASS four-tab progress: 0/25/50/75/100, idempotence, full-score-independent completion, restart, persistence, scoped merge and integration guards.');

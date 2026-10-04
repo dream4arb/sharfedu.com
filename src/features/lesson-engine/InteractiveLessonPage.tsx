@@ -50,13 +50,20 @@ import { ActivityGuide } from "./ActivityGuide";
 import { ActivityReminder } from "./ActivityReminder";
 import { getLessonActivities, getPendingActivities } from "./lessonActivities";
 import { useActivityProgress } from "./useActivityProgress";
+import { useLessonProgress } from "@/hooks/use-lesson-progress";
+import { tabCompletionPercent } from "@shared/lesson-engine/tab-progress";
+import { useAuth } from "@/hooks/use-auth";
 
-export default function InteractiveLessonPage({ embedded = false, lessonId }: { embedded?: boolean; lessonId?: string }) {
+export default function InteractiveLessonPage({ embedded = false, lessonId, progressSubjectSlug = "math" }: { embedded?: boolean; lessonId?: string; progressSubjectSlug?: string }) {
   const { lessonId: routeLessonId } = useParams<{ lessonId?: string }>();
   const requestedLessonId = lessonId ?? routeLessonId;
   const requestedEntry = getRegisteredLesson(requestedLessonId);
   const registered = requestedEntry ?? lessonRegistry[POLYGON_ANGLES_LESSON_ID];
   const lesson = registered.lesson;
+  const { user } = useAuth();
+  const { getCompletedLessonTabs, setLessonTabCompleted, progressReady } = useLessonProgress();
+  const completedTabIds = getCompletedLessonTabs(progressSubjectSlug, lesson.id);
+  const progress = tabCompletionPercent(completedTabIds);
   const activities = useMemo(() => getLessonActivities(lesson), [lesson]);
   const { triedStepIds, markTried } = useActivityProgress(lesson, activities);
   const pendingActivities = getPendingActivities(activities, triedStepIds);
@@ -71,7 +78,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
     emitEvent,
     completeLesson,
     restartAssessment,
-  } = useLessonSession(lesson, !embedded);
+  } = useLessonSession(lesson, !embedded, user?.id);
   const [visualAction, setVisualAction] = useState<TutorVisualAction | null>(null);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
   const [playedVideoIds, setPlayedVideoIds] = useState<string[]>([]);
@@ -99,12 +106,6 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
   const answeredCount = assessmentQuestions.filter((question) => (session.questions[question.id]?.attempts ?? 0) > 0).length;
   const assessmentComplete = assessmentQuestions.length > 0 && answeredCount === assessmentQuestions.length;
   const showReport = activeTabId === "assessment" && currentStep.type === "report" && assessmentComplete;
-  const contentSteps = lesson.steps.filter((step) => step.type !== "assessment" && step.type !== "report");
-  const visitedContentCount = contentSteps.filter((step) => session.visitedStepIds.includes(step.id)).length;
-  const progress = session.completedAt ? 100 : Math.round(
-    (visitedContentCount / Math.max(1, contentSteps.length)) * 75
-    + (answeredCount / Math.max(1, assessmentQuestions.length)) * 25,
-  );
 
   useEffect(() => {
     if (embedded) return;
@@ -145,8 +146,9 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
       assessmentEventSent.current = true;
       emitEvent({ name: "assessment_completed" });
     }
-    if (showReport) completeLesson();
-  }, [completeLesson, activeTabId, emitEvent, assessmentComplete, showReport]);
+    if (assessmentComplete && progressReady) setLessonTabCompleted(progressSubjectSlug, lesson.id, "assessment", true);
+    if (showReport && progress === 100) completeLesson();
+  }, [completeLesson, activeTabId, emitEvent, assessmentComplete, showReport, progressReady, progress, setLessonTabCompleted, progressSubjectSlug, lesson.id]);
 
   useEffect(() => {
     if (currentStep.type !== "official_book") return;
@@ -188,6 +190,10 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
   function navigateTab(direction: -1 | 1) {
     const nextTab = lessonTabs[activeTabIndex + direction];
     if (!nextTab) return;
+    if (direction === 1 && activeTabId !== "assessment") {
+      if (!progressReady) return;
+      setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabId, true);
+    }
     if (selectTab(nextTab.id)) window.scrollTo({ top: 0 });
   }
 
@@ -200,6 +206,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
   function restartTest() {
     assessmentEventSent.current = false;
     restartAssessment();
+    setLessonTabCompleted(progressSubjectSlug, lesson.id, "assessment", false);
     requestAnimationFrame(() => document.getElementById("lesson-assessment-start")?.focus());
   }
 
@@ -329,7 +336,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
         {step.type === "video" && (
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
               <div data-testid="lesson-video-player" className="aspect-video bg-slate-950">
-                {selectedVideo ? <LessonVideoPlayer key={selectedVideo.id} video={selectedVideo} onStarted={recordVideoStarted} />
+                {selectedVideo ? <LessonVideoPlayer key={selectedVideo.id} video={selectedVideo} onStarted={recordVideoStarted} onCompleted={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, "video", true)} />
                   : <p className="flex h-full items-center justify-center p-5 text-center text-white">لا يتوفر شرح مرئي لهذا الدرس حاليًا.</p>}
               </div>
               <div className="p-5 text-center" data-testid="lesson-video-caption">
@@ -451,6 +458,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
             >
               <span aria-hidden="true" data-testid={`lesson-tab-number-${tab.id}`} className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${activeTabId === tab.id ? "border-white/20 bg-slate-100/20" : "border-slate-200 bg-slate-100"}`}>{index + 1}</span>
               <span>{tab.title}</span>
+              {completedTabIds.includes(tab.id) && <Check className="h-4 w-4 shrink-0" aria-label="مكتمل" data-testid={`lesson-tab-completed-${tab.id}`} />}
             </TabsTrigger>
           ))}
           </TabsList>
@@ -502,6 +510,12 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
           ))}
 
             <footer className={`mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 ${activeTabId === "learn" ? "studio-footer" : ""}`}>
+              {activeTabId !== "assessment" && <div className="mb-4 flex justify-center">
+                <button type="button" disabled={!progressReady || completedTabIds.includes(activeTabId)}
+                  onClick={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabId, true)}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-5 font-bold text-emerald-800 hover:bg-emerald-100 disabled:cursor-default disabled:opacity-70"
+                  data-testid="button-complete-lesson-tab"><Check className="h-5 w-5" />{completedTabIds.includes(activeTabId) ? "أكملت هذا التبويب · 25%" : "أكملت هذا التبويب"}</button>
+              </div>}
               {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600">{assessmentComplete ? "نتيجتك جاهزة للعرض هنا." : "أجب عن جميع الأسئلة لإظهار نتيجتك."}</p>}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <button type="button" onClick={() => navigateTab(-1)} disabled={activeTabIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>
@@ -511,7 +525,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
                 ) : (
                   <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-4 gap-y-2" data-testid="next-step-area">
                     {activeTabId === "learn" && !assessmentComplete && <ActivityReminder pendingCount={pendingActivities.length} />}
-                    <button type="button" onClick={() => navigateTab(1)} className="flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-cyan-800" data-testid="button-next-step">
+                    <button type="button" onClick={() => navigateTab(1)} disabled={!progressReady} className="flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-cyan-800 disabled:opacity-35" data-testid="button-next-step">
                       {activeTabId === "learn" ? "ابدأ اختبار الدرس" : lessonTabs[activeTabIndex + 1].title}<ArrowLeft className="h-5 w-5" />
                     </button>
                   </div>

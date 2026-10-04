@@ -45,9 +45,11 @@ export function youtubePlayerUrl(url: string, origin: string): string {
   return playerUrl.toString();
 }
 
-export function LessonVideoPlayer({ video, onStarted }: { video: LessonVideo; onStarted: () => void }) {
+export function LessonVideoPlayer({ video, onStarted, onCompleted }: { video: LessonVideo; onStarted: () => void; onCompleted?: () => void }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const startedCallback = useRef(onStarted);
+  const completedCallback = useRef(onCompleted);
+  completedCallback.current = onCompleted;
   const hostedStarted = useRef(false);
   startedCallback.current = onStarted;
 
@@ -65,6 +67,7 @@ export function LessonVideoPlayer({ video, onStarted }: { video: LessonVideo; on
     host.replaceChildren(frame);
     let disposed = false;
     let started = false;
+    let ended = false;
     let player: YouTubePlayer | undefined;
     void loadYouTubeAPI().then((api) => {
       if (disposed) return;
@@ -72,6 +75,10 @@ export function LessonVideoPlayer({ video, onStarted }: { video: LessonVideo; on
         if (!disposed && !started && event.data === 1) {
           started = true;
           startedCallback.current();
+        }
+        if (!disposed && started && !ended && event.data === 0) {
+          ended = true;
+          completedCallback.current?.();
         }
       } } });
     }).catch(() => {
@@ -88,7 +95,7 @@ export function LessonVideoPlayer({ video, onStarted }: { video: LessonVideo; on
     return <div ref={hostRef} className="h-full w-full" data-testid="youtube-video-player" />;
   }
   return (
-    <video className="h-full w-full" controls playsInline preload="metadata" poster={video.thumbnailUrl}
+    <video className="h-full w-full" controls playsInline preload="metadata" poster={video.thumbnailUrl} onEnded={() => completedCallback.current?.()}
       aria-label={video.title} onPlay={() => {
         if (hostedStarted.current) return;
         hostedStarted.current = true;
