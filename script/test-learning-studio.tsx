@@ -44,6 +44,8 @@ assert.ok(page.indexOf('data-testid="lesson-video-player"') < page.indexOf('data
 assert.ok(page.includes('step.type === "video" ? "text-center" : undefined'),
   "Only the video tab heading and label are centered");
 assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is scoped to learning tab");
+assert.ok(page.includes('data-testid="lesson-step-title">شرح درس {lesson.title}</h1>'),
+  "The interactive explanation heading includes the current lesson name");
 const css = readFileSync(new URL("../src/features/lesson-engine/learningStudio.css", import.meta.url), "utf8");
 assert.ok(css.includes("prefers-reduced-motion"));
 assert.ok(css.includes("focus-visible"));
