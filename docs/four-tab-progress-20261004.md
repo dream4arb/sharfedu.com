@@ -11,3 +11,16 @@ Storage is isolated by student ID (and a separate guest key), subject and lesson
 Checks: four-tab model and persistence round trips; restart/merge/idempotence; original sidebar preservation except scoped marker classes; lesson navigation and presentation regressions; Vite frontend build. Repository-wide TypeScript checking still reports pre-existing backend auth, bcrypt, image declarations, PDF canvas and SubjectData errors, but none in new progress code.
 
 Deployment uses the existing frontend-only publisher, a fresh private rollback index and the unchanged backend digest. No lesson content, curriculum IDs, credentials or unrelated service changes are part of this task.
+
+## Published verification
+
+- Source commit: `9667b00`, pushed before activation.
+- Fresh private rollback directory: application `tmp/lesson-ui-backup-20261004-progress-tabs`; publisher confirmed backup/preparation before activation.
+- Live index SHA256: `b35d6cb04466c6a05f42e68f250185586e79bdf0259edbf49a7590e42145a9eb`.
+- Backend remained `7352d186e2dcc3774f53c6893a2182baa51d2c9a2cebf9a50ca2dc24e9305c63`; no service restart.
+- Isolated guest browser: opening book stayed 0; explicit book/video completion reached 25/50; Next from learning reached 75; two checked answers stayed 75; all five checked answers reached 100 in both header and sidebar.
+- Reload preserved 100. Restart cleared answers and only assessment credit; 75 and 0/5 answers persisted after reload.
+- Five deliberately wrong checked answers still completed assessment while mastery showed 0. Correcting them awarded full mastery 100, with completion still 100.
+- All 34 rendered second-semester lesson menu items had computed list style `none`, with no external markers. Unpublished parallelogram remained 0 and content-pending.
+- No browser console errors. Screenshot: workspace `outputs/production-four-tab-progress-20261004.png`.
+- No real student account was used or modified for browser testing; account-scoped API persistence is implemented via the existing routes, with model round-trip and ordering guards tested locally.
