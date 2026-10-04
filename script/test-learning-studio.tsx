@@ -109,8 +109,12 @@ assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.type ==
   lessonRegistry["l-mm6el08l"].lesson.title, "The video tab heading uses the lesson name");
 assert.ok(page.indexOf('data-testid="lesson-video-player"') < page.indexOf('data-testid="lesson-video-options"'),
   "The video player comes before the alternative explanation cards in DOM and keyboard order");
-assert.ok(page.includes('step.type === "video" ? "text-center" : undefined'),
-  "Only the video tab heading and label are centered");
+assert.ok(page.includes('step.type === "video" || step.type === "assessment" ? "text-center" : undefined'),
+  "Video and exam headings are centered");
+assert.ok(page.includes('step.type !== "assessment" && <p className="text-sm font-black text-cyan-700">{lessonTabs[activeTabIndex].title}</p>'),
+  "Exam heading has no redundant tab label");
+assert.ok(page.includes('{step.type === "assessment" ? lesson.title : step.title}</h1>'),
+  "Exam heading uses the current lesson name");
 assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is scoped to learning tab");
 assert.ok(page.includes('data-testid="lesson-step-title">{lesson.title}</h1>'),
   "The interactive explanation heading includes the current lesson name");
