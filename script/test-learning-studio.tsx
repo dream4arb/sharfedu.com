@@ -35,6 +35,10 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.type === "video")?.tutorMessage, undefined,
+  "Redundant video tutor banner is removed");
+assert.ok(page.indexOf('data-testid="lesson-video-player"') < page.indexOf('data-testid="lesson-video-options"'),
+  "The video player comes before the alternative explanation cards in DOM and keyboard order");
 assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is scoped to learning tab");
 const css = readFileSync(new URL("../src/features/lesson-engine/learningStudio.css", import.meta.url), "utf8");
 assert.ok(css.includes("prefers-reduced-motion"));

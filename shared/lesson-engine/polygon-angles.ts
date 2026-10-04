@@ -368,7 +368,6 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       type: "video",
       eyebrow: "الشرح المرئي",
       title: "شاهد الفكرة وهي تتحرك",
-      tutorMessage: "بعد أن أخذت الصورة الأساسية، شاهد الشرح المرئي. ركّز على الخطوط الخارجة من رأس واحد وعدد المثلثات الناتجة.",
     },
     {
       id: "warmup",
