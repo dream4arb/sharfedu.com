@@ -447,7 +447,7 @@ export default function InteractiveLessonPage() {
               disabled={!tab.stepIndexes.length}
               className="min-h-12 min-w-0 gap-2 whitespace-normal rounded-2xl border border-slate-200 bg-white px-3 py-2 text-center text-xs font-bold leading-5 text-slate-600 hover:bg-cyan-50 data-[state=active]:border-cyan-800 data-[state=active]:bg-cyan-800 data-[state=active]:text-white data-[state=active]:shadow-none sm:text-sm"
             >
-              <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100/20">{index + 1}</span>
+              <span aria-hidden="true" data-testid={`lesson-tab-number-${tab.id}`} className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${activeTabId === tab.id ? "border-white/20 bg-slate-100/20" : "border-slate-200 bg-slate-100"}`}>{index + 1}</span>
               <span>{tab.title}</span>
             </TabsTrigger>
           ))}

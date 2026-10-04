@@ -119,6 +119,9 @@ assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is 
 assert.ok(page.includes('data-testid="lesson-step-title">{lesson.title}</h1>'),
   "The interactive explanation heading includes the current lesson name");
 const css = readFileSync(new URL("../src/features/lesson-engine/learningStudio.css", import.meta.url), "utf8");
+assert.ok(page.includes('data-testid={`lesson-tab-number-${tab.id}`}'), "Each lesson tab has a numbered badge");
+assert.ok(page.includes('rounded-full border ${activeTabId === tab.id ? "border-white/20 bg-slate-100/20" : "border-slate-200 bg-slate-100"}'),
+  "Inactive numbers have a visible circular border and background, while selected tabs retain their contrasting style");
 const sectionHeadingCss = css.match(/\.lesson-studio \.studio-section-head\s*\{([^}]+)\}/)?.[1] ?? "";
 const objectivesCss = css.match(/\.lesson-studio \.studio-objectives\s*\{([^}]+)\}/)?.[1] ?? "";
 assert.ok(!objectivesCss.includes("border-top"), "Independent objectives section has no redundant inner divider");
