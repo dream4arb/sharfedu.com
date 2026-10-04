@@ -16,6 +16,7 @@
     "test:lesson-presentation": "npx tsx script/test-lesson-presentation.ts",
     "test:lesson-activities": "npx tsx script/test-lesson-activities.tsx",
     "test:learning-studio": "npx tsx script/test-learning-studio.tsx",
+    "test:mastery-report": "npx tsx script/test-mastery-report.tsx",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {

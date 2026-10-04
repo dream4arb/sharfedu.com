@@ -27,8 +27,10 @@ export function MasteryReport({
     snapshot: mastery.find((item) => item.skillId === skill.id) ?? { skillId: skill.id, score: 0, attempts: 0, correctAttempts: 0, hintsUsed: 0 },
   }));
   const overall = Math.round(enriched.reduce((total, item) => total + item.snapshot.score, 0) / enriched.length);
-  const weakest = [...enriched].sort((a, b) => a.snapshot.score - b.snapshot.score)[0];
-  const allMastered = enriched.every((item) => item.snapshot.score >= 85);
+  const reviewSkills = enriched
+    .filter((item) => item.snapshot.score < 85)
+    .sort((a, b) => a.snapshot.score - b.snapshot.score);
+  const allMastered = reviewSkills.length === 0;
 
   return (
     <div className="space-y-5">
@@ -70,13 +72,24 @@ export function MasteryReport({
           <p className="mt-2 leading-7 text-emerald-900">يمكنك الانتقال إلى الدرس التالي، والعودة إلى الخريطة البصرية متى احتجت إلى مراجعة سريعة.</p>
         </section>
       ) : (
-        <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-6">
+        <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-6" data-testid="mastery-review-plan" aria-labelledby="mastery-review-plan-title">
           <p className="text-sm font-bold text-amber-700">توصية شارف</p>
-          <h3 className="mt-1 text-xl font-black text-amber-950">راجع: {weakest.title}</h3>
-          <p className="mt-2 leading-7 text-amber-900">{weakest.description}</p>
-          <button type="button" onClick={() => onReview(weakest.id)} className="mt-4 flex min-h-12 items-center gap-2 rounded-xl bg-amber-400 px-5 font-black text-slate-950 hover:bg-amber-300">
-            <RefreshCcw className="h-5 w-5" /> راجع هذه المهارة
-          </button>
+          <h3 id="mastery-review-plan-title" className="mt-1 text-xl font-black text-amber-950">خطة مراجعتك</h3>
+          <p className="mt-2 leading-7 text-amber-900">هذه المهارات تحتاج مراجعة أو تثبيتًا. ابدأ بالأقل إتقانًا، ثم تابع البقية.</p>
+          <ol className="mt-4 space-y-3">
+            {reviewSkills.map((skill) => (
+              <li key={skill.id} data-review-skill={skill.id} className="rounded-2xl border border-amber-200 bg-white/70 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <h4 className="font-black leading-7 text-amber-950">{skill.snapshot.score < 65 ? "راجع" : "ثبّت"}: {skill.title}</h4>
+                  <span className="shrink-0 font-black tabular-nums text-amber-950">{skill.snapshot.score}%</span>
+                </div>
+                <p className="mt-1 text-sm leading-7 text-amber-900">{skill.description}</p>
+                <button type="button" onClick={() => onReview(skill.id)} aria-label={`راجع مهارة ${skill.title}`} className="mt-3 flex min-h-12 items-center gap-2 rounded-xl bg-amber-400 px-5 font-black text-slate-950 hover:bg-amber-300">
+                  <RefreshCcw className="h-5 w-5" /> راجع هذه المهارة
+                </button>
+              </li>
+            ))}
+          </ol>
         </section>
       )}
     </div>
