@@ -317,7 +317,7 @@ export default function InteractiveLessonPage() {
                 {selectedVideo ? <LessonVideoPlayer key={selectedVideo.id} video={selectedVideo} onStarted={recordVideoStarted} />
                   : <p className="flex h-full items-center justify-center p-5 text-center text-white">لا يتوفر شرح مرئي لهذا الدرس حاليًا.</p>}
               </div>
-              <div className="p-5">
+              <div className="p-5 text-center" data-testid="lesson-video-caption">
                 <h2 className="font-black text-slate-900">{selectedVideo?.title}</h2>
                 <p className="mt-1 text-sm text-slate-500">{selectedVideo?.channelName}{selectedVideo?.duration ? ` · ${selectedVideo.duration}` : ""}</p>
               </div>

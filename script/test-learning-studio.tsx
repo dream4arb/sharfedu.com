@@ -39,6 +39,7 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.ok(page.includes('className="p-5 text-center" data-testid="lesson-video-caption"'), "Selected video title and teacher name are centered together");
 assert.ok(page.includes('data-testid="button-restart-assessment"') && page.includes('onClick={restartTest}'));
 assert.ok(page.includes('key={`${session.assessmentRunId ?? session.sessionId}:${question.id}`}'), "Restart clears unsent question drafts by remounting cards");
 assert.ok(page.includes('className="text-center text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>'));
