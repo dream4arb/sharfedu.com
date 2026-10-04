@@ -5,6 +5,7 @@ import { buildLessonTabs, getInitialLessonStepIndex, getLessonTabId, getReviewSt
 for (const { lesson } of Object.values(lessonRegistry)) {
   const tabs = buildLessonTabs(lesson);
   assert.deepEqual(tabs.map((tab) => tab.id), ["book", "video", "learn", "assessment"]);
+  assert.equal(tabs[3].title, "الاختبار والنتيجة");
   assert.ok(tabs.every((tab) => tab.stepIndexes.length > 0));
   const indexes = tabs.flatMap((tab) => tab.stepIndexes);
   assert.deepEqual([...indexes].sort((a, b) => a - b), lesson.steps.map((_, index) => index));

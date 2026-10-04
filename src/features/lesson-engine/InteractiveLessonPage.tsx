@@ -10,6 +10,7 @@ import {
   GraduationCap,
   ListChecks,
   PlayCircle,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   Target,
@@ -68,6 +69,7 @@ export default function InteractiveLessonPage() {
     mastery,
     emitEvent,
     completeLesson,
+    restartAssessment,
   } = useLessonSession(lesson);
   const [visualAction, setVisualAction] = useState<TutorVisualAction | null>(null);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
@@ -187,6 +189,12 @@ export default function InteractiveLessonPage() {
     requestAnimationFrame(() => document.getElementById("lesson-result")?.focus());
   }
 
+  function restartTest() {
+    assessmentEventSent.current = false;
+    restartAssessment();
+    requestAnimationFrame(() => document.getElementById("lesson-assessment-start")?.focus());
+  }
+
   function handleVisualAction(action: TutorVisualAction) {
     if (action.type !== "show_polygon") return;
     const discoveryIndex = lesson.steps.findIndex((step) => step.type === "polygon_discovery");
@@ -292,7 +300,7 @@ export default function InteractiveLessonPage() {
           <div className="space-y-4">
             {stepQuestions.map((question) => (
               <QuestionCard
-                key={question.id}
+                key={`${session.assessmentRunId ?? session.sessionId}:${question.id}`}
                 question={question}
                 progress={session.questions[question.id]}
                 assessmentMode={step.type === "assessment"}
@@ -456,11 +464,14 @@ export default function InteractiveLessonPage() {
                 </div>
               </>}
 
-              {tab.id === "assessment" && assessmentStep && <>
+              {tab.id === "assessment" && assessmentStep && <div id="lesson-assessment-start" tabIndex={-1} className="focus-visible:outline-none" data-testid="assessment-tab-content">
+                <div className="mb-5 flex justify-end">
+                  <button type="button" onClick={restartTest} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-cyan-800 bg-white px-5 font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100" data-testid="button-restart-assessment"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة الاختبار</button>
+                </div>
                 {showReport ? <>
                   <section id="lesson-result" tabIndex={-1} className="rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700" data-testid="lesson-result">
-                    <p className="text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>
-                    <h1 className="mb-6 mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">نتيجتك وما تحتاج إلى مراجعته</h1>
+                    <p className="text-center text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>
+                    <h1 className="mb-6 mt-2 text-center text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">نتيجتك وما تحتاج إلى مراجعته</h1>
                     <details className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5" data-testid="assessment-answer-review">
                       <summary className="cursor-pointer rounded-lg py-2 font-black text-cyan-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700">راجع إجابات الاختبار</summary>
                       <div className="mt-4">{renderStep(assessmentStep, false)}</div>
@@ -468,7 +479,7 @@ export default function InteractiveLessonPage() {
                     <MasteryReport lesson={lesson} mastery={mastery} onReview={reviewSkill} />
                   </section>
                 </> : renderStep(assessmentStep)}
-              </>}
+              </div>}
             </TabsContent>
           ))}
 

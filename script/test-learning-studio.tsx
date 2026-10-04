@@ -39,6 +39,10 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.ok(page.includes('data-testid="button-restart-assessment"') && page.includes('onClick={restartTest}'));
+assert.ok(page.includes('key={`${session.assessmentRunId ?? session.sessionId}:${question.id}`}'), "Restart clears unsent question drafts by remounting cards");
+assert.ok(page.includes('className="text-center text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>'));
+assert.ok(page.includes('mt-2 text-center text-2xl'), "Result title remains centered");
 assert.ok(!page.includes("تابع الشرح بالسرعة المناسبة لك"), "Redundant video follow-up notice is removed");
 assert.ok(!page.includes("أجب بنفسك من دون تلميحات") && !page.includes("سيأخذ التقرير عدد المحاولات في الحسبان"), "Old penalty instructions are removed");
 assert.ok(!page.includes("loadedVideoId") && !page.includes("playSelectedVideo"), "Video is no longer gated behind a custom play screen");

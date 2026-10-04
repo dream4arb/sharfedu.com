@@ -5,7 +5,7 @@ import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { MasteryReport } from "../src/features/lesson-engine/MasteryReport";
 import { getReviewStepIndex } from "../src/features/lesson-engine/lessonNavigation";
 import { calculateAttemptMastery, calculateSkillMastery } from "../shared/lesson-engine/grade";
-import { useLessonSession } from "../src/features/lesson-engine/useLessonSession";
+import { restartLessonAssessment, useLessonSession, type StoredLessonSession } from "../src/features/lesson-engine/useLessonSession";
 
 for (const attemptNumber of [1, 2, 3, 10, 1000]) {
   for (const hintsUsed of [0, 1, 10]) {
@@ -56,6 +56,50 @@ try {
 }
 
 for (const { lesson } of Object.values(lessonRegistry)) {
+  const assessmentIndex = lesson.steps.findIndex(step => step.type === "assessment");
+  const reportIndex = lesson.steps.findIndex(step => step.type === "report");
+  const assessmentIds = lesson.steps[assessmentIndex].questionIds ?? lesson.assessmentQuestionIds;
+  const prior: StoredLessonSession = {
+    lessonVersion: lesson.version, sessionId: "lesson-session", assessmentRunId: "old-test-run",
+    stepIndex: reportIndex, unlockedStepIndex: reportIndex, startedAt: "2026-10-01T00:00:00Z", completedAt: "2026-10-02T00:00:00Z",
+    visitedStepIds: lesson.steps.map(step => step.id),
+    questions: Object.fromEntries(assessmentIds.map(id => {
+      const q = lesson.questions.find(question => question.id === id)!;
+      return [id, { questionId: id, skillId: q.skillId, answer: q.correctAnswer, correct: true,
+        feedback: q.correctFeedback, attempts: 3, hintsUsed: 2, score: 100 }];
+    })),
+  };
+  const restarted = restartLessonAssessment(lesson, prior);
+  assert.deepEqual(restarted.questions, {}, "Restart removes all exam answers, feedback, attempts, hints and scores");
+  assert.equal(restarted.completedAt, undefined);
+  assert.equal(restarted.stepIndex, assessmentIndex);
+  assert.equal(restarted.sessionId, prior.sessionId, "The lesson session is preserved");
+  assert.equal(restarted.startedAt, prior.startedAt);
+  assert.notEqual(restarted.assessmentRunId, prior.assessmentRunId, "A new run remounts even unanswered draft inputs");
+  assert.notEqual(restartLessonAssessment(lesson, restarted).assessmentRunId, restarted.assessmentRunId);
+  assert.deepEqual(restarted.visitedStepIds.filter(id => id !== lesson.steps[assessmentIndex].id),
+    prior.visitedStepIds.filter(id => id !== lesson.steps[assessmentIndex].id && id !== lesson.steps[reportIndex].id),
+    "Book, video and interactive explanation progress is preserved");
+  assert.ok(assessmentIds.every(id => prior.questions[id].score === 100), "Restart does not mutate the prior session");
+  for (const skill of lesson.skills) {
+    assert.equal(calculateSkillMastery(Object.values(restarted.questions).filter(q => q.skillId === skill.id)), 0);
+  }
+  const storageBeforeRestartTest = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: { getItem: () => JSON.stringify(restarted) } });
+  function RestartedProgressProbe() {
+    const { session, mastery } = useLessonSession(lesson);
+    assert.deepEqual(session.questions, {});
+    assert.equal(session.completedAt, undefined);
+    assert.equal(session.assessmentRunId, restarted.assessmentRunId);
+    assert.equal(session.stepIndex, assessmentIndex);
+    assert.ok(mastery.every(skill => skill.score === 0 && skill.attempts === 0 && skill.hintsUsed === 0));
+    return null;
+  }
+  try { renderToStaticMarkup(createElement(RestartedProgressProbe)); }
+  finally {
+    if (storageBeforeRestartTest) Object.defineProperty(globalThis, "localStorage", storageBeforeRestartTest);
+    else Reflect.deleteProperty(globalThis, "localStorage");
+  }
   const cases = [
     [100, 0, 0, 100, 0], // Screenshot regression: three zero-score skills.
     [84, 65, 85, 64, 100], // Review and reinforcement use the same mastery threshold.

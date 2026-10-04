@@ -18,7 +18,7 @@ export interface QuestionProgress {
   score: number;
 }
 
-interface StoredLessonSession {
+export interface StoredLessonSession {
   lessonVersion: number;
   sessionId: string;
   stepIndex: number;
@@ -26,6 +26,7 @@ interface StoredLessonSession {
   visitedStepIds: string[];
   startedAt: string;
   completedAt?: string;
+  assessmentRunId?: string;
   questions: Record<string, QuestionProgress>;
 }
 
@@ -58,6 +59,23 @@ function createSession(lesson: InteractiveLessonDefinition): StoredLessonSession
     visitedStepIds: [lesson.steps[initialStepIndex].id],
     startedAt: new Date().toISOString(),
     questions: {},
+  };
+}
+
+export function restartLessonAssessment(lesson: InteractiveLessonDefinition, session: StoredLessonSession): StoredLessonSession {
+  const assessmentIndex = lesson.steps.findIndex((step) => step.type === "assessment");
+  if (assessmentIndex < 0) return session;
+  const assessmentStep = lesson.steps[assessmentIndex];
+  const questionIds = new Set(assessmentStep.questionIds ?? lesson.assessmentQuestionIds);
+  const assessmentStepIds = new Set(lesson.steps.filter((step) => step.type === "assessment" || step.type === "report").map((step) => step.id));
+  return {
+    ...session,
+    assessmentRunId: crypto.randomUUID(),
+    stepIndex: assessmentIndex,
+    unlockedStepIndex: Math.max(session.unlockedStepIndex, assessmentIndex),
+    completedAt: undefined,
+    questions: Object.fromEntries(Object.entries(session.questions).filter(([id]) => !questionIds.has(id))),
+    visitedStepIds: [...session.visitedStepIds.filter((id) => !assessmentStepIds.has(id)), assessmentStep.id],
   };
 }
 
@@ -165,7 +183,7 @@ export function useLessonSession(lesson: InteractiveLessonDefinition) {
       credentials: "include",
       body: JSON.stringify({
         lessonId: lesson.id,
-        sessionId: session.sessionId,
+        sessionId: session.assessmentRunId ?? session.sessionId,
         questionId: input.question.id,
         answer: input.answer,
         hintsUsed: input.hintsUsed,
@@ -207,6 +225,10 @@ export function useLessonSession(lesson: InteractiveLessonDefinition) {
     emitEvent({ name: "lesson_started" });
   }, [emitEvent, lesson, persist]);
 
+  const restartAssessment = useCallback(() => {
+    persist(restartLessonAssessment(lesson, session));
+  }, [lesson, persist, session]);
+
   return {
     session,
     setStepIndex,
@@ -216,5 +238,6 @@ export function useLessonSession(lesson: InteractiveLessonDefinition) {
     mastery,
     emitEvent,
     reset,
+    restartAssessment,
   };
 }

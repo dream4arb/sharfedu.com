@@ -4,7 +4,7 @@ export const LESSON_TABS = [
   { id: "book", title: "الدرس من الكتاب" },
   { id: "video", title: "الشرح المرئي" },
   { id: "learn", title: "الشرح التفاعلي" },
-  { id: "assessment", title: "اختبار الدرس والنتيجة" },
+  { id: "assessment", title: "الاختبار والنتيجة" },
 ] as const;
 
 export type LessonTabId = typeof LESSON_TABS[number]["id"];
