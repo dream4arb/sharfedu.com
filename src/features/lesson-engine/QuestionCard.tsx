@@ -8,6 +8,8 @@ interface QuestionCardProps {
   question: LessonQuestionDefinition;
   progress?: QuestionProgress;
   assessmentMode?: boolean;
+  questionNumber?: number;
+  totalQuestions?: number;
   onAttempt: (input: {
     question: LessonQuestionDefinition;
     answer: unknown;
@@ -37,7 +39,7 @@ function OptionVisual({ sides, split = false }: { sides: number; split?: boolean
   );
 }
 
-export function QuestionCard({ question, progress, assessmentMode = false, onAttempt, onHint }: QuestionCardProps) {
+export function QuestionCard({ question, progress, assessmentMode = false, questionNumber, totalQuestions, onAttempt, onHint }: QuestionCardProps) {
   const defaultOrdering = useMemo(() => [...(question.options?.map((option) => option.id) ?? [])].reverse(), [question.options]);
   const [answer, setAnswer] = useState<unknown>(progress?.answer ?? (question.type === "ordering" ? defaultOrdering : ""));
   const [feedback, setFeedback] = useState(progress?.feedback ?? "");
@@ -209,8 +211,9 @@ export function QuestionCard({ question, progress, assessmentMode = false, onAtt
   return (
     <section className="rounded-3xl border border-slate-200 bg-slate-50/70 p-4 sm:p-6" data-testid={`question-${question.id}`}>
       <div className="flex items-start gap-3">
-        <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-black text-white">؟</span>
+        <span aria-hidden="true" className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-black text-white">{questionNumber ?? "؟"}</span>
         <div>
+          {questionNumber != null && totalQuestions != null && <p className="mb-1 text-sm font-bold text-cyan-800" data-testid="question-number">السؤال {questionNumber} من {totalQuestions}</p>}
           <h3 className="text-lg font-black leading-8 text-slate-900">{question.prompt}</h3>
           {question.helperText && <p className="mt-1 text-sm text-slate-600">{question.helperText}</p>}
         </div>

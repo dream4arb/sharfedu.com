@@ -3,6 +3,8 @@ import {
   BookOpenText,
   Download,
   ExternalLink,
+  Maximize,
+  Minimize,
   Minus,
   Plus,
 } from "lucide-react";
@@ -14,15 +16,68 @@ interface OfficialBookLessonProps {
   onPageViewed?: (pageNumber: number) => void;
 }
 
-const zoomLevels = [100, 125, 150];
+const zoomLevels = [100, 125, 150, 200, 250, 300];
 
 export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: OfficialBookLessonProps) {
   const excerpt = source.lessonExcerpt;
   const [zoomIndex, setZoomIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const readerRef = useRef<HTMLElement>(null);
+  const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
   const pageListRef = useRef<HTMLDivElement>(null);
   const viewedPages = useRef(new Set<number>());
   const pageViewedCallback = useRef(onPageViewed);
   pageViewedCallback.current = onPageViewed;
+
+  useEffect(() => {
+    const onFullscreenChange = () => setIsFullscreen(document.fullscreenElement === readerRef.current);
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  // Retain a reading-mode fallback on browsers without native fullscreen (including mobile).
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    fullscreenButtonRef.current?.focus({ preventScroll: true });
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !document.fullscreenElement) {
+        event.preventDefault();
+        setIsFullscreen(false);
+      }
+      if (event.key !== "Tab") return;
+      const controls = Array.from(readerRef.current?.querySelectorAll<HTMLElement>("button:not(:disabled), a[href]") ?? []);
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+      fullscreenButtonRef.current?.focus({ preventScroll: true });
+    };
+  }, [isFullscreen]);
+
+  async function toggleFullscreen() {
+    if (isFullscreen) {
+      if (document.fullscreenElement === readerRef.current) await document.exitFullscreen();
+      setIsFullscreen(false);
+      return;
+    }
+    setIsFullscreen(true);
+    const reader = readerRef.current;
+    if (reader?.requestFullscreen && document.fullscreenEnabled) {
+      try { await reader.requestFullscreen(); } catch { /* Keep the same full-window reader if the browser declines. */ }
+    }
+  }
 
   useEffect(() => {
     const pageList = pageListRef.current;
@@ -58,10 +113,14 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
   const zoom = zoomLevels[zoomIndex];
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white" aria-labelledby="official-book-heading">
-      <div className="grid grid-cols-1 items-center gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-5 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]" data-testid="official-book-toolbar">
+    <section ref={readerRef} className={isFullscreen ? "fixed inset-0 z-[100] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-white" : "overflow-hidden rounded-3xl border border-slate-200 bg-white"} aria-labelledby="official-book-heading" data-testid="official-book-reader" data-fullscreen={isFullscreen}>
+      <div className={`${isFullscreen ? "sticky top-0 z-10 " : ""}grid grid-cols-1 items-center gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-5 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]`} data-testid="official-book-toolbar">
         <h1 id="official-book-heading" className="min-w-0 text-center text-sm font-black leading-6 text-slate-900 md:col-start-2 md:row-start-1">صفحة درس {lessonTitle}</h1>
 
+        <button ref={fullscreenButtonRef} type="button" onClick={toggleFullscreen} aria-pressed={isFullscreen} className="inline-flex min-h-11 items-center justify-center justify-self-center gap-2 rounded-xl border border-slate-300 px-3 text-sm font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700 md:col-start-1 md:row-start-1 md:justify-self-start" data-testid="book-fullscreen-toggle">
+          {isFullscreen ? <Minimize className="h-5 w-5" aria-hidden="true" /> : <Maximize className="h-5 w-5" aria-hidden="true" />}
+          {isFullscreen ? "الخروج من ملء الشاشة" : "عرض بملء الشاشة"}
+        </button>
         <div className="flex items-center justify-self-center gap-2 md:col-start-3 md:row-start-1 md:justify-self-end" aria-label="تكبير صفحة الكتاب">
           <button type="button" onClick={() => setZoomIndex((index) => Math.max(0, index - 1))} disabled={zoomIndex === 0} aria-label="تصغير الصفحة" className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 disabled:opacity-35"><Minus className="h-5 w-5" /></button>
           <span className="w-12 text-center text-sm font-black text-slate-700" dir="ltr">{zoom}%</span>

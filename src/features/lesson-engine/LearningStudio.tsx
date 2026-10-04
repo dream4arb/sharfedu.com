@@ -16,6 +16,18 @@ export function buildLearningSections(lesson: InteractiveLessonDefinition, stepI
   return sections;
 }
 
+export function LearningSectionNavigation({ sections, onNavigate }: {
+  sections: ReturnType<typeof buildLearningSections>;
+  onNavigate: (index: number, sectionId: string) => void;
+}) {
+  return <nav className="studio-section-navigation" aria-label="التنقل بين أقسام الشرح" data-testid="learning-section-navigation">
+    {sections.map(({ step, index, sectionNumber }) => <button key={step.id} type="button"
+      aria-controls={`learning-section-${step.id}`} onClick={() => onNavigate(index, step.id)}>
+      <span aria-hidden="true">{sectionNumber}</span>{step.eyebrow.replace(/^\d+\.\s*/, "")}
+    </button>)}
+  </nav>;
+}
+
 /** Open, reusable lesson sections. Only this tab receives the studio theme. */
 export function LearningSection({ step, index, sectionNumber, onFocus, children }: {
   step: LessonStepDefinition;

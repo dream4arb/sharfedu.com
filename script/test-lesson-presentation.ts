@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
@@ -35,6 +36,8 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.ok(!html.includes("المرجع الرسمي للدرس"), "No redundant introductory heading");
   assert.ok(!html.includes("مرّر للأسفل لمتابعة الدرس"), "No redundant scrolling instructions");
   assert.ok(html.includes('data-testid="official-book-toolbar"'), "Compact toolbar retains zoom controls");
+  assert.ok(html.includes('data-testid="book-fullscreen-toggle"') && html.includes("عرض بملء الشاشة"), "Reader offers an accessible fullscreen control");
+  assert.ok(html.includes('aria-pressed="false"') && html.includes('data-fullscreen="false"'), "The reader starts in normal mode");
   assert.ok(!html.includes("كتاب الوزارة"), "Redundant official-book link is removed from the toolbar");
   assert.match(html, /id="official-book-heading" class="[^"]*text-center[^"]*md:col-start-2/, "Book heading is centered in the balanced toolbar");
   assert.ok(html.includes("الكتاب كاملًا من المصدر"), "The official full-book link remains in the source footer");
@@ -48,3 +51,9 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.ok(!html.includes("الصفحة التالية"), "No single-page navigation remains");
   console.log(`PASS ${lesson.id}: ${pages.length} stacked full-size pages, lazy loading, no thumbnails`);
 }
+const bookSource = readFileSync(new URL("../src/features/lesson-engine/OfficialBookLesson.tsx", import.meta.url), "utf8");
+assert.ok(bookSource.includes("[100, 125, 150, 200, 250, 300]"), "Small screens can enlarge textbook text to 300 percent");
+assert.ok(bookSource.includes("requestFullscreen()") && bookSource.includes("document.exitFullscreen()"), "Native fullscreen has enter and exit paths");
+assert.ok(bookSource.includes('event.key === "Escape"') && bookSource.includes('event.key !== "Tab"'), "Fallback reader supports keyboard exit and contained focus");
+assert.ok(bookSource.includes('document.body.style.overflow = previousOverflow'), "Leaving reading mode restores page scrolling");
+assert.ok(bookSource.includes('"sticky top-0 z-10 "'), "Zoom and exit remain reachable while reading fullscreen pages");

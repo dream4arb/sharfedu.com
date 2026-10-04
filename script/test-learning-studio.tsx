@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { buildLessonTabs } from "../src/features/lesson-engine/lessonNavigation";
-import { buildLearningSections, LearningSection } from "../src/features/lesson-engine/LearningStudio";
+import { buildLearningSections, LearningSection, LearningSectionNavigation } from "../src/features/lesson-engine/LearningStudio";
 import { QuestionCard } from "../src/features/lesson-engine/QuestionCard";
 import { LessonVideoPlayer, youtubePlayerUrl } from "../src/features/lesson-engine/LessonVideoPlayer";
 import { PolygonLab } from "../src/features/lesson-engine/PolygonLab";
@@ -23,6 +23,10 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.equal(sections[1].content, "introduction");
   assert.deepEqual(sections.map(section => section.sectionNumber), sections.map((_, index) => index + 1));
   assert.equal(new Set(sections.map(section => section.step.id)).size, sections.length);
+  const navigation = renderToStaticMarkup(createElement(LearningSectionNavigation, { sections, onNavigate: () => undefined }));
+  assert.ok(navigation.includes('aria-label="التنقل بين أقسام الشرح"'));
+  assert.equal((navigation.match(/<button /g) ?? []).length, sections.length, "Each open section has a quick-navigation control");
+  for (const { step } of sections) assert.ok(navigation.includes(`aria-controls="learning-section-${step.id}"`), "Navigation includes the independent goals anchor");
   assert.deepEqual(sections.slice(1).map(section => section.step.id), tab.stepIndexes.map(index => lesson.steps[index].id),
     "Original explanation anchors remain intact for review navigation");
   for (const { step, index, sectionNumber } of sections) {
@@ -56,6 +60,10 @@ assert.ok(page.includes('content !== "introduction" && <>'), "Explanation sectio
 assert.ok(page.includes('learningSections.map(({ step, index, content, sectionNumber })'), "Every section uses the new continuous numbering");
 assert.ok(page.includes('className="p-5 text-center" data-testid="lesson-video-caption"'), "Selected video title and teacher name are centered together");
 assert.ok(page.includes('data-testid="button-restart-assessment"') && page.includes('onClick={restartTest}'));
+assert.ok(page.indexOf('data-testid="assessment-answer-count"') < page.indexOf('{showReport ?'), "Answered count is above the exam/result content");
+assert.ok(page.includes('questionNumber={questionIndex + 1}') && page.includes('totalQuestions={stepQuestions.length}'), "Every exam and review card receives its current question position");
+assert.ok(page.includes('if (cancelled || activeTabRef.current !== "learn") return;'), "Queued reading-observer callbacks cannot override a selected exam tab");
+assert.ok(page.includes('if (activeTabRef.current !== "learn") return;'), "Queued section focus cannot override a later tab choice");
 assert.ok(page.includes('key={`${session.assessmentRunId ?? session.sessionId}:${question.id}`}'), "Restart clears unsent question drafts by remounting cards");
 assert.ok(page.includes('className="text-center text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>'));
 assert.ok(page.includes('mt-2 text-center text-2xl'), "Result title remains centered");
@@ -84,10 +92,11 @@ const question = lessonRegistry["l-mm6el08l"].lesson.questions.find(question => 
 for (const correct of [false, true]) {
   const feedback = correct ? question.correctFeedback : question.defaultIncorrectFeedback;
   const html = renderToStaticMarkup(createElement(QuestionCard, {
-    question, assessmentMode: true, onAttempt: () => undefined, onHint: () => undefined,
+    question, assessmentMode: true, questionNumber: 2, totalQuestions: 5, onAttempt: () => undefined, onHint: () => undefined,
     progress: { questionId: question.id, skillId: question.skillId, answer: correct ? "6" : "5",
       correct, feedback, attempts: 1, hintsUsed: 0, score: correct ? 100 : 0 },
   }));
+  assert.ok(html.includes("السؤال 2 من 5"), "Question ordinal remains visible with correct or incorrect feedback");
   assert.ok(html.includes(`<p>${feedback}</p>`), "Feedback is shown directly, without a recording notice");
   assert.ok(!html.includes("تم تسجيل محاولتك"));
   assert.ok(html.includes(correct ? "تمت الإجابة" : "أعد المحاولة"), "Retry and success actions remain intact");

@@ -20,7 +20,7 @@ import { getRegisteredLesson, lessonRegistry } from "@shared/lesson-engine/regis
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
 import { StudioLessonIntroduction } from "./StudioLessonIntroduction";
-import { buildLearningSections, LearningSection } from "./LearningStudio";
+import { buildLearningSections, LearningSection, LearningSectionNavigation } from "./LearningStudio";
 import "./learningStudio.css";
 import { OfficialBookLesson } from "./OfficialBookLesson";
 import { LessonVideoPlayer } from "./LessonVideoPlayer";
@@ -78,6 +78,8 @@ export default function InteractiveLessonPage() {
   const currentStep = lesson.steps[session.stepIndex];
   const lessonTabs = useMemo(() => buildLessonTabs(lesson), [lesson]);
   const activeTabId = getLessonTabId(currentStep);
+  // Explicit navigation owns this guard; a queued reading update must not reset it during render.
+  const activeTabRef = useRef(activeTabId);
   const activeTabIndex = lessonTabs.findIndex((tab) => tab.id === activeTabId);
   const learningTab = lessonTabs.find((tab) => tab.id === "learn")!;
   const learningSections = useMemo(() => buildLearningSections(lesson, learningTab.stepIndexes), [lesson, learningTab]);
@@ -155,7 +157,9 @@ export default function InteractiveLessonPage() {
   useEffect(() => {
     if (activeTabId !== "learn") return;
     // Expanded sections count as visited when reached, not merely when mounted.
+    let cancelled = false;
     const observer = new IntersectionObserver((entries) => {
+      if (cancelled || activeTabRef.current !== "learn") return;
       const visibleHeading = entries.filter((entry) => entry.isIntersecting)
         .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
       if (!visibleHeading) return;
@@ -165,7 +169,7 @@ export default function InteractiveLessonPage() {
       setStepIndexRef.current(index);
     }, { rootMargin: "0px 0px -35% 0px", threshold: 0.5 });
     document.querySelectorAll("[data-learning-step-index]").forEach((heading) => observer.observe(heading));
-    return () => observer.disconnect();
+    return () => { cancelled = true; observer.disconnect(); };
   }, [activeTabId, lesson.id]);
 
   function selectTab(tabId: LessonTabId) {
@@ -174,6 +178,7 @@ export default function InteractiveLessonPage() {
     const nextStepIndex = tabId === "learn" ? lastLearningStep.current
       : tabId === "assessment" && session.completedAt && assessmentComplete ? reportStepIndex
       : tab.stepIndexes[0];
+    activeTabRef.current = tabId;
     setStepIndex(nextStepIndex >= 0 ? nextStepIndex : tab.stepIndexes[0]);
     return true;
   }
@@ -203,10 +208,12 @@ export default function InteractiveLessonPage() {
     setVisualAction({ ...action });
   }
 
-  function openLearningSection(index: number) {
+  function openLearningSection(index: number, sectionId = lesson.steps[index].id) {
+    activeTabRef.current = "learn";
     setStepIndex(index);
     requestAnimationFrame(() => {
-      const section = document.getElementById(`learning-section-${lesson.steps[index].id}`);
+      if (activeTabRef.current !== "learn") return;
+      const section = document.getElementById(`learning-section-${sectionId}`);
       section?.scrollIntoView({ block: "start" });
       section?.focus({ preventScroll: true });
     });
@@ -301,12 +308,14 @@ export default function InteractiveLessonPage() {
 
         {stepQuestions.length > 0 && (
           <div className="space-y-4">
-            {stepQuestions.map((question) => (
+            {stepQuestions.map((question, questionIndex) => (
               <QuestionCard
                 key={`${session.assessmentRunId ?? session.sessionId}:${question.id}`}
                 question={question}
                 progress={session.questions[question.id]}
                 assessmentMode={step.type === "assessment"}
+                questionNumber={questionIndex + 1}
+                totalQuestions={stepQuestions.length}
                 onAttempt={recordAttempt}
                 onHint={recordHint}
               />
@@ -456,18 +465,20 @@ export default function InteractiveLessonPage() {
                 <div className="studio-page-heading">
                   <h1 data-testid="lesson-step-title">شرح درس {lesson.title}</h1>
                 </div>
+                <LearningSectionNavigation sections={learningSections} onNavigate={openLearningSection} />
                 <div className="studio-section-stack" data-testid="learning-section-stack">
                   {learningSections.map(({ step, index, content, sectionNumber }) => {
                     return <LearningSection key={step.id} step={step} index={index} sectionNumber={sectionNumber}
                       onFocus={() => {
-                        if (currentStepIndexRef.current !== index) setStepIndexRef.current(index);
+                        if (activeTabRef.current === "learn" && currentStepIndexRef.current !== index) setStepIndexRef.current(index);
                       }}>{renderStep(step, false, step.type !== "objectives", content)}</LearningSection>;
                   })}
                 </div>
               </>}
 
               {tab.id === "assessment" && assessmentStep && <div id="lesson-assessment-start" tabIndex={-1} className="focus-visible:outline-none" data-testid="assessment-tab-content">
-                <div className="mb-5 flex justify-end">
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                  {!showReport && <p className="text-sm font-bold text-slate-600" role="status" aria-live="polite" aria-atomic="true" data-testid="assessment-answer-count">أجبت عن {answeredCount} من {assessmentQuestions.length}</p>}
                   <button type="button" onClick={restartTest} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-cyan-800 bg-white px-5 font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100" data-testid="button-restart-assessment"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة الاختبار</button>
                 </div>
                 {showReport ? <>
@@ -486,7 +497,7 @@ export default function InteractiveLessonPage() {
           ))}
 
             <footer className={`mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 ${activeTabId === "learn" ? "studio-footer" : ""}`}>
-              {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600" role="status">أجبت عن {answeredCount} من {assessmentQuestions.length}. {assessmentComplete ? "نتيجتك جاهزة للعرض هنا." : "أجب عن جميع الأسئلة لإظهار نتيجتك."}</p>}
+              {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600">{assessmentComplete ? "نتيجتك جاهزة للعرض هنا." : "أجب عن جميع الأسئلة لإظهار نتيجتك."}</p>}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <button type="button" onClick={() => navigateTab(-1)} disabled={activeTabIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>
                 <span className="hidden text-sm font-bold text-slate-500 sm:inline">{activeTabIndex + 1} من 4</span>
