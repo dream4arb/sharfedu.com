@@ -1,0 +1,118 @@
+{
+  "stage": "high",
+  "grade": "1",
+  "subject": "math",
+  "checkedAt": "2026-10-04",
+  "scope": "Instructional lesson names in official book order: core lessons, preparation, exploration and extension. Chapter tests, review guides and formula appendices are not lesson entries. Names only; no lesson content is added.",
+  "sources": {
+    "s1": {
+      "title": "الرياضيات 1-1",
+      "url": "https://iencontent.ien.edu.sa/books/c8af75f7-GE-CBM-TRC1-SM1-MATH1.1.pdf",
+      "edition": "1447-2025",
+      "bytes": 187450899,
+      "sha256": "7990cdac13951368de4e9ee6e17ab936a8dba77db4fb0e54240414a97232fac4",
+      "tocPdfPages": [8, 9]
+    },
+    "s2": {
+      "title": "الرياضيات 1-2",
+      "url": "https://iencontent.ien.edu.sa/books/523c5dd3-GE-CBM-TRC1-SM1-MATH1.1.pdf",
+      "edition": "1447-2025",
+      "bytes": 107986987,
+      "sha256": "2ccfb468d0723a8c0b84eaa8d76c6f89d6759cea0ec83140dea5e788a8099bbc",
+      "tocPdfPages": [8, 9]
+    }
+  },
+  "chapters": [
+    {"semester": "s1", "id": "ch1", "name": "التبرير والبرهان", "lessons": [
+      {"number": "1-1", "title": "التبرير الاستقرائي والتخمين", "page": 12},
+      {"number": "1-2", "title": "المنطق", "page": 19},
+      {"number": "1-3", "title": "العبارات الشرطية", "page": 26},
+      {"number": "1-4", "title": "التبرير الاستنتاجي", "page": 37},
+      {"number": "1-5", "title": "المسلمات والبراهين الحرة", "page": 45},
+      {"number": "1-6", "title": "البرهان الجبري", "page": 53},
+      {"number": "1-7", "title": "إثبات علاقات بين القطع المستقيمة", "page": 60},
+      {"number": "1-8", "title": "إثبات علاقات بين الزوايا", "page": 66}
+    ]},
+    {"semester": "s1", "id": "ch2", "name": "التوازي والتعامد", "lessons": [
+      {"number": "2-1", "title": "المستقيمان والقاطع", "page": 86},
+      {"number": "2-2", "title": "الزوايا والمستقيمات المتوازية", "page": 94},
+      {"number": "2-3", "title": "إثبات توازي مستقيمين", "page": 102},
+      {"number": "2-4", "title": "ميل المستقيم", "page": 109},
+      {"number": "2-5", "title": "صيغ معادلة المستقيم", "page": 117},
+      {"number": "2-6", "title": "الأعمدة والمسافة", "page": 126}
+    ]},
+    {"semester": "s1", "id": "ch3", "name": "المثلثات المتطابقة", "lessons": [
+      {"number": "3-1", "title": "تصنيف المثلثات", "page": 146},
+      {"number": "3-2", "title": "زوايا المثلثات", "page": 154},
+      {"number": "3-3", "title": "المثلثات المتطابقة", "page": 162},
+      {"number": "3-4", "title": "إثبات تطابق المثلثات SSS, SAS", "page": 170},
+      {"number": "3-5", "title": "إثبات تطابق المثلثات ASA, AAS", "page": 179},
+      {"number": "3-6", "title": "المثلثات المتطابقة الضلعين والمثلثات المتطابقة الأضلاع", "page": 188},
+      {"number": "3-7", "title": "المثلثات والبرهان الإحداثي", "page": 196}
+    ]},
+    {"semester": "s1", "id": "ch4", "name": "العلاقات في المثلث", "lessons": [
+      {"number": "4-1", "title": "المنصفات في المثلث", "page": 215},
+      {"number": "4-2", "title": "القطع المتوسطة والارتفاعات في المثلث", "page": 225},
+      {"number": "4-3", "title": "المتباينات في المثلث", "page": 233},
+      {"number": "4-4", "title": "البرهان غير المباشر", "page": 241},
+      {"number": "4-5", "title": "متباينة المثلث", "page": 249},
+      {"number": "4-6", "title": "المتباينات في مثلثين", "page": 255}
+    ]},
+    {"semester": "s2", "id": "ch5", "name": "الأشكال الرباعية", "lessons": [
+      {"number": "5-1", "title": "زوايا المضلع", "page": 12},
+      {"number": "5-2", "title": "متوازي الأضلاع", "page": 21},
+      {"number": "5-3", "title": "تمييز متوازي الأضلاع", "page": 29},
+      {"number": "5-4", "title": "المستطيل", "page": 38},
+      {"number": "5-5", "title": "المعين والمربع", "page": 44},
+      {"number": "5-6", "title": "شبه المنحرف وشكل الطائرة الورقية", "page": 52}
+    ]},
+    {"semester": "s2", "id": "ch6", "name": "التشابه", "lessons": [
+      {"number": "6-1", "title": "المضلعات المتشابهة", "page": 72},
+      {"number": "6-2", "title": "المثلثات المتشابهة", "page": 80},
+      {"number": "6-3", "title": "المستقيمات المتوازية والأجزاء المتناسبة", "page": 90},
+      {"number": "6-4", "title": "عناصر المثلثات المتشابهة", "page": 99}
+    ]},
+    {"semester": "s2", "id": "ch7", "name": "التحويلات الهندسية والتماثل", "lessons": [
+      {"number": "7-1", "title": "الانعكاس", "page": 118},
+      {"number": "7-2", "title": "الإزاحة (الانسحاب)", "page": 126},
+      {"number": "7-3", "title": "الدوران", "page": 133},
+      {"number": "7-4", "title": "تركيب التحويلات الهندسية", "page": 141},
+      {"number": "7-5", "title": "التماثل", "page": 154},
+      {"number": "7-6", "title": "التمدد", "page": 160}
+    ]},
+    {"semester": "s2", "id": "ch8", "name": "الدائرة", "lessons": [
+      {"number": "8-1", "title": "الدائرة ومحيطها", "page": 178},
+      {"number": "8-2", "title": "قياس الزوايا والأقواس", "page": 186},
+      {"number": "8-3", "title": "الأقواس والأوتار", "page": 194},
+      {"number": "8-4", "title": "الزوايا المحيطية", "page": 201},
+      {"number": "8-5", "title": "المماسات", "page": 209},
+      {"number": "8-6", "title": "القاطع والمماس وقياسات الزوايا", "page": 216},
+      {"number": "8-7", "title": "قطع مستقيمة خاصة في الدائرة", "page": 224},
+      {"number": "8-8", "title": "معادلة الدائرة", "page": 231}
+    ]}
+  ],
+  "supplemental": [
+    {"chapter": "ch1", "number": "prep-1", "kind": "preparation", "title": "التهيئة للفصل 1", "page": 11},
+    {"chapter": "ch1", "number": "extension-1-3", "kind": "extension", "title": "توسع 1-3: معمل الهندسة: العبارات الشرطية الثنائية", "page": 36},
+    {"chapter": "ch2", "number": "prep-2", "kind": "preparation", "title": "التهيئة للفصل 2", "page": 85},
+    {"chapter": "ch2", "number": "exploration-2-2", "kind": "exploration", "title": "استكشاف 2-2: معمل برمجيات الهندسة: الزوايا والمستقيمات المتوازية", "page": 92},
+    {"chapter": "ch2", "number": "extension-2-5", "kind": "extension", "title": "توسع 2-5: معمل الهندسة: معادلة العمود المنصف", "page": 125},
+    {"chapter": "ch3", "number": "prep-3", "kind": "preparation", "title": "التهيئة للفصل 3", "page": 145},
+    {"chapter": "ch3", "number": "exploration-3-2", "kind": "exploration", "title": "استكشاف 3-2: معمل الهندسة: زوايا المثلثات", "page": 153},
+    {"chapter": "ch3", "number": "extension-3-5", "kind": "extension", "title": "توسع 3-5: معمل الهندسة: تطابق المثلثات القائمة", "page": 186},
+    {"chapter": "ch4", "number": "prep-4", "kind": "preparation", "title": "التهيئة للفصل 4", "page": 213},
+    {"chapter": "ch4", "number": "exploration-4-1", "kind": "exploration", "title": "استكشاف 4-1: معمل الهندسة: إنشاء المنصفات", "page": 214},
+    {"chapter": "ch4", "number": "exploration-4-2", "kind": "exploration", "title": "استكشاف 4-2: معمل الهندسة: إنشاء القطع المتوسطة والارتفاعات", "page": 224},
+    {"chapter": "ch4", "number": "exploration-4-5", "kind": "exploration", "title": "استكشاف 4-5: معمل الحاسبة البيانية: متباينة المثلث", "page": 248},
+    {"chapter": "ch5", "number": "prep-5", "kind": "preparation", "title": "التهيئة للفصل 5", "page": 11},
+    {"chapter": "ch5", "number": "extension-5-1", "kind": "extension", "title": "توسع 5-1: معمل الجداول الإلكترونية: زوايا المضلع", "page": 20},
+    {"chapter": "ch6", "number": "prep-6", "kind": "preparation", "title": "التهيئة للفصل 6", "page": 71},
+    {"chapter": "ch6", "number": "extension-6-4", "kind": "extension", "title": "توسع 6-4: معمل الهندسة: الكسريات", "page": 106},
+    {"chapter": "ch7", "number": "prep-7", "kind": "preparation", "title": "التهيئة للفصل 7", "page": 117},
+    {"chapter": "ch7", "number": "exploration-7-3", "kind": "exploration", "title": "استكشاف 7-3: معمل الهندسة: الدوران", "page": 132},
+    {"chapter": "ch7", "number": "exploration-7-4", "kind": "exploration", "title": "استكشاف 7-4: معمل الحاسبة البيانية: تركيب التحويلات الهندسية", "page": 140},
+    {"chapter": "ch7", "number": "extension-7-4", "kind": "extension", "title": "توسع 7-4: معمل الهندسة: التبليط", "page": 149},
+    {"chapter": "ch8", "number": "prep-8", "kind": "preparation", "title": "التهيئة للفصل 8", "page": 177},
+    {"chapter": "ch8", "number": "exploration-8-8", "kind": "exploration", "title": "استكشاف 8-8: معمل الحاسبة البيانية: معادلة الدائرة", "page": 230}
+  ]
+}
