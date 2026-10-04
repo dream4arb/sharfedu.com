@@ -59,13 +59,10 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
 
   return (
     <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white" aria-labelledby="official-book-heading">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-5" data-testid="official-book-toolbar">
-        <div className="min-w-0 sm:flex sm:items-center sm:gap-3">
-          <h1 id="official-book-heading" className="text-sm font-black leading-6 text-slate-900">صفحة درس {lessonTitle}</h1>
-          <a href={excerpt.officialPdfUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-cyan-800 underline decoration-cyan-200 underline-offset-4 hover:decoration-cyan-800">كتاب الوزارة</a>
-        </div>
+      <div className="grid grid-cols-1 items-center gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-5 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]" data-testid="official-book-toolbar">
+        <h1 id="official-book-heading" className="min-w-0 text-center text-sm font-black leading-6 text-slate-900 md:col-start-2 md:row-start-1">صفحة درس {lessonTitle}</h1>
 
-        <div className="flex items-center gap-2" aria-label="تكبير صفحة الكتاب">
+        <div className="flex items-center justify-self-center gap-2 md:col-start-3 md:row-start-1 md:justify-self-end" aria-label="تكبير صفحة الكتاب">
           <button type="button" onClick={() => setZoomIndex((index) => Math.max(0, index - 1))} disabled={zoomIndex === 0} aria-label="تصغير الصفحة" className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 disabled:opacity-35"><Minus className="h-5 w-5" /></button>
           <span className="w-12 text-center text-sm font-black text-slate-700" dir="ltr">{zoom}%</span>
           <button type="button" onClick={() => setZoomIndex((index) => Math.min(zoomLevels.length - 1, index + 1))} disabled={zoomIndex === zoomLevels.length - 1} aria-label="تكبير الصفحة" className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 disabled:opacity-35"><Plus className="h-5 w-5" /></button>

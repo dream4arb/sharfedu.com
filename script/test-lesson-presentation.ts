@@ -26,7 +26,10 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.ok(!html.includes("العرض بموافقة المصدر الرسمي"), "Removed approval wording does not appear");
   assert.ok(!html.includes("المرجع الرسمي للدرس"), "No redundant introductory heading");
   assert.ok(!html.includes("مرّر للأسفل لمتابعة الدرس"), "No redundant scrolling instructions");
-  assert.ok(html.includes('data-testid="official-book-toolbar"'), "Compact toolbar retains zoom and official link");
+  assert.ok(html.includes('data-testid="official-book-toolbar"'), "Compact toolbar retains zoom controls");
+  assert.ok(!html.includes("كتاب الوزارة"), "Redundant official-book link is removed from the toolbar");
+  assert.match(html, /id="official-book-heading" class="[^"]*text-center[^"]*md:col-start-2/, "Book heading is centered in the balanced toolbar");
+  assert.ok(html.includes("الكتاب كاملًا من المصدر"), "The official full-book link remains in the source footer");
   assert.ok(html.includes(`صفحة درس ${lesson.title}`), "Book toolbar names the current lesson");
   let previousPosition = -1;
   for (const page of pages) {
