@@ -21,6 +21,9 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   const firstPagePosition = html.indexOf("data-book-page=");
   const sourceDetailsPosition = html.indexOf('data-testid="official-book-source-details"');
   assert.ok(sourceDetailsPosition > firstPagePosition, "Detailed source attribution comes after the pages");
+  assert.ok(!html.includes("<details") && !html.includes("<summary"), "Source and download links are always visible, without disclosure controls");
+  assert.ok(html.includes('aria-labelledby="official-book-source-heading"'), "Source footer has a semantic heading");
+  assert.ok(!html.includes("العرض بموافقة المصدر الرسمي"), "Removed approval wording does not appear");
   assert.ok(!html.includes("المرجع الرسمي للدرس"), "No redundant introductory heading");
   assert.ok(!html.includes("مرّر للأسفل لمتابعة الدرس"), "No redundant scrolling instructions");
   assert.ok(html.includes('data-testid="official-book-toolbar"'), "Compact toolbar retains zoom and official link");

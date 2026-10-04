@@ -492,7 +492,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       permissionStatus: "authorized",
       pdfUrl: "/lesson-books/l-mm6el08l/official-lesson.pdf",
       officialPdfUrl: "https://iencontent.ien.edu.sa/books/523c5dd3-GE-CBM-TRC1-SM1-MATH1.1.pdf",
-      attribution: "وزارة التعليم السعودية — رياضيات 1-2، الدرس 5-1: زوايا المضلع. العرض بموافقة المصدر الرسمي.",
+      attribution: "وزارة التعليم السعودية — رياضيات 1-2، الدرس 5-1: زوايا المضلع.",
       pages: [12, 13, 14, 15, 16, 17, 18, 19].map((pageNumber) => ({
         pageNumber,
         imageUrl: `/lesson-books/l-mm6el08l/page-${String(pageNumber).padStart(3, "0")}.jpg`,

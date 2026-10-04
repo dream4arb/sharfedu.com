@@ -91,8 +91,8 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
         ))}
       </div>
 
-      <details className="border-t border-slate-200 p-4 sm:p-5" data-testid="official-book-source-details">
-        <summary className="cursor-pointer rounded-lg py-2 text-sm font-bold text-cyan-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700">المصدر وملفات الكتاب</summary>
+      <section className="border-t border-slate-200 p-4 sm:p-5" data-testid="official-book-source-details" aria-labelledby="official-book-source-heading">
+        <h2 id="official-book-source-heading" className="py-2 text-sm font-bold text-cyan-800">المصدر وملفات الكتاب</h2>
         <p className="mt-3 text-sm font-bold leading-7 text-slate-800">{source.bookTitle}</p>
         <p className="mt-2 text-xs leading-6 text-slate-600">{excerpt.attribution}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -103,7 +103,7 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
             الكتاب كاملًا من المصدر <ExternalLink className="h-5 w-5" />
           </a>
         </div>
-      </details>
+      </section>
     </section>
   );
 }
