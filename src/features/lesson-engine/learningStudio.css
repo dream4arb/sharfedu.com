@@ -73,7 +73,7 @@
 .lesson-studio .studio-objectives, .lesson-studio .studio-prose-block, .lesson-studio .studio-summary {
   border: 0; border-radius: 0; padding: 0; background: transparent; box-shadow: none;
 }
-.lesson-studio .studio-objectives { border-top: 1px solid var(--studio-line); padding-top: 24px; }
+.lesson-studio .studio-objectives { padding-top: 24px; }
 .lesson-studio .studio-objectives li { border: 0; background: #f7fafb; color: #344c55; }
 .lesson-studio .studio-learning-method { background: #f7fafb; color: #344c55; border: 1px solid var(--studio-line); border-radius: 14px; box-shadow: none; }
 .lesson-studio .studio-learning-method p { color: var(--studio-muted); }

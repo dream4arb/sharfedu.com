@@ -116,6 +116,9 @@ assert.ok(page.includes('data-testid="lesson-step-title">{lesson.title}</h1>'),
   "The interactive explanation heading includes the current lesson name");
 const css = readFileSync(new URL("../src/features/lesson-engine/learningStudio.css", import.meta.url), "utf8");
 const sectionHeadingCss = css.match(/\.lesson-studio \.studio-section-head\s*\{([^}]+)\}/)?.[1] ?? "";
+const objectivesCss = css.match(/\.lesson-studio \.studio-objectives\s*\{([^}]+)\}/)?.[1] ?? "";
+assert.ok(!objectivesCss.includes("border-top"), "Independent objectives section has no redundant inner divider");
+assert.ok(sectionHeadingCss.includes("border-bottom"), "Section heading boundary remains intact");
 assert.ok(sectionHeadingCss.includes("flex-direction: column") && sectionHeadingCss.includes("align-items: center") && sectionHeadingCss.includes("text-align: center"),
   "Every section has centered metadata above its centered title");
 assert.ok(!/\.studio-section-label\s*\{[^}]*clip:/.test(css), "Section labels remain visible on mobile");
