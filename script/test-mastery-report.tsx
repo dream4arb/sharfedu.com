@@ -5,6 +5,7 @@ import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { MasteryReport } from "../src/features/lesson-engine/MasteryReport";
 import { getReviewStepIndex } from "../src/features/lesson-engine/lessonNavigation";
 import { calculateAttemptMastery, calculateSkillMastery } from "../shared/lesson-engine/grade";
+import { useLessonSession } from "../src/features/lesson-engine/useLessonSession";
 
 for (const attemptNumber of [1, 2, 3, 10, 1000]) {
   for (const hintsUsed of [0, 1, 10]) {
@@ -24,6 +25,35 @@ assert.equal(calculateSkillMastery([
   { questionId: "q2", correct: false },
 ]), 50, "Uncorrected questions still need review, without duplicate attempt weighting");
 assert.equal(calculateSkillMastery([]), 0);
+
+// Loading existing local results must upgrade scores, not reset student progress.
+const savedLesson = lessonRegistry["l-mm6el08l"].lesson;
+const savedQuestion = savedLesson.questions.find(question => question.role === "assessment") ?? savedLesson.questions[0];
+const oldStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
+  getItem: () => JSON.stringify({
+    lessonVersion: savedLesson.version, sessionId: "preserved-session", stepIndex: 0,
+    unlockedStepIndex: 0, visitedStepIds: [savedLesson.steps[0].id], startedAt: "2026-10-01T00:00:00Z",
+    questions: { [savedQuestion.id]: { questionId: savedQuestion.id, skillId: savedQuestion.skillId,
+      answer: savedQuestion.correctAnswer, correct: true, feedback: savedQuestion.correctFeedback,
+      attempts: 3, hintsUsed: 0, score: 76 } },
+  }),
+} });
+function SavedProgressProbe() {
+  const { session, mastery } = useLessonSession(savedLesson);
+  assert.equal(session.sessionId, "preserved-session");
+  assert.equal(session.questions[savedQuestion.id].score, 100);
+  assert.equal(session.questions[savedQuestion.id].attempts, 3);
+  assert.deepEqual(session.questions[savedQuestion.id].answer, savedQuestion.correctAnswer);
+  assert.equal(mastery.find(item => item.skillId === savedQuestion.skillId)!.score, 100);
+  return null;
+}
+try {
+  renderToStaticMarkup(createElement(SavedProgressProbe));
+} finally {
+  if (oldStorage) Object.defineProperty(globalThis, "localStorage", oldStorage);
+  else Reflect.deleteProperty(globalThis, "localStorage");
+}
 
 for (const { lesson } of Object.values(lessonRegistry)) {
   const cases = [
