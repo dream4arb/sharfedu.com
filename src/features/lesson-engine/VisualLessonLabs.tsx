@@ -169,7 +169,7 @@ export function FormulaDiscoveryLab() {
         {stage < 3 ? (
           <button type="button" data-activity-primary onClick={() => setStage((value) => Math.min(3, value + 1))} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 font-black text-slate-950 sm:w-auto"><Play className="h-5 w-5" />{stageLabels[stage]}</button>
         ) : (
-          <button type="button" onClick={() => setStage(0)} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/20 px-5 font-black sm:w-auto"><RotateCcw className="h-5 w-5" />أعد المشهد</button>
+          <button type="button" onClick={() => setStage(0)} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/20 px-5 font-black sm:w-auto"><RotateCcw className="h-5 w-5" />إعادة</button>
         )}
       </div>
     </section>
@@ -232,7 +232,7 @@ export function MissingAngleLab() {
           </div>
 
           <button type="button" data-activity-primary onClick={() => stage < 3 ? setStage(stage + 1) : setStage(0)} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-violet-700 px-5 font-black text-white hover:bg-violet-800">
-            {stage < 3 ? <><Play className="h-5 w-5" />{labels[stage]}</> : <><RotateCcw className="h-5 w-5" />أعد المشهد</>}
+            {stage < 3 ? <><Play className="h-5 w-5" />{labels[stage]}</> : <><RotateCcw className="h-5 w-5" />إعادة</>}
           </button>
         </div>
       </div>

@@ -1,1 +1,0 @@
-import{r as e}from"./index-Dx2wjb4a.js";function a(s){const[r,u]=e.useState({displayStructure:{},lessonTitles:{}});return e.useEffect(()=>{fetch("/api/public/structure").then(t=>t.json()).then(t=>{u({displayStructure:t?.displayStructure??{},lessonTitles:t?.lessonTitles??{}})}).catch(()=>{})},[s]),r}export{a as u};
