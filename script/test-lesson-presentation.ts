@@ -54,6 +54,12 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   console.log(`PASS ${lesson.id}: ${pages.length} stacked full-size pages, lazy loading, no thumbnails`);
 }
 const bookSource = readFileSync(new URL("../src/features/lesson-engine/OfficialBookLesson.tsx", import.meta.url), "utf8");
+const lessonPageSource = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+const assessmentHeaderSource = lessonPageSource.slice(lessonPageSource.indexOf('data-testid="assessment-tab-content"'), lessonPageSource.indexOf('<section id="lesson-result"'));
+assert.ok(assessmentHeaderSource.includes('data-testid="assessment-header"') && assessmentHeaderSource.includes('data-testid="lesson-step-title"') && assessmentHeaderSource.includes('data-testid="button-restart-assessment"'), "Assessment name and restart button share a header");
+assert.ok(assessmentHeaderSource.includes('sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]') && assessmentHeaderSource.includes('sm:col-start-2') && assessmentHeaderSource.includes('sm:col-start-3'), "Balanced desktop header keeps the lesson name centered and restart alongside");
+assert.ok(assessmentHeaderSource.includes('data-testid="assessment-answer-count"'), "Answer counter stays below the lesson name");
+assert.ok(lessonPageSource.includes('</> : renderStep(assessmentStep, false)'), "No duplicate title below the assessment header");
 assert.ok(bookSource.includes("[100, 125, 150, 200, 250, 300]"), "Small screens can enlarge textbook text to 300 percent");
 assert.ok(bookSource.includes("requestFullscreen()") && bookSource.includes("document.exitFullscreen()"), "Native fullscreen has enter and exit paths");
 assert.ok(bookSource.includes('event.key === "Escape"') && bookSource.includes('event.key !== "Tab"'), "Fallback reader supports keyboard exit and contained focus");

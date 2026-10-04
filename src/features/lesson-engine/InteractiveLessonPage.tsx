@@ -479,8 +479,12 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
               </>}
 
               {tab.id === "assessment" && assessmentStep && <div id="lesson-assessment-start" tabIndex={-1} className="focus-visible:outline-none" data-testid="assessment-tab-content">
-                <div className="mb-5 flex flex-wrap items-center justify-end gap-3">
-                  <button type="button" onClick={restartTest} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-cyan-800 bg-white px-5 font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100" data-testid="button-restart-assessment"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة الاختبار</button>
+                <div className={showReport ? "mb-5 flex flex-wrap items-center justify-end gap-3" : "mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"} data-testid="assessment-header">
+                  {!showReport && <div className="min-w-0 text-center sm:col-start-2" data-testid="lesson-step-heading">
+                    <h1 className="flex min-h-12 items-center justify-center text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{lesson.title}</h1>
+                    <p className="mt-2 text-center text-sm font-bold text-slate-600" role="status" aria-live="polite" aria-atomic="true" data-testid="assessment-answer-count">أجبت عن {answeredCount} من {assessmentQuestions.length}</p>
+                  </div>}
+                  <button type="button" onClick={restartTest} className={`inline-flex min-h-12 items-center gap-2 rounded-xl border border-cyan-800 bg-white px-3 font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100 sm:px-5 ${showReport ? "" : "col-start-2 row-start-1 justify-self-end sm:col-start-3"}`} data-testid="button-restart-assessment"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة الاختبار</button>
                 </div>
                 {showReport ? <>
                   <section id="lesson-result" tabIndex={-1} className="rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700" data-testid="lesson-result">
@@ -492,7 +496,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId }: { 
                     </details>
                     <MasteryReport lesson={lesson} mastery={mastery} onReview={reviewSkill} />
                   </section>
-                </> : renderStep(assessmentStep)}
+                </> : renderStep(assessmentStep, false)}
               </div>}
             </TabsContent>
           ))}
