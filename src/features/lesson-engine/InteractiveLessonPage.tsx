@@ -504,12 +504,12 @@ export default function InteractiveLessonPage() {
                         if (currentStepIndexRef.current !== index) setStepIndexRef.current(index);
                       }}
                     >
-                      <header className="flex flex-col items-center gap-2 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 p-4 sm:p-6" data-learning-step-index={index}>
-                        <div className="flex max-w-full flex-wrap items-center justify-center gap-3" data-testid={`learning-meta-${step.id}`}>
-                          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-800 text-lg font-black text-white" aria-hidden="true">{sectionIndex + 1}</span>
-                          <p className="min-w-0 text-center text-xs font-bold text-cyan-700">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
+                      <header className="flex items-center justify-center gap-2 border-b border-cyan-200 border-r-4 border-r-cyan-700 bg-cyan-50/80 px-2 py-4 sm:gap-4 sm:p-6" data-learning-step-index={index}>
+                        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3" data-testid={`learning-meta-${step.id}`}>
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-cyan-800 text-xs font-black text-white sm:h-11 sm:w-11 sm:rounded-2xl sm:text-lg" aria-hidden="true">{sectionIndex + 1}</span>
+                          <p className="sr-only whitespace-nowrap text-center text-xs font-bold text-cyan-700 sm:not-sr-only">القسم {sectionIndex + 1} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
                         </div>
-                        <h2 id={`learning-title-${step.id}`} className="min-w-0 text-center text-lg font-black leading-7 text-slate-950 sm:text-xl">{step.title}</h2>
+                        <h2 id={`learning-title-${step.id}`} className="whitespace-nowrap text-center text-xs font-black leading-6 text-slate-950 sm:text-xl sm:leading-7">{step.title}</h2>
                       </header>
                       <div className="p-3 sm:p-6">
                         {renderStep(step, false, step.type !== "objectives")}
