@@ -41,6 +41,8 @@ assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.type ==
   lessonRegistry["l-mm6el08l"].lesson.title, "The video tab heading uses the lesson name");
 assert.ok(page.indexOf('data-testid="lesson-video-player"') < page.indexOf('data-testid="lesson-video-options"'),
   "The video player comes before the alternative explanation cards in DOM and keyboard order");
+assert.ok(page.includes('step.type === "video" ? "text-center" : undefined'),
+  "Only the video tab heading and label are centered");
 assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is scoped to learning tab");
 const css = readFileSync(new URL("../src/features/lesson-engine/learningStudio.css", import.meta.url), "utf8");
 assert.ok(css.includes("prefers-reduced-motion"));

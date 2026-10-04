@@ -230,10 +230,10 @@ export default function InteractiveLessonPage() {
     return (
       <>
         {step.type !== "official_book" && (showHeading || tutorMessage) && <div className="mb-6">
-          {showHeading && <>
+          {showHeading && <div className={step.type === "video" ? "text-center" : undefined} data-testid="lesson-step-heading">
             <p className="text-sm font-black text-cyan-700">{lessonTabs[activeTabIndex].title}</p>
             <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{step.title}</h1>
-          </>}
+          </div>}
           {tutorMessage && (
             <div className="studio-note mt-4 flex gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4 leading-7 text-cyan-950">
               <Sparkles className="mt-1 h-5 w-5 shrink-0 text-cyan-700" />
