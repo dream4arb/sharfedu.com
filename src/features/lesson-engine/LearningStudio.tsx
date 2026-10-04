@@ -1,5 +1,20 @@
 import type { ReactNode } from "react";
-import type { LessonStepDefinition } from "@shared/lesson-engine/types";
+import type { InteractiveLessonDefinition, LessonStepDefinition } from "@shared/lesson-engine/types";
+
+/** Split the presentation without changing saved content IDs or lesson step indexes. */
+export function buildLearningSections(lesson: InteractiveLessonDefinition, stepIndexes: number[]) {
+  const sections: Array<{ step: LessonStepDefinition; index: number; content: "objectives" | "introduction" | "default"; sectionNumber: number }> = [];
+  for (const index of stepIndexes) {
+    const step = lesson.steps[index];
+    if (step.type === "objectives") {
+      sections.push({ step: { ...step, id: `${step.id}-objectives`, eyebrow: "الهدف من الدرس", title: "الهدف من الدرس" }, index, content: "objectives", sectionNumber: sections.length + 1 });
+      sections.push({ step: { ...step, eyebrow: "شرح الدرس" }, index, content: "introduction", sectionNumber: sections.length + 1 });
+    } else {
+      sections.push({ step, index, content: "default", sectionNumber: sections.length + 1 });
+    }
+  }
+  return sections;
+}
 
 /** Open, reusable lesson sections. Only this tab receives the studio theme. */
 export function LearningSection({ step, index, sectionNumber, onFocus, children }: {

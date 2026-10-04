@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { buildLessonTabs } from "../src/features/lesson-engine/lessonNavigation";
-import { LearningSection } from "../src/features/lesson-engine/LearningStudio";
+import { buildLearningSections, LearningSection } from "../src/features/lesson-engine/LearningStudio";
 import { QuestionCard } from "../src/features/lesson-engine/QuestionCard";
 import { LessonVideoPlayer, youtubePlayerUrl } from "../src/features/lesson-engine/LessonVideoPlayer";
 import { PolygonLab } from "../src/features/lesson-engine/PolygonLab";
@@ -12,10 +12,22 @@ import { FormulaDiscoveryLab, MissingAngleLab, ExteriorTurnLab } from "../src/fe
 
 for (const { lesson } of Object.values(lessonRegistry)) {
   const tab = buildLessonTabs(lesson).find(tab => tab.id === "learn")!;
-  for (const [number, index] of tab.stepIndexes.entries()) {
-    const step = lesson.steps[index];
+  const originalContent = JSON.stringify(lesson);
+  const sections = buildLearningSections(lesson, tab.stepIndexes);
+  assert.equal(JSON.stringify(lesson), originalContent, "Section split never mutates stored lesson definitions");
+  assert.equal(sections.length, tab.stepIndexes.length + 1);
+  assert.equal(sections[0].step.title, "الهدف من الدرس");
+  assert.equal(sections[0].step.eyebrow, "الهدف من الدرس");
+  assert.equal(sections[0].content, "objectives");
+  assert.equal(sections[1].step.eyebrow, "شرح الدرس");
+  assert.equal(sections[1].content, "introduction");
+  assert.deepEqual(sections.map(section => section.sectionNumber), sections.map((_, index) => index + 1));
+  assert.equal(new Set(sections.map(section => section.step.id)).size, sections.length);
+  assert.deepEqual(sections.slice(1).map(section => section.step.id), tab.stepIndexes.map(index => lesson.steps[index].id),
+    "Original explanation anchors remain intact for review navigation");
+  for (const { step, index, sectionNumber } of sections) {
     const html = renderToStaticMarkup(createElement(LearningSection, {
-      step, index, sectionNumber: number + 1, onFocus: () => undefined,
+      step, index, sectionNumber, onFocus: () => undefined,
       children: createElement("p", {}, "محتوى القسم"),
     }));
     assert.ok(html.includes(`data-testid="learning-section-${step.id}"`));
@@ -39,6 +51,9 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+assert.ok(page.includes('content !== "objectives" && <StudioLessonIntroduction'), "Goals section excludes the explanation");
+assert.ok(page.includes('content !== "introduction" && <>'), "Explanation section excludes goals and learning-method content");
+assert.ok(page.includes('learningSections.map(({ step, index, content, sectionNumber })'), "Every section uses the new continuous numbering");
 assert.ok(page.includes('className="p-5 text-center" data-testid="lesson-video-caption"'), "Selected video title and teacher name are centered together");
 assert.ok(page.includes('data-testid="button-restart-assessment"') && page.includes('onClick={restartTest}'));
 assert.ok(page.includes('key={`${session.assessmentRunId ?? session.sessionId}:${question.id}`}'), "Restart clears unsent question drafts by remounting cards");

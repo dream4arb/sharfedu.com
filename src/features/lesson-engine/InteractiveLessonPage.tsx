@@ -20,7 +20,7 @@ import { getRegisteredLesson, lessonRegistry } from "@shared/lesson-engine/regis
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
 import { StudioLessonIntroduction } from "./StudioLessonIntroduction";
-import { LearningSection } from "./LearningStudio";
+import { buildLearningSections, LearningSection } from "./LearningStudio";
 import "./learningStudio.css";
 import { OfficialBookLesson } from "./OfficialBookLesson";
 import { LessonVideoPlayer } from "./LessonVideoPlayer";
@@ -80,6 +80,7 @@ export default function InteractiveLessonPage() {
   const activeTabId = getLessonTabId(currentStep);
   const activeTabIndex = lessonTabs.findIndex((tab) => tab.id === activeTabId);
   const learningTab = lessonTabs.find((tab) => tab.id === "learn")!;
+  const learningSections = useMemo(() => buildLearningSections(lesson, learningTab.stepIndexes), [lesson, learningTab]);
   const assessmentStep = lesson.steps.find((step) => step.type === "assessment");
   const reportStepIndex = lesson.steps.findIndex((step) => step.type === "report");
   const lastLearningStep = useRef(learningTab.stepIndexes[0]);
@@ -216,7 +217,7 @@ export default function InteractiveLessonPage() {
     openLearningSection(stepIndex >= 0 ? stepIndex : learningTab.stepIndexes[0]);
   }
 
-  function renderStep(step: LessonStepDefinition, showHeading = true, showTutorMessage = true) {
+  function renderStep(step: LessonStepDefinition, showHeading = true, showTutorMessage = true, content: "objectives" | "introduction" | "default" = "default") {
     // Graded questions live only in the final tab, not in the learning sections.
     const stepQuestions = step.type === "assessment" ? assessmentQuestions : [];
     const tutorMessage = showTutorMessage ? step.tutorMessage : undefined;
@@ -250,7 +251,8 @@ export default function InteractiveLessonPage() {
 
         {step.type === "objectives" && (
           <div className="space-y-5">
-            <StudioLessonIntroduction introduction={lesson.introduction} />
+            {content !== "objectives" && <StudioLessonIntroduction introduction={lesson.introduction} />}
+            {content !== "introduction" && <>
             <section className="studio-objectives rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
               <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
                 <span className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2"><Clock3 className="h-4 w-4" /> نحو {lesson.estimatedMinutes} دقيقة</span>
@@ -269,6 +271,7 @@ export default function InteractiveLessonPage() {
               <h2 className="mt-2 text-2xl font-black">افهم، شاهد، حرّك، ثم طبّق</h2>
               <p className="mt-3 max-w-2xl leading-8 text-slate-200">راجع الدرس من كتاب الوزارة، واختر شرح الفيديو الأنسب لك. هنا تجد الشرح والأنشطة البصرية مجتمعة بلا درجات، ثم تنتقل إلى اختبار واحد ونتيجته في المكان نفسه.</p>
             </section>
+            </>}
           </div>
         )}
 
@@ -454,12 +457,11 @@ export default function InteractiveLessonPage() {
                   <h1 data-testid="lesson-step-title">شرح درس {lesson.title}</h1>
                 </div>
                 <div className="studio-section-stack" data-testid="learning-section-stack">
-                  {tab.stepIndexes.map((index, sectionIndex) => {
-                    const step = lesson.steps[index];
-                    return <LearningSection key={step.id} step={step} index={index} sectionNumber={sectionIndex + 1}
+                  {learningSections.map(({ step, index, content, sectionNumber }) => {
+                    return <LearningSection key={step.id} step={step} index={index} sectionNumber={sectionNumber}
                       onFocus={() => {
                         if (currentStepIndexRef.current !== index) setStepIndexRef.current(index);
-                      }}>{renderStep(step, false, step.type !== "objectives")}</LearningSection>;
+                      }}>{renderStep(step, false, step.type !== "objectives", content)}</LearningSection>;
                   })}
                 </div>
               </>}
