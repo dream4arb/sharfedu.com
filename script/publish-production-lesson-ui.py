@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT=Path('/home/894422.cloudwaysapps.com/cmkdrtgqcv/public_html')
 PUBLIC=ROOT/'node_app/server/public'
 BACKUP=ROOT.parent/'tmp/lesson-ui-backup-20261004'
-EXPECTED_BACKEND='7352d186e2dcc3774f53c6893a2182baa51d2c9a2cebf9a50ca2dcc24e9305c63'
+EXPECTED_BACKEND='7352d186e2dcc3774f53c6893a2182baa51d2c9a2cebf9a50ca2dc24e9305c63'
 def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
  p=argparse.ArgumentParser();p.add_argument('--bundle');p.add_argument('--sha256');p.add_argument('--activate',action='store_true');p.add_argument('--rollback',action='store_true');args=p.parse_args()
