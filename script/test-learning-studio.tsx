@@ -70,6 +70,7 @@ assert.ok(page.includes('key={`${session.assessmentRunId ?? session.sessionId}:$
 assert.ok(page.includes('className="text-center text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>'));
 assert.ok(page.includes('mt-2 text-center text-2xl'), "Result title remains centered");
 assert.ok(!page.includes("تابع الشرح بالسرعة المناسبة لك"), "Redundant video follow-up notice is removed");
+assert.ok(!page.includes("لم يناسبك شرح المعلم الأول؟"), "Redundant notice below video choices is removed");
 assert.ok(!page.includes("أجب بنفسك من دون تلميحات") && !page.includes("سيأخذ التقرير عدد المحاولات في الحسبان"), "Old penalty instructions are removed");
 assert.ok(!page.includes("loadedVideoId") && !page.includes("playSelectedVideo"), "Video is no longer gated behind a custom play screen");
 assert.ok(page.includes('<LessonVideoPlayer key={selectedVideo.id}'), "Switching videos remounts the native player immediately");

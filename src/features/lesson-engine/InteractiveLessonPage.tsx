@@ -369,7 +369,6 @@ export default function InteractiveLessonPage() {
                     );
                   })}
                 </div>
-                {lessonVideos.length > 1 && <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm leading-6 text-amber-950">لم يناسبك شرح المعلم الأول؟ اختر أي شرح آخر من البطاقات، ويمكنك العودة بينها في أي وقت.</p>}
               </div>
           </section>
         )}
