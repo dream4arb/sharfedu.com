@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { buildLessonTabs } from "../src/features/lesson-engine/lessonNavigation";
 import { LearningSection } from "../src/features/lesson-engine/LearningStudio";
+import { QuestionCard } from "../src/features/lesson-engine/QuestionCard";
 import { PolygonLab } from "../src/features/lesson-engine/PolygonLab";
 import { FormulaDiscoveryLab, MissingAngleLab, ExteriorTurnLab } from "../src/features/lesson-engine/VisualLessonLabs";
 
@@ -35,6 +36,21 @@ for (const Lab of [PolygonLab, FormulaDiscoveryLab, MissingAngleLab, ExteriorTur
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === "teacher-summary")?.tutorMessage,
   undefined, "The redundant pre-exam tutor banner is removed from the content, not merely hidden");
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
+const reportSection = page.slice(page.indexOf('<section id="lesson-result"'));
+assert.ok(reportSection.indexOf('data-testid="assessment-answer-review"') < reportSection.indexOf('<MasteryReport'),
+  "Answer review is above mastery and recommendations in the result section");
+const question = lessonRegistry["l-mm6el08l"].lesson.questions.find(question => question.id === "assessment-octagon-triangles")!;
+for (const correct of [false, true]) {
+  const feedback = correct ? question.correctFeedback : question.defaultIncorrectFeedback;
+  const html = renderToStaticMarkup(createElement(QuestionCard, {
+    question, assessmentMode: true, onAttempt: () => undefined, onHint: () => undefined,
+    progress: { questionId: question.id, skillId: question.skillId, answer: correct ? "6" : "5",
+      correct, feedback, attempts: 1, hintsUsed: 0, score: correct ? 100 : 0 },
+  }));
+  assert.ok(html.includes(`<p>${feedback}</p>`), "Feedback is shown directly, without a recording notice");
+  assert.ok(!html.includes("تم تسجيل محاولتك"));
+  assert.ok(html.includes(correct ? "تمت الإجابة" : "أعد المحاولة"), "Retry and success actions remain intact");
+}
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.type === "video")?.tutorMessage, undefined,
   "Redundant video tutor banner is removed");
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.type === "video")?.title,

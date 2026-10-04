@@ -508,12 +508,12 @@ export default function InteractiveLessonPage() {
                   <section id="lesson-result" tabIndex={-1} className="rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700" data-testid="lesson-result">
                     <p className="text-sm font-black text-cyan-700">اختبار الدرس والنتيجة</p>
                     <h1 className="mb-6 mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">نتيجتك وما تحتاج إلى مراجعته</h1>
+                    <details className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5" data-testid="assessment-answer-review">
+                      <summary className="cursor-pointer rounded-lg py-2 font-black text-cyan-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700">راجع إجابات الاختبار</summary>
+                      <div className="mt-4">{renderStep(assessmentStep, false)}</div>
+                    </details>
                     <MasteryReport lesson={lesson} mastery={mastery} onReview={reviewSkill} />
                   </section>
-                  <details className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-                    <summary className="cursor-pointer rounded-lg py-2 font-black text-cyan-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700">راجع إجابات الاختبار</summary>
-                    <div className="mt-4">{renderStep(assessmentStep, false)}</div>
-                  </details>
                 </> : renderStep(assessmentStep)}
               </>}
             </TabsContent>

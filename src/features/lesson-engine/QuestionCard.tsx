@@ -238,7 +238,7 @@ export function QuestionCard({ question, progress, assessmentMode = false, onAtt
           data-testid="question-feedback"
         >
           {isCorrect ? <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-emerald-600" /> : <XCircle className="mt-1 h-5 w-5 shrink-0 text-rose-600" />}
-          <p>{assessmentMode && !isCorrect ? "تم تسجيل محاولتك. " : ""}{feedback}</p>
+          <p>{feedback}</p>
         </div>
       )}
 
