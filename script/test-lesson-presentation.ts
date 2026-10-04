@@ -4,8 +4,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { OfficialBookLesson } from "../src/features/lesson-engine/OfficialBookLesson";
 import { lessonPresentation } from "../src/features/lesson-engine/lessonPresentation";
+import { VisualLessonMap } from "../src/features/lesson-engine/VisualLessonLabs";
 
 assert.equal(lessonPresentation.showTutor, false, "Tutor is temporarily hidden, not removed");
+const lessonMapHtml = renderToStaticMarkup(createElement(VisualLessonMap));
+assert.ok(!lessonMapHtml.includes("خريطة بصرية قبل الاختبار"), "Redundant map introduction is removed");
+assert.match(lessonMapHtml, /id="lesson-map-title" class="[^"]*text-center/, "Lesson map heading is centered");
+assert.equal((lessonMapHtml.match(/role="tab"/g) ?? []).length, 3, "All recap tracks remain available");
 
 for (const { lesson } of Object.values(lessonRegistry)) {
   const html = renderToStaticMarkup(createElement(OfficialBookLesson, { source: lesson.curriculumSource, lessonTitle: lesson.title }));

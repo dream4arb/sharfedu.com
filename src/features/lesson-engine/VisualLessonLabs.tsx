@@ -317,8 +317,7 @@ export function VisualLessonMap() {
 
   return (
     <section className="studio-lab studio-map rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-labelledby="lesson-map-title">
-      <p className="text-sm font-black text-cyan-700">خريطة بصرية قبل الاختبار</p>
-      <h2 id="lesson-map-title" className="mt-1 text-xl font-black text-slate-950">اختر المسار الذي تريد تثبيته</h2>
+      <h2 id="lesson-map-title" className="text-center text-xl font-black text-slate-950">اختر المسار الذي تريد تثبيته</h2>
       <div className="mt-5 grid gap-2 sm:grid-cols-3" role="tablist" aria-label="مسارات ملخص الدرس">
         {recapTracks.map((track) => (
           <button key={track.id} type="button" role="tab" aria-selected={activeId === track.id} onClick={() => setActiveId(track.id)} className={`min-h-12 rounded-xl px-3 font-black transition ${activeId === track.id ? recapClasses[track.color].active : "bg-slate-100 text-slate-700"}`}>{track.label}</button>

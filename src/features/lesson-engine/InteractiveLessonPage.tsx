@@ -372,8 +372,7 @@ export default function InteractiveLessonPage() {
               </section>
             )}
             <section className="studio-summary rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
-              <div className="flex items-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المحتوى</h2></div>
-              <p className="mt-2 text-sm font-bold text-emerald-700">{lesson.teacherSummary.attribution}</p>
+              <div className="flex items-center justify-center gap-2 text-emerald-900"><ShieldCheck className="h-6 w-6" /><h2 className="text-xl font-black">ملخص المحتوى</h2></div>
               <ol className="mt-5 grid gap-3 sm:grid-cols-2">
                 {lesson.teacherSummary.points.map((point, index) => (
                   <li key={point} className="flex gap-3 rounded-2xl border border-emerald-100 bg-white/80 p-4 leading-7 text-emerald-950">
