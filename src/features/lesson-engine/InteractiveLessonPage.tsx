@@ -269,6 +269,7 @@ export default function InteractiveLessonPage() {
         {step.type === "official_book" && (
           <OfficialBookLesson
             source={lesson.curriculumSource}
+            lessonTitle={lesson.title}
             onPageViewed={(pageNumber) => emitEvent({ name: "book_page_viewed", stepId: step.id, metadata: { pageNumber } })}
           />
         )}

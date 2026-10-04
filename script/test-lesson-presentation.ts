@@ -8,7 +8,7 @@ import { lessonPresentation } from "../src/features/lesson-engine/lessonPresenta
 assert.equal(lessonPresentation.showTutor, false, "Tutor is temporarily hidden, not removed");
 
 for (const { lesson } of Object.values(lessonRegistry)) {
-  const html = renderToStaticMarkup(createElement(OfficialBookLesson, { source: lesson.curriculumSource }));
+  const html = renderToStaticMarkup(createElement(OfficialBookLesson, { source: lesson.curriculumSource, lessonTitle: lesson.title }));
   const pages = lesson.curriculumSource.lessonExcerpt?.pages ?? [];
   if (!pages.length) {
     assert.ok(html.includes("صفحات الكتاب قيد الربط"), "Missing excerpts retain the honest official-source fallback");
@@ -24,6 +24,7 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.ok(!html.includes("المرجع الرسمي للدرس"), "No redundant introductory heading");
   assert.ok(!html.includes("مرّر للأسفل لمتابعة الدرس"), "No redundant scrolling instructions");
   assert.ok(html.includes('data-testid="official-book-toolbar"'), "Compact toolbar retains zoom and official link");
+  assert.ok(html.includes(`صفحة درس ${lesson.title}`), "Book toolbar names the current lesson");
   let previousPosition = -1;
   for (const page of pages) {
     const position = html.indexOf(`data-book-page="${page.pageNumber}"`);

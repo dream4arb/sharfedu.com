@@ -10,12 +10,13 @@ import type { CurriculumSourceDefinition } from "@shared/lesson-engine/types";
 
 interface OfficialBookLessonProps {
   source: CurriculumSourceDefinition;
+  lessonTitle: string;
   onPageViewed?: (pageNumber: number) => void;
 }
 
 const zoomLevels = [100, 125, 150];
 
-export function OfficialBookLesson({ source, onPageViewed }: OfficialBookLessonProps) {
+export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: OfficialBookLessonProps) {
   const excerpt = source.lessonExcerpt;
   const [zoomIndex, setZoomIndex] = useState(0);
   const pageListRef = useRef<HTMLDivElement>(null);
@@ -60,7 +61,7 @@ export function OfficialBookLesson({ source, onPageViewed }: OfficialBookLessonP
     <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white" aria-labelledby="official-book-heading">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-5" data-testid="official-book-toolbar">
         <div className="min-w-0 sm:flex sm:items-center sm:gap-3">
-          <h1 id="official-book-heading" className="text-sm font-black leading-6 text-slate-900">صفحات الدرس</h1>
+          <h1 id="official-book-heading" className="text-sm font-black leading-6 text-slate-900">صفحة درس {lessonTitle}</h1>
           <a href={excerpt.officialPdfUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-cyan-800 underline decoration-cyan-200 underline-offset-4 hover:decoration-cyan-800">كتاب الوزارة</a>
         </div>
 
