@@ -20,7 +20,10 @@ for (const { lesson } of Object.values(lessonRegistry)) {
   assert.equal((html.match(/loading="lazy"/g) ?? []).length, pages.length - 1);
   const firstPagePosition = html.indexOf("data-book-page=");
   const sourceDetailsPosition = html.indexOf('data-testid="official-book-source-details"');
-  assert.ok(sourceDetailsPosition > firstPagePosition, "Detailed source attribution comes after the pages");
+  assert.ok(sourceDetailsPosition > firstPagePosition, "Source footer comes after the pages");
+  assert.match(html, /id="official-book-source-heading" class="[^"]*text-center/, "Source footer heading is centered");
+  assert.match(html.slice(sourceDetailsPosition), /<p class="[^"]*text-center[^"]*">/, "Book title in the footer is centered");
+  assert.ok(!html.includes(lesson.curriculumSource.lessonExcerpt!.attribution), "Redundant source attribution is not displayed");
   assert.ok(!html.includes("<details") && !html.includes("<summary"), "Source and download links are always visible, without disclosure controls");
   assert.ok(html.includes('aria-labelledby="official-book-source-heading"'), "Source footer has a semantic heading");
   assert.ok(!html.includes("العرض بموافقة المصدر الرسمي"), "Removed approval wording does not appear");

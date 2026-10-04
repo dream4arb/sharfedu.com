@@ -89,9 +89,8 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
       </div>
 
       <section className="border-t border-slate-200 p-4 sm:p-5" data-testid="official-book-source-details" aria-labelledby="official-book-source-heading">
-        <h2 id="official-book-source-heading" className="py-2 text-sm font-bold text-cyan-800">المصدر وملفات الكتاب</h2>
-        <p className="mt-3 text-sm font-bold leading-7 text-slate-800">{source.bookTitle}</p>
-        <p className="mt-2 text-xs leading-6 text-slate-600">{excerpt.attribution}</p>
+        <h2 id="official-book-source-heading" className="py-2 text-center text-sm font-bold text-cyan-800">المصدر وملفات الكتاب</h2>
+        <p className="mt-3 text-center text-sm font-bold leading-7 text-slate-800">{source.bookTitle}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <a href={excerpt.pdfUrl} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-center font-black text-white hover:bg-cyan-800">
             نسخة صفحات الدرس <Download className="h-5 w-5" />

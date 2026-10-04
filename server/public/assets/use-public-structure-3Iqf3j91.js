@@ -1,1 +1,0 @@
-import{r as e}from"./index-DfDe57-K.js";function a(s){const[r,u]=e.useState({displayStructure:{},lessonTitles:{}});return e.useEffect(()=>{fetch("/api/public/structure").then(t=>t.json()).then(t=>{u({displayStructure:t?.displayStructure??{},lessonTitles:t?.lessonTitles??{}})}).catch(()=>{})},[s]),r}export{a as u};
