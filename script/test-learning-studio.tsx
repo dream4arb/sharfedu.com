@@ -37,6 +37,8 @@ assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.id === 
 const page = readFileSync(new URL("../src/features/lesson-engine/InteractiveLessonPage.tsx", import.meta.url), "utf8");
 assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.type === "video")?.tutorMessage, undefined,
   "Redundant video tutor banner is removed");
+assert.equal(lessonRegistry["l-mm6el08l"].lesson.steps.find(step => step.type === "video")?.title,
+  lessonRegistry["l-mm6el08l"].lesson.title, "The video tab heading uses the lesson name");
 assert.ok(page.indexOf('data-testid="lesson-video-player"') < page.indexOf('data-testid="lesson-video-options"'),
   "The video player comes before the alternative explanation cards in DOM and keyboard order");
 assert.ok(page.includes('tab.id === "learn" ? "lesson-studio" : ""'), "Theme is scoped to learning tab");

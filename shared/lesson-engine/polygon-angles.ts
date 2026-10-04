@@ -367,7 +367,7 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       id: "video-summary",
       type: "video",
       eyebrow: "الشرح المرئي",
-      title: "شاهد الفكرة وهي تتحرك",
+      title: "زوايا المضلع",
     },
     {
       id: "warmup",
