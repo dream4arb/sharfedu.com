@@ -430,7 +430,6 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       type: "teacher_summary",
       eyebrow: "خريطة الدرس",
       title: "ثبّت الخطوات في ذهنك",
-      tutorMessage: "هذه خلاصة قصيرة قبل الاختبار. لا توجد أسئلة في هذه الشريحة.",
     },
     {
       id: "assessment",
