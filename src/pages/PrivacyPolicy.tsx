@@ -175,13 +175,7 @@ const sections = [
 ];
 
 export default function PrivacyPolicy() {
-  useEffect(() => {
-    setPageMeta(
-      "سياسة الخصوصية | منصة شارف التعليمية",
-      "سياسة الخصوصية لمنصة شارف التعليمية - تعرف على كيفية جمع واستخدام وحماية بياناتك الشخصية وفقاً لأنظمة المملكة العربية السعودية",
-      "سياسة الخصوصية، حماية البيانات، شارف، منصة تعليمية، بيانات شخصية"
-    );
-  }, []);
+
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">

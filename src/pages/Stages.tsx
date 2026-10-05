@@ -153,13 +153,7 @@ const highlights = [
 ];
 
 export default function Stages() {
-  useEffect(() => {
-    setPageMeta({
-      title: "المراحل الدراسية - منصة شارف التعليمية",
-      description: "تصفح جميع المراحل الدراسية في منصة شارف: الابتدائية، المتوسطة، الثانوية، المسارات، والقدرات والتحصيلي. محتوى تعليمي شامل للمنهج السعودي.",
-      keywords: "المراحل الدراسية, ابتدائي, متوسط, ثانوي, مسارات, قدرات, تحصيلي, منهج سعودي, شارف",
-    });
-  }, []);
+
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">

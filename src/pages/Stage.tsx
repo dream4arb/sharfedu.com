@@ -295,30 +295,7 @@ export default function Stage() {
   };
   const urlStage = stageUrlMap[stageId || ""] || stageId || "primary";
 
-  useEffect(() => {
-    if (!stage) return;
-    const autoTitle = `${stage.title} - ${stage.subtitle}`;
-    const autoDesc = `${stage.title} في منصة شارف التعليمية. ${stage.description}. شرح تفاعلي وملخصات واختبارات لجميع المواد الدراسية.`;
-    const autoKw = `${stage.title}, دروس ${stage.title}, مواد ${stage.title}, شرح ${stage.title}, منصة شارف`;
-    const path = `/stage/${stageId}`;
-    fetch(`/api/seo?path=${encodeURIComponent(path)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && (data.title || data.description)) {
-          setPageMeta({
-            title: data.title || autoTitle,
-            description: data.description || autoDesc,
-            keywords: data.keywords || autoKw,
-            ogTitle: data.ogTitle,
-            ogDescription: data.ogDescription,
-            ogImage: data.ogImage,
-          });
-        } else {
-          setPageMeta(autoTitle, autoDesc, autoKw);
-        }
-      })
-      .catch(() => setPageMeta(autoTitle, autoDesc, autoKw));
-  }, [stageId, stage]);
+
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
@@ -397,7 +374,7 @@ export default function Stage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
                       {grade.subjects.map((subject, subIndex) => {
                         const SubjectIcon = subject.icon;
-                        const subjectHref = `/lesson/${urlStage}/${subject.id}`;
+                        const subjectHref = `/lesson/${urlStage}/${subject.id}${grade.id === stage.grades[0].id ? "" : `?grade=${encodeURIComponent(grade.id)}`}`;
                         
                         if (gradeLocked) {
                           return (

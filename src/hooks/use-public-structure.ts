@@ -13,12 +13,14 @@ export type LessonTitlesMap = Record<string, string>;
 export interface PublicStructureData {
   displayStructure: DisplayStructure;
   lessonTitles: LessonTitlesMap;
+  lessonLocations: Record<string, { gradeId: string; gradeName: string; stageSlug: string; subjectSlug: string }>;
 }
 
 export function usePublicStructure(version?: number): PublicStructureData {
   const [data, setData] = useState<PublicStructureData>({
     displayStructure: {},
     lessonTitles: {},
+    lessonLocations: {},
   });
 
   useEffect(() => {
@@ -28,6 +30,7 @@ export function usePublicStructure(version?: number): PublicStructureData {
         setData({
           displayStructure: d?.displayStructure ?? {},
           lessonTitles: d?.lessonTitles ?? {},
+          lessonLocations: d?.lessonLocations ?? {},
         });
       })
       .catch(() => {});

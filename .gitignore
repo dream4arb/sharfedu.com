@@ -19,3 +19,4 @@ sqlite.db
 server/public/attached_assets/uploads/
 attached_assets/
 .local/
+__pycache__/

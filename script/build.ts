@@ -26,7 +26,7 @@ async function buildAll() {
   await rm("dist", { recursive: true, force: true });
 
   console.log("Building client...");
-  await viteBuild();
+  await viteBuild({ configLoader: "runner" });
 
   console.log("Building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));

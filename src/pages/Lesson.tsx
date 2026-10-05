@@ -16,7 +16,8 @@ import { SsaIframe } from "@/components/SsaIframe";
 import { type MathTestData } from "@/data/math-tests-final";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useParams, useLocation } from "wouter";
+import { Link, useParams, useLocation, useSearch } from "wouter";
+import { lessonReadingSections } from "@shared/seo/publication";
 import { 
   Loader2, Play, FileText, Download, CheckCircle,
   Lock, ArrowRight, Home, BookOpen, Check, Video, Clock,
@@ -328,7 +329,8 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
 export default function Lesson() {
   const { user } = useAuth();
   const [structureVersion, setStructureVersion] = useState(0);
-  const { displayStructure, lessonTitles: lessonTitlesFromApi } = usePublicStructure(structureVersion);
+  const { displayStructure, lessonTitles: lessonTitlesFromApi, lessonLocations } = usePublicStructure(structureVersion);
+  const routeSearch = useSearch();
   const { isCompleted, markComplete, markIncomplete, getProgress, markTabComplete, isTabCompleted, getLessonProgress, completedTabs, fourTabProgress, getCompletedLessonTabs } = useLessonProgress();
   const params = useParams<{ stage: string; subject: string; lessonId?: string }>();
   const [, setLocation] = useLocation();
@@ -517,8 +519,11 @@ export default function Lesson() {
   const staticLessonsMap = Object.fromEntries(staticLessons.map((l) => [l.id, l]));
   
   // أولوية: هيكل لوحة التحكم (displayStructure) ثم البيانات الثابتة
-  const structureKey = `${internalStage}_${subjectId}`;
-  const apiStruct = displayStructure[structureKey];
+  const firstGradeKey = Object.keys(displayStructure).find(key => key.startsWith(`${internalStage}_`) && key.endsWith(`_${subjectId}`) && key !== `${internalStage}_${subjectId}`);
+  const firstGradeId = firstGradeKey?.slice(`${internalStage}_`.length, -`_${subjectId}`.length) || (internalStage === "paths" || internalStage === "qudurat" ? "general" : "1");
+  const selectedGradeId = (lessonId ? lessonLocations[lessonId]?.gradeId : new URLSearchParams(routeSearch).get("grade")) || firstGradeId;
+  const structureKey = `${internalStage}_${selectedGradeId}_${subjectId}`;
+  const apiStruct = displayStructure[structureKey] || (selectedGradeId === firstGradeId ? displayStructure[`${internalStage}_${subjectId}`] : undefined);
   let lessons: LessonData[] = [];
   let semesters: SemesterData[];
   
@@ -540,8 +545,8 @@ export default function Lesson() {
     }));
     semesters = ensureTwoSemestersWithAttachments(fromApi);
   } else {
-    lessons = staticLessons;
-    const base = getSemestersForSidebar(subjectData?.semesters, lessons);
+    lessons = selectedGradeId === firstGradeId ? staticLessons : [];
+    const base = getSemestersForSidebar(selectedGradeId === firstGradeId ? subjectData?.semesters : undefined, lessons);
     semesters = ensureTwoSemestersWithAttachments(base);
   }
   
@@ -561,11 +566,7 @@ export default function Lesson() {
     high: { "1": "اول ثانوي", "2": "ثاني ثانوي", "3": "ثالث ثانوي" },
   };
   const gradeShort = (() => {
-    const sg = typeof window !== "undefined" ? sessionStorage.getItem("lesson_grade") : null;
-    const ss = typeof window !== "undefined" ? sessionStorage.getItem("lesson_stage") : null;
-    if (ss && sg && gradeShortMap[ss]?.[sg]) return gradeShortMap[ss][sg];
-    const fromUrl = subjectData?.grades?.[0];
-    if (fromUrl && gradeShortMap[internalStage]?.[String(fromUrl)]) return gradeShortMap[internalStage][String(fromUrl)];
+    if (gradeShortMap[internalStage]?.[selectedGradeId]) return gradeShortMap[internalStage][selectedGradeId];
     return stageShortNames[internalStage] || "";
   })();
   const currentSemesterName = (() => {
@@ -589,15 +590,13 @@ export default function Lesson() {
     subjectName = subjectId || "المادة";
   }
 
-  // اسم الصف الدراسي (من sessionStorage عند الانتقال من صفحة المرحلة أو المادة)
+  // اسم الصف مستمد من رابط الصفحة أو معرّف الدرس، وليس جلسة زيارة قديمة.
   const gradeNamesMap: Record<string, Record<string, string>> = {
     elementary: { "1": "الصف الأول ابتدائي", "2": "الصف الثاني ابتدائي", "3": "الصف الثالث ابتدائي", "4": "الصف الرابع ابتدائي", "5": "الصف الخامس ابتدائي", "6": "الصف السادس ابتدائي" },
     middle: { "1": "الصف الأول متوسط", "2": "الصف الثاني متوسط", "3": "الصف الثالث متوسط" },
     high: { "1": "الصف الأول ثانوي", "2": "الصف الثاني ثانوي", "3": "الصف الثالث ثانوي" },
   };
-  const savedGradeId = typeof window !== "undefined" ? sessionStorage.getItem("lesson_grade") : null;
-  const savedStageId = typeof window !== "undefined" ? sessionStorage.getItem("lesson_stage") : null;
-  const gradeName = (savedStageId && savedGradeId && gradeNamesMap[savedStageId]?.[savedGradeId]) || null;
+  const gradeName = gradeNamesMap[internalStage]?.[selectedGradeId] || lessonLocations[lessonId || ""]?.gradeName || null;
   const subjectDisplayName = gradeName ? `${subjectName} - ${gradeName}` : subjectName;
   
   // Get progress with error handling
@@ -713,33 +712,7 @@ export default function Lesson() {
     return () => { cancelled = true; };
   }, [currentLessonId, currentVideoUrl, additionalVideosKey, cmsVideoDataValue]);
 
-  useEffect(() => {
-    if (!currentLesson || !subjectName) return;
-    const title = getLessonDisplayTitle(currentLesson, lessonTitlesFromApi);
-    const autoTitle = `${title} - ${subjectName}`;
-    const gradePart = gradeShort ? ` ${gradeShort}` : "";
-    const semPart = currentSemesterName ? ` ${currentSemesterName}` : "";
-    const autoDesc = `درس ${title} مادة ${subjectName}${gradePart}${semPart} - شرح الدرس والملخصات والاختبارات على منصة شارف التعليمية`;
-    const autoKw = `${title}, ${subjectName}, شرح ${title}, ملخص ${title}, اختبار ${title}, منصة شارف`;
-    const lessonPath = window.location.pathname;
-    fetch(`/api/seo?path=${encodeURIComponent(lessonPath)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && (data.title || data.description)) {
-          setPageMeta({
-            title: data.title || autoTitle,
-            description: data.description || autoDesc,
-            keywords: data.keywords || autoKw,
-            ogTitle: data.ogTitle,
-            ogDescription: data.ogDescription,
-            ogImage: data.ogImage,
-          });
-        } else {
-          setPageMeta(autoTitle, autoDesc, autoKw);
-        }
-      })
-      .catch(() => setPageMeta(autoTitle, autoDesc, autoKw));
-  }, [currentLesson, subjectName, lessonTitlesFromApi, gradeShort, currentSemesterName]);
+
 
 
   // Reset state when lesson changes
@@ -1277,7 +1250,7 @@ export default function Lesson() {
       const hierarchy = await res.json();
       const stage = hierarchy.find((s: any) => s.slug === internalStage);
       if (!stage) throw new Error("المرحلة غير موجودة");
-      const gId = savedGradeId || "1";
+      const gId = selectedGradeId;
       const grade = stage.grades.find((g: any) => g.id === gId);
       if (!grade) throw new Error("الصف غير موجود");
       const subject = grade.subjects.find((s: any) => s.slug === subjectId);
@@ -1505,7 +1478,7 @@ export default function Lesson() {
                 />
               )}
               <InlineSeoEditor
-                pagePath={window.location.pathname}
+                pagePath={`${window.location.pathname}${!lessonId && selectedGradeId !== firstGradeId ? `?grade=${encodeURIComponent(selectedGradeId)}` : ""}`}
                 autoTitle={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} - ${subjectName || ""}`}
                 autoDescription={`درس ${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} مادة ${subjectName || ""}${gradeShort ? ` ${gradeShort}` : ""}${currentSemesterName ? ` ${currentSemesterName}` : ""} - شرح الدرس والملخصات والاختبارات على منصة شارف التعليمية`}
                 autoKeywords={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""}, ${subjectName || ""}, منصة شارف`}
@@ -1605,7 +1578,7 @@ export default function Lesson() {
                       className="gap-2 shrink-0"
                       onClick={() => {
                         setAttachmentView(null);
-                        setLocation(`/lesson/${urlStage}/${subjectId}`);
+                        setLocation(`/lesson/${urlStage}/${subjectId}${selectedGradeId === firstGradeId ? "" : `?grade=${encodeURIComponent(selectedGradeId)}`}`);
                       }}
                     >
                       <X className="w-4 h-4" />
@@ -1640,7 +1613,7 @@ export default function Lesson() {
                     <BookOpen className="w-8 h-8 sm:w-10 sm:h-10" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold mb-3 text-foreground">
-                    أهلاً بك في مادة {subjectName}
+                    {lessonId && Object.keys(displayStructure).length > 0 ? "الدرس غير موجود" : `أهلاً بك في مادة ${subjectName}`}
                   </h2>
                   <p className="text-sm sm:text-base text-muted-foreground mb-4 max-w-md">
                     {lessons.length === 0 
@@ -1658,7 +1631,17 @@ export default function Lesson() {
                   firstLessonHref={firstUnitLesson ? `/lesson/${urlStage}/${subjectId}/${firstUnitLesson.id}` : undefined}
                   firstLessonTitle={firstUnitLesson ? getLessonDisplayTitle(firstUnitLesson, lessonTitlesFromApi) : undefined} />
               ) : isPublishedLesson(lessonIdFromParams) ? (
-                <InteractiveLessonPage key={lessonIdFromParams} embedded lessonId={lessonIdFromParams} progressSubjectSlug={subjectId} />
+                <>
+                  <InteractiveLessonPage key={lessonIdFromParams} embedded lessonId={lessonIdFromParams} progressSubjectSlug={subjectId} />
+                  <article className="rounded-2xl border border-border/50 bg-white p-6 sm:p-8 mt-8 leading-8" aria-label="ملخص زوايا المضلع" data-testid="public-lesson-summary">
+                    <h2 className="text-2xl font-bold mb-5">ملخص درس زوايا المضلع</h2>
+                    {lessonReadingSections(lessonIdFromParams).map(section => <section key={section.heading} className="mt-5">
+                      <h3 className="text-lg font-bold mb-2">{section.heading}</h3>
+                      {section.paragraphs.map(paragraph => <p key={paragraph} className="mt-2 text-muted-foreground">{paragraph}</p>)}
+                    </section>)}
+                    <p className="text-sm text-muted-foreground mt-5">المادة: الرياضيات 1-2، أول ثانوي · الوحدة: الأشكال الرباعية · صفحات الدرس في الكتاب: 12–19.</p>
+                  </article>
+                </>
               ) : (
                 <section className="rounded-2xl border border-border/50 bg-white p-8 text-center" data-testid="lesson-content-pending">
                   <h2 className="text-2xl font-bold">{getLessonDisplayTitle(currentLesson, lessonTitlesFromApi)}</h2>

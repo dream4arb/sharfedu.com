@@ -15,6 +15,9 @@ export interface PageMetaOptions {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
+  canonical?: string;
+  robots?: string;
+  structuredData?: unknown[];
 }
 
 /**
@@ -59,7 +62,8 @@ export function setPageMeta(
     canonical.setAttribute("rel", "canonical");
     document.head.appendChild(canonical);
   }
-  canonical.href = `https://sharfedu.com${window.location.pathname}`;
+  const queryGrade = new URLSearchParams(window.location.search).get("grade");
+  canonical.href = opts.canonical || `https://sharfedu.com${window.location.pathname}${queryGrade && queryGrade !== "1" ? `?grade=${encodeURIComponent(queryGrade)}` : ""}`;
 
   // Open Graph
   const setOg = (property: string, content: string) => {
@@ -71,8 +75,22 @@ export function setPageMeta(
     }
     el.setAttribute("content", content);
   };
-  setOg("og:url", `https://sharfedu.com${window.location.pathname}`);
-  if (ogTitle) setOg("og:title", ogTitle);
-  if (ogDescription) setOg("og:description", ogDescription);
-  if (ogImage) setOg("og:image", ogImage);
+  setOg("og:url", canonical.href);
+  setOg("og:title", ogTitle || document.title);
+  setOg("og:description", ogDescription || desc || DEFAULT_SEO.description);
+  setOg("og:image", ogImage || "https://sharfedu.com/hero-main.webp");
+  const setName = (name: string, content: string) => {
+    let el = document.querySelector(`meta[name="${name}"]`);
+    if (!el) { el = document.createElement("meta"); el.setAttribute("name", name); document.head.appendChild(el); }
+    el.setAttribute("content", content);
+  };
+  setName("twitter:title", ogTitle || document.title);
+  setName("twitter:description", ogDescription || desc || DEFAULT_SEO.description);
+  setName("twitter:image", ogImage || "https://sharfedu.com/hero-main.webp");
+  if (opts.robots) setName("robots", opts.robots);
+  if (opts.structuredData) {
+    document.querySelectorAll('script[type="application/ld+json"]').forEach(el => el.remove());
+    const script = document.createElement("script"); script.type = "application/ld+json";
+    script.id = "page-structured-data"; script.textContent = JSON.stringify(opts.structuredData); document.head.appendChild(script);
+  }
 }

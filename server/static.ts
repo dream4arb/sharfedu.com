@@ -1,6 +1,8 @@
 import express, { type Express } from "express";
 import { existsSync } from "fs";
 import path from "path";
+import { pageWithOverrides, ORIGIN } from "./seo/model";
+import { renderSeoHtml } from "./seo/routes";
 
 function resolvePublicPath(): string {
   const candidates = [
@@ -28,9 +30,26 @@ export function serveStatic(app: Express) {
   }
   console.log(`[static] Serving static files from: ${publicPath}`);
 
+  app.use(async (req, res, next) => {
+    if (!["GET", "HEAD"].includes(req.method) || req.path.startsWith("/api")) return next();
+    if (/^\/(node_app|prompt-files|tests)(\/|$)/.test(req.path)) return res.status(404).set("X-Robots-Tag", "noindex").send("Not Found");
+    if (req.path === "/index.html") return res.redirect(301, "/");
+    if (path.extname(req.path)) return next();
+    try {
+      const page = await pageWithOverrides(req.originalUrl);
+      const canonicalPath = page.canonical.slice(ORIGIN.length);
+      if (page.status === 200 && req.path !== canonicalPath.split("?")[0]) {
+        const query = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+        return res.redirect(301, canonicalPath + (canonicalPath.includes("?") ? "" : query));
+      }
+      res.status(page.status).type("html").set("Cache-Control", "no-store").set("X-Robots-Tag", page.robots)
+        .send(await renderSeoHtml(path.resolve(publicPath, "index.html"), page));
+    } catch (error) { next(error); }
+  });
+
   app.use(
     express.static(publicPath, {
-      index: "index.html",
+      index: false,
       maxAge: "1y",
       immutable: true,
       setHeaders: (res, filePath) => {
@@ -57,9 +76,6 @@ export function serveStatic(app: Express) {
 
   app.use((req, res, next) => {
     if (req.method !== "GET" || req.path.startsWith("/api")) return next();
-    const indexFile = path.resolve(publicPath, "index.html");
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("Cache-Control", "no-cache");
-    res.sendFile(indexFile);
+    res.status(404).set("X-Robots-Tag", "noindex").send("Not Found");
   });
 }
