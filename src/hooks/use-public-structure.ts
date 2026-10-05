@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getPublicLessonBootstrap } from "@/lib/publicLessonBootstrap";
 
 export type DisplaySemester = {
   id: string;
@@ -17,11 +18,11 @@ export interface PublicStructureData {
 }
 
 export function usePublicStructure(version?: number): PublicStructureData {
-  const [data, setData] = useState<PublicStructureData>({
+  const [data, setData] = useState<PublicStructureData>(() => getPublicLessonBootstrap()?.structure ?? ({
     displayStructure: {},
     lessonTitles: {},
     lessonLocations: {},
-  });
+  }));
 
   useEffect(() => {
     fetch("/api/public/structure")

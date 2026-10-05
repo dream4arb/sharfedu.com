@@ -16,7 +16,6 @@ import { PdfCanvasViewer } from "@/components/PdfCanvasViewer";
 import { SsaIframe } from "@/components/SsaIframe";
 import { type MathTestData } from "@/data/math-tests-final";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams, useLocation, useSearch } from "wouter";
 import { lessonReadingSections } from "@shared/seo/publication";
 import { 
@@ -228,9 +227,7 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
 
   if (submitted) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="bg-gradient-to-l from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200/60 dark:border-emerald-800/40 rounded-2xl p-6 text-center mt-8"
         data-testid="rating-submitted"
       >
@@ -239,15 +236,12 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
           <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">شكراً لتقييمك!</span>
         </div>
         <p className="text-sm text-emerald-600/80 dark:text-emerald-400/70">تقييمك يساعدنا في تحسين المحتوى التعليمي</p>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+    <div
       className="bg-white dark:bg-card border border-border/50 rounded-2xl p-6 sm:p-8 shadow-sm mt-8"
       data-testid="rating-widget"
     >
@@ -270,6 +264,8 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
             onMouseLeave={() => setHoveredStar(0)}
             className="transition-transform hover:scale-125 focus:outline-none"
             data-testid={`star-${star}`}
+            aria-label={`تقييم الدرس ${star} من 5`}
+            aria-pressed={rating === star}
           >
             <Star
               className={`w-9 h-9 sm:w-10 sm:h-10 transition-colors ${
@@ -283,9 +279,7 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
       </div>
 
       {rating > 0 && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
+        <div
           className="space-y-4"
         >
           <div className="text-center text-sm font-semibold text-amber-600 dark:text-amber-400 mb-3">
@@ -321,13 +315,14 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
             )}
             إرسال التقييم
           </Button>
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
 export default function Lesson() {
+  useEffect(() => { document.getElementById("lesson-seo-fallback")?.remove(); }, []);
   const { user } = useAuth();
   const [structureVersion, setStructureVersion] = useState(0);
   const { displayStructure, lessonTitles: lessonTitlesFromApi, lessonLocations } = usePublicStructure(structureVersion);
@@ -1547,9 +1542,7 @@ export default function Lesson() {
               )}
               {attachmentView !== null ? (
                 // عرض PDF المرفق في نفس الصفحة مكان رسالة الترحيب
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                <div
                   className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/50 p-6 flex flex-col min-h-[500px]"
                 >
                   <div className="flex items-center justify-between gap-4 mb-4">
@@ -1603,12 +1596,10 @@ export default function Lesson() {
                       </div>
                     )}
                   </div>
-                </motion.div>
+                </div>
               ) : !currentLesson || !lessonId ? (
                 // Welcome Message - Show when no lesson is selected or lessonId is invalid
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                <div
                   className="bg-white dark:bg-card rounded-2xl shadow-lg border border-border/50 p-6 sm:p-12 flex flex-col items-center justify-center min-h-[300px] sm:min-h-[500px] text-center"
                 >
                   <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white mb-4 sm:mb-6 shadow-lg`}>
@@ -1623,7 +1614,7 @@ export default function Lesson() {
                       : "يرجى اختيار الفصل الدراسي والدرس المناسب لك من القائمة الجانبية للبدء"
                     }
                   </p>
-                </motion.div>
+                </div>
               ) : (
                 <>
               {currentPreparation && preparationLocation ? (
@@ -1664,10 +1655,7 @@ export default function Lesson() {
 
               {/* Navigation Buttons - نفس التنسيق لجميع التبويبات */}
               {currentLesson && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+              <div
                 className="flex items-center justify-between gap-4 mt-8"
               >
                 <div className="flex items-center justify-between gap-4 w-full">
@@ -1705,7 +1693,7 @@ export default function Lesson() {
                   <div className="flex-1" />
                 )}
                 </div>
-              </motion.div>
+              </div>
               )}
                 </>
               )}

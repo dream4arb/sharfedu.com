@@ -14,6 +14,10 @@ for (const path of ['src/App.tsx', 'src/index.css', 'src/pages/Home.tsx', 'src/p
   'src/components/ui/sidebar.tsx', 'src/components/lessons/LessonSidebar.tsx',
   'src/components/lessons/UnitPreparationPage.tsx', 'server/index.ts',
   'server/admin/contentRoutes.ts', 'shared/curriculum/math-high1-names.json']) {
-  assert.equal(text(path), execFileSync('git', ['show', `61d9fa1:${path}`], {encoding: 'utf8'}).replace(/\r\n/g, '\n'), path);
+  const baseline = execFileSync('git', ['show', `61d9fa1:${path}`], {encoding: 'utf8'}).replace(/\r\n/g, '\n');
+  // Performance changes only how Home is downloaded, not any route or provider.
+  const expected = path === 'src/App.tsx' ? baseline.replace('import Home from "@/pages/Home";\n', '')
+    .replace('const Dashboard = lazy', 'const Home = lazy(() => import("@/pages/Home"));\nconst Dashboard = lazy') : baseline;
+  assert.equal(text(path), expected, path);
 }
 console.log('PASS: server-approved lesson packages drive rendering; other pages, curriculum, sidebar, preparation and semester boundaries preserved.');

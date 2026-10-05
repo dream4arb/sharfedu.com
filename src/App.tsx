@@ -5,11 +5,11 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LessonProgressProvider } from "@/hooks/use-lesson-progress";
-import Home from "@/pages/Home";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SeoHead } from "@/components/SeoHead";
 import { useAuth, useAuthProvider, AuthContext } from "@/hooks/use-auth";
 
+const Home = lazy(() => import("@/pages/Home"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Courses = lazy(() => import("@/pages/Courses"));

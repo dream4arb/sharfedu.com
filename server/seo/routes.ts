@@ -5,6 +5,8 @@ import { escapeHtml as e, pageWithOverrides, resolveSeoPage, sitemapPaths, sitem
 import { requireAdmin } from "../middleware/adminAuth";
 import { getPublicationCatalog } from "../lesson-publication/store";
 import { installLessonPublicationRoutes } from "../lesson-publication/routes";
+import path from "node:path";
+import { bookImageAttributes } from "../../shared/lesson-engine/book-image";
 
 export async function seoSitemapInfo() {
   const catalog = await getPublicationCatalog();
@@ -77,5 +79,75 @@ export async function renderSeoHtml(indexFile: string, page: SeoPage) {
     <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${e(page.ogTitle)}">
     <meta name="twitter:description" content="${e(page.ogDescription)}"><meta name="twitter:image" content="${e(page.ogImage)}">
     <script type="application/ld+json" id="page-structured-data">${json}</script>`;
-  return html.replace("</head>", `${meta}</head>`).replace('<div id="root"></div>', `<div id="root">${renderPublicBody(page)}</div>`);
+  const isLessonRoute = page.status === 200 && page.pagePath.startsWith("/lesson/");
+  if (!isLessonRoute) {
+    let homeHint = "";
+    if (page.pagePath === "/") try {
+      const manifest = JSON.parse(await readFile(path.join(path.dirname(indexFile), "assets/manifest.json"), "utf8"));
+      const home = manifest["src/pages/Home.tsx"];
+      if (home?.file) homeHint = `<link rel="modulepreload" crossorigin href="/${e(home.file)}">`;
+      for (const css of home?.css ?? []) homeHint += `<link rel="stylesheet" crossorigin href="/${e(css)}">`;
+    } catch { /* No production manifest in development. */ }
+    return html.replace("</head>", `${meta}${homeHint}</head>`).replace('<div id="root"></div>', `<div id="root">${renderPublicBody(page)}</div>`);
+  }
+
+  // Bootstrap public content only, never user, session, draft or progress data.
+  // The HTML and client consume the same published revision and course structure.
+  const parts = page.pagePath.split("?")[0].split("/").filter(Boolean);
+  const hierarchy = getFullHierarchy();
+  const stage = hierarchy.find(s => s.slug === ({ primary: "elementary", secondary: "high", intermediate: "middle" }[parts[1]] || parts[1]));
+  const catalog = await getPublicationCatalog();
+  const entry = parts[3] && page.robots.startsWith("index") ? catalog[parts[3]] : undefined;
+  const gradeId = entry?.location.grade || (parts[3] ? stage?.grades.find(g => g.subjects.some(s => s.slug === parts[2] && s.semesters.some(sem => sem.chapters.some(ch => ch.lessons.some(l => l.id === parts[3])))))?.id : new URL(page.canonical).searchParams.get("grade")) || stage?.grades[0]?.id;
+  const structure = { displayStructure: {} as Record<string, unknown>, lessonTitles: {} as Record<string, string>, lessonLocations: {} as Record<string, unknown> };
+  if (stage) for (const grade of stage.grades.filter(g => g.id === stage.grades[0].id || g.id === gradeId)) {
+    const subject = grade.subjects.find(s => s.slug === parts[2]);
+    if (!subject) continue;
+    structure.displayStructure[`${stage.slug}_${grade.id}_${subject.slug}`] = { semesters: subject.semesters };
+    for (const semester of subject.semesters) for (const chapter of semester.chapters) for (const lesson of chapter.lessons) {
+      structure.lessonTitles[lesson.id] = lesson.title;
+      structure.lessonLocations[lesson.id] = { gradeId: grade.id, gradeName: grade.name, stageSlug: stage.slug, subjectSlug: subject.slug };
+    }
+  }
+  const bootstrap = JSON.stringify({ path: page.pagePath.split("?")[0], entry, structure }).replace(/</g, "\\u003c");
+  let hints = "";
+  try {
+    const manifest = JSON.parse(await readFile(path.join(path.dirname(indexFile), "assets/manifest.json"), "utf8"));
+    const seen = new Set<string>();
+    const styles = new Set(Array.from(html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g), match => match[1]));
+    const scripts = new Set(Array.from(html.matchAll(/<script\b[^>]*src="([^"]+)"/g), match => match[1]));
+    const preload = (key: string) => {
+      if (seen.has(key) || !manifest[key]) return;
+      seen.add(key);
+      const asset = manifest[key];
+      if (asset.file?.endsWith(".js") && !scripts.has(`/${asset.file}`)) hints += `<link rel="modulepreload" crossorigin href="/${e(asset.file)}">`;
+      for (const css of asset.css ?? []) {
+        if (styles.has(`/${css}`)) continue;
+        styles.add(`/${css}`);
+        hints += `<link rel="stylesheet" crossorigin href="/${e(css)}">`;
+      }
+      for (const imported of asset.imports ?? []) preload(imported);
+    };
+    preload("src/pages/Lesson.tsx");
+  } catch { /* Development uses Vite rather than the production manifest. */ }
+  const firstPage = entry?.lesson.curriculumSource.lessonExcerpt?.pages[0];
+  if (firstPage) {
+    const image = bookImageAttributes(firstPage);
+    hints += `<link rel="preload" as="image" href="${e(image.src)}"${image.srcSet ? ` imagesrcset="${e(image.srcSet)}" imagesizes="${e(image.sizes!)}"` : ""} fetchpriority="high">`;
+  }
+  // Lesson-critical styling arrives with HTML instead of extra blocking round trips
+  // on mobile. Other routes retain their cached external stylesheets.
+  for (const match of Array.from(html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="(\/assets\/(?:index-[^"/]+\.css|tajawal-v12\.css))"[^>]*>/g))) {
+    try {
+      const css = await readFile(path.join(path.dirname(indexFile), match[1].slice(1)), "utf8");
+      // Only inline standalone CSS; preserve the base URL for relative asset URLs.
+      if (/url\(\s*["']?(?!\/|data:|#)[^"')\s]/i.test(css)) continue;
+      html = html.replace(match[0], `<style data-lesson-critical-css>${css.replace(/<\/style/gi, "<\\/style")}</style>`);
+    } catch { /* Keep the original link if a build asset is unavailable. */ }
+  }
+  // Keep the readable server fallback outside the mount target. Replacing a large
+  // article with a loader and then an unrelated layout was the major mobile CLS.
+  // It remains visible without JS or if the app fails; the mounted lesson replaces it.
+  return html.replace("</head>", `${meta}${hints}<script type="application/json" id="public-lesson-bootstrap">${bootstrap}</script></head>`)
+    .replace('<div id="root"></div>', `<div id="root"></div><div id="lesson-seo-fallback">${renderPublicBody(page)}</div><noscript><style>#root{display:none}</style></noscript>`);
 }

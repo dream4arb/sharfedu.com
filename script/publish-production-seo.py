@@ -78,7 +78,23 @@ def main():
     parser.add_argument('--tab-progress-top', action='store_true')
     parser.add_argument('--remove-tab-completion-button', action='store_true')
     parser.add_argument('--current-unit-highlight', action='store_true')
-    parser.add_argument('--readiness', action='store_true'); args = parser.parse_args()
+    parser.add_argument('--readiness', action='store_true')
+    parser.add_argument('--performance-final', action='store_true')
+    parser.add_argument('--performance-routing', action='store_true')
+    parser.add_argument('--performance-lightweight', action='store_true')
+    parser.add_argument('--performance', action='store_true'); args = parser.parse_args()
+    if args.performance:
+        BACKUP = ROOT.parent / 'tmp/performance-backup-20261005'
+        EXPECTED = 'fa8afb9f2b860fd38d68d0422d110f2961adf57497a3b0ba1d96500e41ba766f'
+    if args.performance_final:
+        BACKUP = ROOT.parent / 'tmp/performance-final-backup-20261005'
+        EXPECTED = '5acc285d85b671bb7b1dc5ea7196bd943d4aa115df149c194b2f9d6aab4cd729'
+    if args.performance_routing:
+        BACKUP = ROOT.parent / 'tmp/performance-routing-backup-20261005'
+        EXPECTED = 'caa8c9fe69651c6f14836752919020fcd1e2f26da7992e3156d70558ef8f3e59'
+    if args.performance_lightweight:
+        BACKUP = ROOT.parent / 'tmp/performance-lightweight-backup-20261005'
+        EXPECTED = '4a9712544753567e7938a0fec10003d9a5eb2de889fc3093723d2f301247b2d4'
     if args.readiness:
         BACKUP = ROOT.parent / 'tmp/readiness-backup-20261005'
         EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
@@ -119,6 +135,7 @@ def main():
         for name in ('sitemap.xml','robots.txt'):
             if (BACKUP/name).is_file(): shutil.copy2(BACKUP/name, ROOT/name)
         if (BACKUP/'pdf.worker.min.mjs').is_file(): shutil.copy2(BACKUP/'pdf.worker.min.mjs', PUBLIC/'pdf.worker.min.mjs')
+        if (BACKUP/'asset-manifest.json').is_file(): shutil.copy2(BACKUP/'asset-manifest.json', PUBLIC/'assets/manifest.json')
         restart(); print('SEO_ROLLED_BACK'); return
     if args.prepare:
         assert sha(APP/'index.cjs') == EXPECTED, 'Backend changed since inspection'
@@ -129,6 +146,8 @@ def main():
         BACKUP.mkdir(mode=0o700,exist_ok=True); os.chmod(BACKUP,0o700)
         for source,name in [(APP/'index.cjs','backend.cjs'),(PUBLIC/'index.html','index.html'),(PUBLIC/'pdf.worker.min.mjs','pdf.worker.min.mjs'),(ROOT/'.htaccess','htaccess'),(ROOT/'sitemap.xml','sitemap.xml'),(ROOT/'robots.txt','robots.txt')]:
             if source.is_file() and not (BACKUP/name).exists(): shutil.copy2(source, BACKUP/name)
+        if (PUBLIC/'assets/manifest.json').is_file() and not (BACKUP/'asset-manifest.json').exists():
+            shutil.copy2(PUBLIC/'assets/manifest.json', BACKUP/'asset-manifest.json')
         # SQLite's own backup API creates a consistent private safety snapshot; never restored automatically.
         import sqlite3
         source = sqlite3.connect(f'file:{APP / "sqlite.db"}?mode=ro', uri=True)
@@ -145,7 +164,7 @@ def main():
                 target = APP/'index.seo-next.cjs' if member.name == 'index.cjs' else PUBLIC/('index.seo-next.html' if member.name == 'index.html' else member.name)
                 assert APP.resolve() in target.resolve().parents
                 data=archive.extractfile(member).read()
-                if member.name.startswith('assets/') and target.exists(): assert target.read_bytes() == data, 'Asset hash collision'
+                if member.name.startswith('assets/') and member.name != 'assets/manifest.json' and target.exists(): assert target.read_bytes() == data, 'Asset hash collision'
                 target.parent.mkdir(parents=True,exist_ok=True); target.write_bytes(data)
         shutil.move(bundle, BACKUP/'published-seo.tar.gz')
         print(json.dumps({'prepared':True,'backup':str(BACKUP),'backendSha':sha(APP/'index.seo-next.cjs')}))

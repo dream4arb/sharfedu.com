@@ -1,0 +1,1 @@
+const n="arb998@gmail.com";function r(e){if(!e)return!1;const t=e.role??e.role,a=e.email??e.email;return t==="admin"||a===n}function i(e){if(!e)return!1;if(r(e))return!0;const t=e.stageSlug??e.stage_slug,a=e.gradeId??e.grade_id;return!!(t&&a)}function c(e,t,a){return!0}function o(e,t){return!0}export{o as a,c,i};

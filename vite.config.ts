@@ -16,6 +16,7 @@ export default defineConfig({
     },
   },
   build: {
+    manifest: "assets/manifest.json",
     outDir: "server/public",
     emptyOutDir: true,
     rollupOptions: {

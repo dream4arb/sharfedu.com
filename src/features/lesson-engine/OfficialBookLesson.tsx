@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { CurriculumSourceDefinition } from "@shared/lesson-engine/types";
 import { isBookReadingComplete } from "./bookReadingCompletion";
+import { bookImageAttributes } from "@shared/lesson-engine/book-image";
 
 interface OfficialBookLessonProps {
   source: CurriculumSourceDefinition;
@@ -164,12 +165,12 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed, onComple
             <figure data-book-page={page.pageNumber} className="mx-auto overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-sm" style={{ width: `${zoom}%`, maxWidth: zoom === 100 ? "900px" : "none" }}>
               <figcaption className="border-b border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700">صفحة {page.pageNumber} <span className="mr-2 font-normal text-slate-500">· {index + 1} من {pages.length}</span></figcaption>
               <img
-                src={page.imageUrl}
+                {...bookImageAttributes(page, zoom)}
                 alt={page.alt}
-                width={1417}
-                height={1826}
                 loading={index === 0 ? "eager" : "lazy"}
+                {...{ fetchpriority: index === 0 ? "high" : "auto" }}
                 decoding="async"
+                style={{ aspectRatio: `${page.width ?? 1417} / ${page.height ?? 1826}` }}
                 className="block h-auto w-full bg-white"
               />
             </figure>

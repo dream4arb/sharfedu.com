@@ -497,6 +497,9 @@ export const polygonAnglesLesson: InteractiveLessonDefinition = {
       pages: [12, 13, 14, 15, 16, 17, 18, 19].map((pageNumber) => ({
         pageNumber,
         imageUrl: `/lesson-books/l-mm6el08l/page-${String(pageNumber).padStart(3, "0")}.jpg`,
+        width: 1417,
+        height: 1826,
+        imageSources: [480, 640, 960, 1417].map(width => ({ width, url: `/lesson-books/l-mm6el08l/page-${String(pageNumber).padStart(3, "0")}-${width}-v1.webp` })),
         alt: `صفحة ${pageNumber} من درس زوايا المضلع في كتاب الرياضيات الرسمي`,
       })),
     },

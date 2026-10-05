@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import type { PublishedLesson } from "@shared/seo/publication";
 import type { RegisteredLesson } from "@shared/lesson-engine/registry";
+import { getPublicLessonBootstrap } from "@/lib/publicLessonBootstrap";
 
 export function usePublishedLesson(id: string | undefined, stage: string, grade: string, subject: string) {
-  const [saved, setSaved] = useState<{ id: string; entry: PublishedLesson | null } | null>(null);
+  const [saved, setSaved] = useState<{ id: string; entry: PublishedLesson | null } | null>(() => {
+    const initial = getPublicLessonBootstrap()?.entry;
+    return initial && initial.lesson.id === id ? { id: id!, entry: initial } : null;
+  });
   useEffect(() => {
     if (!id) return;
     const controller = new AbortController();

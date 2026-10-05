@@ -119,6 +119,9 @@ export interface CurriculumSourceDefinition {
       pageNumber: number;
       imageUrl: string;
       alt: string;
+      width?: number;
+      height?: number;
+      imageSources?: Array<{ url: string; width: number }>;
     }>;
   };
 }

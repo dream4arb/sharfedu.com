@@ -1,0 +1,38 @@
+import assert from "node:assert/strict";
+import { readFileSync, existsSync } from "node:fs";
+import { polygonAnglesLesson } from "../shared/lesson-engine/polygon-angles";
+import { bookImageAttributes } from "../shared/lesson-engine/book-image";
+import { resolveSeoPage } from "../server/seo/model";
+import { renderSeoHtml } from "../server/seo/routes";
+import { getFullHierarchy, setCurrentHierarchy } from "../server/data/cms-hierarchy";
+const read = (file: string) => readFileSync(file, "utf8");
+setCurrentHierarchy([{ slug: "high", name: "الثانوية", grades: [{ id: "1", name: "أول ثانوي", subjects: [{ slug: "math", name: "الرياضيات", semesters: [{ id: "s2", name: "الفصل الدراسي الثاني", chapters: [{ id: "5", name: "الأشكال الرباعية", number: 5, lessons: [{ id: polygonAnglesLesson.id, title: polygonAnglesLesson.title }] }] }] }] }] }]);
+const html = await renderSeoHtml("server/public/index.html", resolveSeoPage("/lesson/secondary/math/l-mm6el08l", getFullHierarchy()));
+assert.ok(html.includes('id="lesson-seo-fallback"') && !html.includes('<div id="root"><main'), "Server fallback no longer gets painted then removed from inside the mount target");
+assert.ok(html.includes('imagesrcset="') && html.includes('fetchpriority="high"'));
+assert.ok(html.includes('rel="modulepreload"') && html.includes('/assets/Lesson-'));
+const stylesheetUrls = Array.from(html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g), match => match[1]);
+assert.equal(stylesheetUrls.length, new Set(stylesheetUrls).size, "Initial CSS is never requested twice with different credentials");
+assert.ok(html.includes('data-lesson-critical-css'), "Core lesson CSS is delivered with HTML, avoiding blocking mobile round trips");
+assert.ok(!html.includes('rel="stylesheet" href="/assets/RenderedMathFormula-'), "Book tab does not load KaTeX CSS");
+const boot = JSON.parse(html.match(/id="public-lesson-bootstrap">([\s\S]*?)<\/script>/)![1]);
+assert.equal(boot.entry.lesson.id, polygonAnglesLesson.id);
+assert.ok(boot.structure.lessonLocations[polygonAnglesLesson.id]);
+assert.ok(boot.structure.displayStructure.high_1_math);
+assert.ok(!Object.keys(boot).some(key => /user|session|progress/i.test(key)));
+assert.ok(html.includes("540°") && html.includes('content="index, follow'));
+for (const page of polygonAnglesLesson.curriculumSource.lessonExcerpt!.pages) {
+  const props = bookImageAttributes(page);
+  assert.equal(props.width, 1417); assert.equal(props.height, 1826);
+  assert.ok(props.srcSet?.includes('480w') && props.srcSet.includes('640w') && props.srcSet.includes('960w'));
+  for (const source of page.imageSources!) assert.ok(existsSync('server/public' + source.url));
+  assert.equal(bookImageAttributes(page, 200).srcSet, undefined, "Zoom retains the full-resolution original");
+}
+assert.ok(read("src/hooks/use-mobile.tsx").includes('React.useState(() =>'));
+assert.ok(read("src/App.tsx").includes('const Home = lazy(() => import("@/pages/Home"))'), "Home-only UI is not downloaded on lessons");
+assert.ok(read("src/features/lesson-engine/OfficialBookLesson.tsx").includes('aspectRatio:'));
+assert.ok(read("src/pages/Lesson.tsx").includes('aria-label={`تقييم الدرس ${star} من 5`}'));
+assert.ok(!read("src/pages/Lesson.tsx").includes('from "framer-motion"'), "Decorative offscreen animations do not delay lesson loading");
+assert.ok(!read("server/public/index.html").includes("fonts.googleapis.com"));
+assert.ok(read("public/assets/tajawal-v12.css").includes("font-display: optional"));
+console.log("PASS performance: stable mobile first render, public bootstrap, route/image preload, responsive additive assets, full zoom originals, deferred math and labelled ratings; SEO/progress unchanged.");

@@ -11,7 +11,8 @@ const normalizeProgressPlacement = (source: string) => normalizeResetStyle(sourc
   .replace(/              \{activeTabId !== "assessment" && <div className="mb-4 flex justify-center">[\s\S]*?              <\/div>\}\n/, '');
 for (const path of ["src/App.tsx","src/index.css","src/components/lessons/LessonSidebar.tsx","src/components/lessons/UnitPreparationPage.tsx","src/hooks/use-lesson-progress.tsx","server/index.ts","server/auth/sessionStore.ts","server/storage.ts","server/admin/contentRoutes.ts","shared/curriculum/math-high1-names.json"]) {
   const baseline = execFileSync("git",["show",`61d9fa1:${path}`],{encoding:"utf8"}).replace(/\r\n/g,"\n");
-  const expected = path === "server/storage.ts" ? baseline.replaceAll("userId: number", "userId: string") : baseline;
+  const expected = path === "server/storage.ts" ? baseline.replaceAll("userId: number", "userId: string")
+    : path === "src/App.tsx" ? baseline.replace('import Home from "@/pages/Home";\n', '').replace('const Dashboard = lazy', 'const Home = lazy(() => import("@/pages/Home"));\nconst Dashboard = lazy') : baseline;
   assert.equal(path.endsWith("InteractiveLessonPage.tsx") ? normalizeProgressPlacement(text(path)) : text(path),
     path.endsWith("InteractiveLessonPage.tsx") ? normalizeProgressPlacement(expected) : expected, path);
 }
