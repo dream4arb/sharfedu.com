@@ -9,25 +9,30 @@ import {
   Plus,
 } from "lucide-react";
 import type { CurriculumSourceDefinition } from "@shared/lesson-engine/types";
+import { isBookReadingComplete } from "./bookReadingCompletion";
 
 interface OfficialBookLessonProps {
   source: CurriculumSourceDefinition;
   lessonTitle: string;
   onPageViewed?: (pageNumber: number) => void;
+  onCompleted?: () => void;
 }
 
 const zoomLevels = [100, 125, 150, 200, 250, 300];
 
-export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: OfficialBookLessonProps) {
+export function OfficialBookLesson({ source, lessonTitle, onPageViewed, onCompleted }: OfficialBookLessonProps) {
   const excerpt = source.lessonExcerpt;
   const [zoomIndex, setZoomIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const readerRef = useRef<HTMLElement>(null);
   const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
   const pageListRef = useRef<HTMLDivElement>(null);
+  const readingEndRef = useRef<HTMLDivElement>(null);
   const viewedPages = useRef(new Set<number>());
   const pageViewedCallback = useRef(onPageViewed);
   pageViewedCallback.current = onPageViewed;
+  const completedCallback = useRef(onCompleted);
+  completedCallback.current = onCompleted;
 
   useEffect(() => {
     const onFullscreenChange = () => setIsFullscreen(document.fullscreenElement === readerRef.current);
@@ -83,17 +88,31 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
     const pageList = pageListRef.current;
     if (!pageList || !excerpt) return;
     viewedPages.current.clear();
+    let reachedEnd = false;
+    let completed = false;
+    let cancelled = false;
+    const requiredPages = excerpt.pages.map((page) => page.pageNumber);
     const observer = new IntersectionObserver((entries) => {
+      if (cancelled) return;
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
+        if (entry.target === readingEndRef.current) {
+          reachedEnd = true;
+          continue;
+        }
         const pageNumber = Number((entry.target as HTMLElement).dataset.bookPage);
         if (viewedPages.current.has(pageNumber)) continue;
         viewedPages.current.add(pageNumber);
         pageViewedCallback.current?.(pageNumber);
       }
+      if (!completed && isBookReadingComplete(requiredPages, viewedPages.current, reachedEnd)) {
+        completed = true;
+        completedCallback.current?.();
+      }
     }, { threshold: 0.1 });
     pageList.querySelectorAll("[data-book-page]").forEach((page) => observer.observe(page));
-    return () => observer.disconnect();
+    if (readingEndRef.current) observer.observe(readingEndRef.current);
+    return () => { cancelled = true; observer.disconnect(); };
   }, [excerpt]);
 
   if (!excerpt?.pages.length) {
@@ -145,6 +164,7 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed }: Offici
             </figure>
           </div>
         ))}
+        <div ref={readingEndRef} className="h-px" aria-hidden="true" data-testid="book-reading-end" />
       </div>
 
       <section className="border-t border-slate-200 p-4 sm:p-5" data-testid="official-book-source-details" aria-labelledby="official-book-source-heading">

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { COMPLETION_TABS, fourTabApiFields, mergeFourTabProgress, readFourTabCompletion, readFourTabProgress, tabCompletionPercent, updateTabCompletion, type FourTabCompletion } from '../shared/lesson-engine/tab-progress';
+import { COMPLETION_TABS, fourTabApiFields, mergeFourTabProgress, readFourTabCompletion, readFourTabProgress, shouldCompleteContentTabOnAdvance, tabCompletionPercent, updateTabCompletion, type FourTabCompletion } from '../shared/lesson-engine/tab-progress';
+import { isBookReadingComplete } from '../src/features/lesson-engine/bookReadingCompletion';
 
 let record: FourTabCompletion | undefined;
 assert.equal(tabCompletionPercent(undefined), 0);
@@ -33,7 +34,23 @@ assert.deepEqual(readFourTabProgress(JSON.stringify(before)), before);
 const page = readFileSync('src/features/lesson-engine/InteractiveLessonPage.tsx', 'utf8');
 assert.ok(page.includes('assessmentComplete && progressReady') && page.includes('"assessment", true'), 'All checked answers complete assessment regardless of grade');
 assert.ok(page.includes('"assessment", false'), 'Retest clears assessment completion');
-assert.ok(page.includes('direction === 1 && activeTabId !== "assessment"'), 'Next confirms only the current content tab');
+for (const current of COMPLETION_TABS) for (const target of COMPLETION_TABS) {
+  assert.equal(shouldCompleteContentTabOnAdvance(current, target), current !== 'assessment' && COMPLETION_TABS.indexOf(target) > COMPLETION_TABS.indexOf(current));
+}
+const reportedCase = updateTabCompletion(undefined, 'video', true, 1);
+const withLearning = updateTabCompletion(reportedCase, 'learn', true, 2);
+const withAssessment = updateTabCompletion(withLearning, 'assessment', true, 3);
+assert.equal(tabCompletionPercent(withAssessment.completedTabs), 75);
+assert.equal(tabCompletionPercent(updateTabCompletion(withAssessment, 'book', true, 4).completedTabs), 100, 'Missing book completion repairs 75% without resetting answers or other tabs');
+assert.ok(page.includes('shouldCompleteContentTabOnAdvance(activeTabRef.current, tabId)'), 'Header and footer share forward-navigation completion');
+assert.ok(page.includes('onCompleted={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, "book", true)}'), 'Reading completion records book tab');
+assert.equal(isBookReadingComplete([12,13,14], new Set([12,13,14]), true), true);
+assert.equal(isBookReadingComplete([12,13,14], new Set([12,14]), true), false, 'Jump to end does not complete skipped pages');
+assert.equal(isBookReadingComplete([12,13,14], new Set([12,13,14]), false), false, 'All pages seen but not finished');
+assert.equal(isBookReadingComplete([], new Set(), true), false, 'Empty reader cannot auto-complete');
+const reader = readFileSync('src/features/lesson-engine/OfficialBookLesson.tsx', 'utf8');
+assert.ok(reader.includes('isBookReadingComplete(requiredPages, viewedPages.current, reachedEnd)'));
+assert.ok(reader.includes('if (!completed &&') && reader.includes('if (cancelled) return;'), 'Observer reports once and ignores queued callbacks after leaving the reader');
 assert.ok(page.includes('data-testid="button-complete-lesson-tab"'));
 const provider = readFileSync('src/hooks/use-four-tab-progress.ts', 'utf8');
 assert.ok(provider.includes('${userId ?? "guest"}'), 'Guest and student records are isolated');

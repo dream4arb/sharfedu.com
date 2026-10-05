@@ -51,7 +51,7 @@ import { ActivityReminder } from "./ActivityReminder";
 import { getLessonActivities, getPendingActivities } from "./lessonActivities";
 import { useActivityProgress } from "./useActivityProgress";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
-import { tabCompletionPercent } from "@shared/lesson-engine/tab-progress";
+import { shouldCompleteContentTabOnAdvance, tabCompletionPercent } from "@shared/lesson-engine/tab-progress";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function InteractiveLessonPage({ embedded = false, lessonId, progressSubjectSlug = "math" }: { embedded?: boolean; lessonId?: string; progressSubjectSlug?: string }) {
@@ -179,6 +179,10 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
   function selectTab(tabId: LessonTabId) {
     const tab = lessonTabs.find((item) => item.id === tabId);
     if (!tab || !tab.stepIndexes.length) return false;
+    if (shouldCompleteContentTabOnAdvance(activeTabRef.current, tabId)) {
+      if (!progressReady) return false;
+      setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabRef.current, true);
+    }
     const nextStepIndex = tabId === "learn" ? lastLearningStep.current
       : tabId === "assessment" && session.completedAt && assessmentComplete ? reportStepIndex
       : tab.stepIndexes[0];
@@ -190,10 +194,6 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
   function navigateTab(direction: -1 | 1) {
     const nextTab = lessonTabs[activeTabIndex + direction];
     if (!nextTab) return;
-    if (direction === 1 && activeTabId !== "assessment") {
-      if (!progressReady) return;
-      setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabId, true);
-    }
     if (selectTab(nextTab.id)) window.scrollTo({ top: 0 });
   }
 
@@ -297,6 +297,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
             source={lesson.curriculumSource}
             lessonTitle={lesson.title}
             onPageViewed={(pageNumber) => emitEvent({ name: "book_page_viewed", stepId: step.id, metadata: { pageNumber } })}
+            onCompleted={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, "book", true)}
           />
         )}
 
