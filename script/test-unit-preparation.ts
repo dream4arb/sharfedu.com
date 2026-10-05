@@ -16,6 +16,9 @@ assert.equal(isUnitPreparation('l-mm6el08l'), false);
 assert.equal(isUnitPreparation('math-high1-s1-prep-5'), false, 'Wrong-semester identifier is not classified');
 assert.equal(isUnitPreparation('unrelated-prep-5'), false);
 assert.equal(isUnitPreparation(undefined), false);
+assert.equal(isUnitPreparation('intro-1'), true, 'Preserved production identifier for chapter 1 preparation');
+const productionIds = ids.map(entry => entry.id === 'math-high1-s1-prep-1' ? { id: 'intro-1' } : entry);
+assert.equal(instructionalLessons(productionIds).length, 65);
 // Historic preparation records remain intact, but contribute neither numerator nor denominator.
 const historical = { 'math-high1-s2-prep-5': 100, 'l-mm6el08l': 75 };
 const actual = instructionalLessons(Object.keys(historical).map(id => ({ id })));

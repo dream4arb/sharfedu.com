@@ -5,6 +5,8 @@ const preparationIds = new Set(curriculum.supplemental.filter(entry => entry.kin
   const semester = curriculum.chapters.find(chapter => chapter.id === entry.chapter)!.semester;
   return `math-high1-${semester}-${entry.number}`;
 }));
+// Production retained this original identifier during the textbook-name audit.
+preparationIds.add("intro-1");
 
 export function isUnitPreparation(lessonId: string | undefined): boolean {
   return !!lessonId && preparationIds.has(lessonId);
