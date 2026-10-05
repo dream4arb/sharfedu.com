@@ -478,12 +478,6 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
             </TabsTrigger>
           ))}
           </TabsList>
-          {activeTabId !== "assessment" && <div className="mt-3 flex justify-center">
-            <button type="button" disabled={!progressReady || completedTabIds.includes(activeTabId)}
-              onClick={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabId, true)}
-              className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-5 font-bold text-emerald-800 hover:bg-emerald-100 disabled:cursor-default disabled:opacity-70"
-              data-testid="button-complete-lesson-tab"><Check className="h-5 w-5" />{completedTabIds.includes(activeTabId) ? "أكملت هذا التبويب" : "تأكيد إكمال هذا التبويب"}</button>
-          </div>}
         </nav>
       </div>
 

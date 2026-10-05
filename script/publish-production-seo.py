@@ -71,7 +71,8 @@ def main():
     parser.add_argument('--sidebar-current-caption', action='store_true')
     parser.add_argument('--end-dashboard-button', action='store_true')
     parser.add_argument('--reset-button-size', action='store_true')
-    parser.add_argument('--tab-progress-top', action='store_true'); args = parser.parse_args()
+    parser.add_argument('--tab-progress-top', action='store_true')
+    parser.add_argument('--remove-tab-completion-button', action='store_true'); args = parser.parse_args()
     if args.follow_up:
         BACKUP = ROOT.parent / 'tmp/seo-backup-20261005-final'
         EXPECTED = 'e8f8b03cef7a269d65edb68e24a19dbc02a71ee88509b1f7b14d64754deb1f27'
@@ -95,6 +96,9 @@ def main():
         EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
     if args.tab_progress_top:
         BACKUP = ROOT.parent / 'tmp/tab-progress-top-backup-20261005'
+        EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
+    if args.remove_tab_completion_button:
+        BACKUP = ROOT.parent / 'tmp/remove-tab-completion-button-backup-20261005'
         EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
     assert ROOT.resolve() == ROOT and PUBLIC.is_dir()
     if args.rollback:
