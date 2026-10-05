@@ -6,7 +6,7 @@ import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { MasteryReport } from "../src/features/lesson-engine/MasteryReport";
 import { getReviewStepIndex } from "../src/features/lesson-engine/lessonNavigation";
 import { calculateAttemptMastery, calculateSkillMastery } from "../shared/lesson-engine/grade";
-import { restartLessonAssessment, useLessonSession, type StoredLessonSession } from "../src/features/lesson-engine/useLessonSession";
+import { createLessonSession, restartLessonAssessment, useLessonSession, type StoredLessonSession } from "../src/features/lesson-engine/useLessonSession";
 
 const page = readFileSync("src/features/lesson-engine/InteractiveLessonPage.tsx", "utf8");
 assert.match(page, /const showReport = activeTabId === "assessment" && assessmentComplete;/,
@@ -78,6 +78,14 @@ for (const { lesson } of Object.values(lessonRegistry)) {
     })),
   };
   const restarted = restartLessonAssessment(lesson, prior);
+  const wholeLessonReset = createLessonSession(lesson);
+  assert.deepEqual(wholeLessonReset.questions, {}, 'Whole lesson reset removes answers, attempts, hints, scores and feedback');
+  assert.equal(wholeLessonReset.completedAt, undefined);
+  assert.equal(wholeLessonReset.assessmentRunId, undefined);
+  assert.notEqual(wholeLessonReset.sessionId, prior.sessionId, 'Fresh session remounts assessment drafts');
+  assert.equal(lesson.steps[wholeLessonReset.stepIndex].type, 'official_book', 'Whole lesson reset returns to book');
+  assert.deepEqual(wholeLessonReset.visitedStepIds, [lesson.steps[wholeLessonReset.stepIndex].id]);
+  assert.equal(wholeLessonReset.unlockedStepIndex, wholeLessonReset.stepIndex);
   // Completed quiz from an earlier 75% session must survive reload/navigation,
   // even without a completedAt timestamp and with a non-report saved step.
   const returningSession = { ...prior, completedAt: undefined, stepIndex: 0 };

@@ -31,6 +31,14 @@ export function updateTabCompletion(previous: FourTabCompletion | undefined, tab
   };
 }
 
+/** Keep an explicit newer zero snapshot so older synced completion cannot resurrect a reset. */
+export function resetLessonCompletion(progress: FourTabProgress, subject: string, id: string, now = Date.now()): FourTabProgress {
+  return { ...progress, [subject]: { ...progress[subject], [id]: {
+    model: "four-tabs-v1", completedTabs: [],
+    updatedAt: Math.max(now, (progress[subject]?.[id]?.updatedAt ?? 0) + 1),
+  } } };
+}
+
 export function readFourTabCompletion(raw: unknown): FourTabCompletion | null {
   try {
     const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;

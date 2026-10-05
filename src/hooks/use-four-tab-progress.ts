@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fourTabApiFields, mergeFourTabProgress, readFourTabCompletion, readFourTabProgress, updateTabCompletion,
+import { fourTabApiFields, mergeFourTabProgress, readFourTabCompletion, readFourTabProgress, resetLessonCompletion, updateTabCompletion,
   type CompletionTabId, type FourTabProgress } from "@shared/lesson-engine/tab-progress";
 
 export function useFourTabProgress(userId: string | undefined, authLoading: boolean) {
@@ -65,6 +65,13 @@ export function useFourTabProgress(userId: string | undefined, authLoading: bool
     });
   }, [authLoading, storageKey]);
 
+  const resetLessonProgress = useCallback((subject: string, id: string) => {
+    if (authLoading) return;
+    setSaved((previous) => ({ storageKey,
+      progress: resetLessonCompletion(previous.storageKey === storageKey ? previous.progress : load(), subject, id),
+    }));
+  }, [authLoading, storageKey]);
+
   // Serialize and coalesce writes; an older 25% request cannot overwrite a later 100%.
   useEffect(() => {
     if (!userId || authLoading || hydratedKey !== storageKey || saved.storageKey !== storageKey) return;
@@ -102,5 +109,5 @@ export function useFourTabProgress(userId: string | undefined, authLoading: bool
   }, [authLoading, hydratedKey, progress, retry, saved.storageKey, storageKey, userId]);
 
   const progressReady = !authLoading;
-  return { fourTabProgress: progress, setLessonTabCompleted, progressReady };
+  return { fourTabProgress: progress, setLessonTabCompleted, resetLessonProgress, progressReady };
 }

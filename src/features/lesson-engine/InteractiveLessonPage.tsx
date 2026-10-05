@@ -53,6 +53,7 @@ import { useActivityProgress } from "./useActivityProgress";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { shouldCompleteContentTabOnAdvance, tabCompletionPercent } from "@shared/lesson-engine/tab-progress";
 import { useAuth } from "@/hooks/use-auth";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export default function InteractiveLessonPage({ embedded = false, lessonId, progressSubjectSlug = "math" }: { embedded?: boolean; lessonId?: string; progressSubjectSlug?: string }) {
   const { lessonId: routeLessonId } = useParams<{ lessonId?: string }>();
@@ -61,11 +62,11 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
   const registered = requestedEntry ?? lessonRegistry[POLYGON_ANGLES_LESSON_ID];
   const lesson = registered.lesson;
   const { user } = useAuth();
-  const { getCompletedLessonTabs, setLessonTabCompleted, progressReady } = useLessonProgress();
+  const { getCompletedLessonTabs, setLessonTabCompleted, resetLessonProgress, progressReady } = useLessonProgress();
   const completedTabIds = getCompletedLessonTabs(progressSubjectSlug, lesson.id);
   const progress = tabCompletionPercent(completedTabIds);
   const activities = useMemo(() => getLessonActivities(lesson), [lesson]);
-  const { triedStepIds, markTried } = useActivityProgress(lesson, activities);
+  const { triedStepIds, markTried, resetActivities } = useActivityProgress(lesson, activities);
   const pendingActivities = getPendingActivities(activities, triedStepIds);
   const questionMap = registered.questionMap;
   const lessonVideos = (lesson.videos ?? []).slice(0, 4);
@@ -78,6 +79,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
     emitEvent,
     completeLesson,
     restartAssessment,
+    reset: resetSession,
   } = useLessonSession(lesson, !embedded, user?.id);
   const [visualAction, setVisualAction] = useState<TutorVisualAction | null>(null);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
@@ -204,6 +206,20 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
     restartAssessment();
     setLessonTabCompleted(progressSubjectSlug, lesson.id, "assessment", false);
     requestAnimationFrame(() => document.getElementById("lesson-assessment-start")?.focus());
+  }
+
+  function restartProgress() {
+    if (!progressReady) return;
+    assessmentEventSent.current = false;
+    activeTabRef.current = "book";
+    lastLearningStep.current = learningTab.stepIndexes[0];
+    resetSession();
+    resetActivities();
+    resetLessonProgress(progressSubjectSlug, lesson.id);
+    setSelectedVideoIndex(0);
+    setPlayedVideoIds([]);
+    setVisualAction(null);
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" }));
   }
 
   function handleVisualAction(action: TutorVisualAction) {
@@ -489,7 +505,24 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
                     <h1 className="flex min-h-12 items-center justify-center text-2xl font-black leading-tight text-slate-950 sm:text-3xl" data-testid="lesson-step-title">{lesson.title}</h1>
                     <p className="mt-2 text-center text-sm font-bold text-slate-600" role="status" aria-live="polite" aria-atomic="true" data-testid="assessment-answer-count">أجبت عن {answeredCount} من {assessmentQuestions.length}</p>
                   </div>}
-                  <button type="button" onClick={restartTest} className={`inline-flex min-h-12 items-center gap-2 rounded-xl border border-cyan-800 bg-white px-3 font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100 sm:px-5 ${showReport ? "" : "col-start-2 row-start-1 justify-self-end sm:col-start-3"}`} data-testid="button-restart-assessment"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة الاختبار</button>
+                  <div className={`flex flex-wrap items-center justify-end gap-2 ${showReport ? "" : "col-span-2 row-start-2 sm:col-span-1 sm:col-start-3 sm:row-start-1"}`} data-testid="assessment-reset-actions">
+                    <button type="button" onClick={restartTest} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-cyan-800 bg-white px-3 font-bold text-cyan-800 hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-100 sm:px-5" data-testid="button-restart-assessment"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة الاختبار</button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button type="button" disabled={!progressReady} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 font-bold text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-100 disabled:opacity-40 sm:px-5" data-testid="button-reset-lesson-progress"><RotateCcw className="h-5 w-5" aria-hidden="true" />إعادة التقدم</button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent dir="rtl" className="max-w-[calc(100%-2rem)] rounded-2xl sm:max-w-lg" onCloseAutoFocus={(event) => { if (activeTabRef.current === "book") event.preventDefault(); }}>
+                        <AlertDialogHeader className="sm:text-right">
+                          <AlertDialogTitle>إعادة التقدم في درس {lesson.title}؟</AlertDialogTitle>
+                          <AlertDialogDescription>سيتم تصفير إنجاز التبويبات الأربعة وإجابات الاختبار لهذا الدرس، والعودة إلى تبويب الكتاب. لن يتغير تقدمك في بقية الدروس.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="gap-2 sm:space-x-0">
+                          <AlertDialogCancel data-testid="cancel-reset-lesson-progress">إلغاء</AlertDialogCancel>
+                          <AlertDialogAction disabled={!progressReady} onClick={restartProgress} data-testid="confirm-reset-lesson-progress">نعم، إعادة التقدم</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
                 {showReport ? <>
                   <section id="lesson-result" tabIndex={-1} className="rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700" data-testid="lesson-result">

@@ -25,6 +25,7 @@ interface ApiProgressItem {
 interface LessonProgress {
   fourTabProgress: FourTabProgress;
   setLessonTabCompleted: (subject: string, id: string, tab: CompletionTabId, completed: boolean) => void;
+  resetLessonProgress: (subject: string, id: string) => void;
   getCompletedLessonTabs: (subject: string, id: string) => CompletionTabId[];
   progressReady: boolean;
   completedTabs: Record<string, Record<string, TabProgress>>;
@@ -57,7 +58,7 @@ const QUESTIONS_PROGRESS_MAX = 33.34; // For questions tab (to ensure total = 10
 
 export function LessonProgressProvider({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
-  const { fourTabProgress, setLessonTabCompleted, progressReady } = useFourTabProgress(user?.id, isLoading);
+  const { fourTabProgress, setLessonTabCompleted, resetLessonProgress, progressReady } = useFourTabProgress(user?.id, isLoading);
   const getCompletedLessonTabs = (subject: string, id: string) => fourTabProgress[subject]?.[id]?.completedTabs ?? [];
   const [completedTabs, setCompletedTabs] = useState<Record<string, Record<string, TabProgress>>>(() => {
     try {
@@ -249,7 +250,7 @@ export function LessonProgressProvider({ children }: { children: ReactNode }) {
 
   return (
     <LessonProgressContext.Provider value={{ 
-      fourTabProgress, setLessonTabCompleted, getCompletedLessonTabs, progressReady,
+      fourTabProgress, setLessonTabCompleted, resetLessonProgress, getCompletedLessonTabs, progressReady,
       completedTabs, 
       markTabComplete, 
       markTabIncomplete, 

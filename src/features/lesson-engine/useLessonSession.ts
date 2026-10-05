@@ -49,7 +49,7 @@ export interface LessonAnalyticsEvent {
   metadata?: Record<string, string | number | boolean>;
 }
 
-function createSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
+export function createLessonSession(lesson: InteractiveLessonDefinition): StoredLessonSession {
   const initialStepIndex = getInitialLessonStepIndex(lesson);
   return {
     lessonVersion: lesson.version,
@@ -82,9 +82,9 @@ export function restartLessonAssessment(lesson: InteractiveLessonDefinition, ses
 function loadSession(lesson: InteractiveLessonDefinition, key: string): StoredLessonSession {
   try {
     const raw = localStorage.getItem(key);
-    if (!raw) return createSession(lesson);
+    if (!raw) return createLessonSession(lesson);
     const parsed = JSON.parse(raw) as StoredLessonSession;
-    if (parsed.lessonVersion !== lesson.version || !parsed.sessionId) return createSession(lesson);
+    if (parsed.lessonVersion !== lesson.version || !parsed.sessionId) return createLessonSession(lesson);
     const stepIndex = Number.isInteger(parsed.stepIndex)
       ? Math.max(0, Math.min(parsed.stepIndex, lesson.steps.length - 1))
       : getInitialLessonStepIndex(lesson);
@@ -105,7 +105,7 @@ function loadSession(lesson: InteractiveLessonDefinition, key: string): StoredLe
       }])),
     };
   } catch {
-    return createSession(lesson);
+    return createLessonSession(lesson);
   }
 }
 
@@ -226,7 +226,7 @@ export function useLessonSession(lesson: InteractiveLessonDefinition, remoteLogg
   }), [lesson.skills, session.questions]);
 
   const reset = useCallback(() => {
-    const next = createSession(lesson);
+    const next = createLessonSession(lesson);
     persist(next);
     emitEvent({ name: "lesson_started" });
   }, [emitEvent, lesson, persist]);

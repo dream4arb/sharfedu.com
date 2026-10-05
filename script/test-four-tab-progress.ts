@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { COMPLETION_TABS, fourTabApiFields, mergeFourTabProgress, readFourTabCompletion, readFourTabProgress, shouldCompleteContentTabOnAdvance, tabCompletionPercent, updateTabCompletion, type FourTabCompletion } from '../shared/lesson-engine/tab-progress';
+import { COMPLETION_TABS, fourTabApiFields, mergeFourTabProgress, readFourTabCompletion, readFourTabProgress, resetLessonCompletion, shouldCompleteContentTabOnAdvance, tabCompletionPercent, updateTabCompletion, type FourTabCompletion } from '../shared/lesson-engine/tab-progress';
 import { isBookReadingComplete } from '../src/features/lesson-engine/bookReadingCompletion';
 
 let record: FourTabCompletion | undefined;
@@ -31,9 +31,23 @@ assert.deepEqual(mergeFourTabProgress(before, after).math.polygon, reset, 'Newer
 assert.deepEqual(mergeFourTabProgress(after, before).math.polygon, reset, 'Older server completion cannot restore the reset tab');
 assert.deepEqual(mergeFourTabProgress(before, after).math.unrelated, reset);
 assert.deepEqual(readFourTabProgress(JSON.stringify(before)), before);
+const fullResetBefore = { ...before, science: { other: complete } };
+const fullReset = resetLessonCompletion(fullResetBefore, 'math', 'polygon', 0);
+assert.equal(tabCompletionPercent(fullReset.math.polygon.completedTabs), 0, 'Whole-lesson reset clears all four tabs atomically');
+assert.ok(fullReset.math.polygon.updatedAt > record!.updatedAt, 'Reset snapshot is newer even when clock moves backwards');
+assert.equal(fullReset.math.unrelated, fullResetBefore.math.unrelated, 'Other lesson remains intact');
+assert.equal(fullReset.science, fullResetBefore.science, 'Other subject remains intact');
+assert.equal(tabCompletionPercent(fullResetBefore.math.polygon.completedTabs), 100, 'Reset does not mutate previous data');
+assert.deepEqual(mergeFourTabProgress(fullReset, fullResetBefore), fullReset, 'Older server completion cannot undo full reset');
+assert.deepEqual(readFourTabProgress(JSON.stringify(fullReset)), fullReset, 'Zero snapshot survives reload');
+assert.equal(fourTabApiFields(fullReset.math.polygon).totalProgress, '0');
+assert.equal(fourTabApiFields(fullReset.math.polygon).questionsScore, 0);
+assert.equal(tabCompletionPercent(resetLessonCompletion({}, 'math', 'new', 1).math.new.completedTabs), 0);
 const page = readFileSync('src/features/lesson-engine/InteractiveLessonPage.tsx', 'utf8');
 assert.ok(page.includes('assessmentComplete && progressReady') && page.includes('"assessment", true'), 'All checked answers complete assessment regardless of grade');
 assert.ok(page.includes('"assessment", false'), 'Retest clears assessment completion');
+assert.ok(page.includes('resetSession();') && page.includes('resetActivities();') && page.includes('resetLessonProgress(progressSubjectSlug, lesson.id);'), 'Whole reset clears quiz, activity and completion state for current lesson only');
+assert.ok(page.includes('data-testid="assessment-reset-actions"') && page.includes('data-testid="button-reset-lesson-progress"') && page.includes('data-testid="confirm-reset-lesson-progress"') && page.includes('data-testid="cancel-reset-lesson-progress"'), 'Adjacent reset action requires confirmation and supports cancel');
 for (const current of COMPLETION_TABS) for (const target of COMPLETION_TABS) {
   assert.equal(shouldCompleteContentTabOnAdvance(current, target), current !== 'assessment' && COMPLETION_TABS.indexOf(target) > COMPLETION_TABS.indexOf(current));
 }

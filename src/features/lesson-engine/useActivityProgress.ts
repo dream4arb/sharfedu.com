@@ -30,5 +30,11 @@ export function useActivityProgress(lesson: InteractiveLessonDefinition, activit
     });
   }, [activities, storageKey]);
 
-  return { triedStepIds, markTried };
+  const resetActivities = useCallback(() => {
+    setSaved({ storageKey, triedStepIds: [] });
+    try { localStorage.setItem(storageKey, JSON.stringify({ triedStepIds: [] })); }
+    catch { /* Continue in memory. */ }
+  }, [storageKey]);
+
+  return { triedStepIds, markTried, resetActivities };
 }
