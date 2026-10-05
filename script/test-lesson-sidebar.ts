@@ -53,6 +53,7 @@ assert.equal(filterLessonOutline(semesters, 'اسم معدل', 'first', item => 
 assert.equal(semesters[0].chapters[0].lessons.length, 3, 'Filtering does not mutate curriculum');
 const component = readFileSync('src/components/lessons/LessonSidebar.tsx', 'utf8');
 assert.ok(component.includes('aria-current={active ? "page"'));
+assert.ok(!component.includes('{active && <small>الدرس الحالي</small>}'), 'No redundant current-lesson caption inside lesson cards');
 assert.ok(component.includes('aria-expanded={open} aria-controls={panelId}'));
 assert.ok(component.includes('aria-label="ابحث عن درس"'));
 assert.ok(component.includes('key={chapter.id} data-open={open}'), 'One shared frame per chapter');

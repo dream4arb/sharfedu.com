@@ -94,7 +94,6 @@ export default function LessonSidebar(props: SidebarProps) {
             {percent === 100 ? <Check aria-hidden="true" size={18} /> : index + 1}
           </span>
           <span className="lesson-outline__lesson-text"><span>{title}</span>
-            {active && <small>الدرس الحالي</small>}
           </span>
           <span className="lesson-outline__percent" data-started={percent > 0 || undefined} aria-label={`التقدم ${percent}%`}>{percent}%</span>
         </Link>
