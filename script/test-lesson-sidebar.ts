@@ -34,6 +34,8 @@ assert.ok(component.includes('aria-label="ابحث عن درس"'));
 assert.ok(component.includes('key={chapter.id} data-open={open}'), 'One shared frame per chapter');
 assert.ok(component.includes('id={panelId} hidden={!open} className="lesson-outline__chapter-body"'), 'Lessons inside the chapter panel');
 assert.ok(component.includes('className="lesson-outline__lesson-label">دروس الوحدة'), 'Clear visual hierarchy label');
+assert.ok(component.includes('<small>الوحدة {chapter.number ?? chapterIndex + 1}</small>'), 'Unit number retained without lesson count');
+assert.ok(!component.includes('{chapter.lessons.length} دروس'), 'No lesson counts in unit headings');
 const sidebarCss = readFileSync('src/components/lessons/lessonSidebar.css', 'utf8');
 assert.match(sidebarCss, /\.lesson-outline__chapter \{[^}]*border: 1px[^}]*overflow: hidden/, 'The outer frame contains both heading and lesson panel');
 assert.match(sidebarCss, /\.lesson-outline__chapter\[data-open=true\] \.lesson-outline__chapter-heading/, 'Unit heading differs from nested lesson cards');

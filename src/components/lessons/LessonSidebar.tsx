@@ -147,7 +147,7 @@ export default function LessonSidebar(props: SidebarProps) {
                     <button type="button" className="lesson-outline__chapter-toggle" aria-expanded={open} aria-controls={panelId}
                       onClick={() => setOpenChapterId(open ? null : chapter.id)} disabled={isSearching}>
                       <span className="lesson-outline__chapter-icon"><BookOpen size={19} aria-hidden="true" /></span>
-                      <span className="lesson-outline__chapter-text"><small>الوحدة {chapter.number ?? chapterIndex + 1} · {chapter.lessons.length} دروس</small><strong>{chapter.name}</strong></span>
+                      <span className="lesson-outline__chapter-text"><small>الوحدة {chapter.number ?? chapterIndex + 1}</small><strong>{chapter.name}</strong></span>
                       <ChevronDown size={16} className="lesson-outline__chevron" aria-hidden="true" />
                     </button>
                     <div className="lesson-outline__admin"><AdminChapterActions semesterId={semester.id} chapterId={chapter.id} chapterName={chapter.name}
