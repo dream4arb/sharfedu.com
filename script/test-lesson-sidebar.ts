@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { filterLessonOutline, findLessonLocation, normalizeLessonSearch } from '../src/components/lessons/lessonSidebarModel';
+import { filterLessonOutline, findLessonLocation, getSemesterLessonNeighbors, normalizeLessonSearch } from '../src/components/lessons/lessonSidebarModel';
 import type { LessonData, SemesterData } from '../src/data/lessons';
 
 const lesson = (id: string, title: string): LessonData => ({ id, title, duration: '', videoUrl: '' });
@@ -17,6 +17,26 @@ assert.equal(normalizeLessonSearch(' أَثْبِـت  الفكرة '), 'اثب�
 assert.equal(findLessonLocation(semesters, 'polygon')?.semester.id, 'second');
 assert.equal(findLessonLocation(semesters, 'logic-lesson')?.chapter.id, 'logic');
 assert.equal(findLessonLocation(semesters, 'missing'), undefined);
+for (const semester of semesters) {
+  const entries = semester.chapters.flatMap(chapter => chapter.lessons);
+  for (const [index, entry] of entries.entries()) {
+    const neighbors = getSemesterLessonNeighbors(semesters, entry.id);
+    assert.equal(neighbors.prevLesson?.id ?? null, entries[index - 1]?.id ?? null);
+    assert.equal(neighbors.nextLesson?.id ?? null, entries[index + 1]?.id ?? null);
+  }
+}
+assert.deepEqual(getSemesterLessonNeighbors(semesters, undefined), { prevLesson: null, nextLesson: null });
+assert.deepEqual(getSemesterLessonNeighbors(semesters, 'missing'), { prevLesson: null, nextLesson: null });
+assert.deepEqual(getSemesterLessonNeighbors([], 'missing'), { prevLesson: null, nextLesson: null });
+const acrossChapters: SemesterData[] = [{ ...semesters[0], chapters: [
+  { ...semesters[0].chapters[0], lessons: [lesson('a', 'أ')] },
+  { ...semesters[0].chapters[0], id: 'empty', lessons: [] },
+  { ...semesters[0].chapters[0], id: 'b', lessons: [lesson('b', 'ب')] },
+] }];
+assert.equal(getSemesterLessonNeighbors(acrossChapters, 'a').nextLesson?.id, 'b', 'Chapter boundaries remain navigable inside a semester');
+assert.equal(getSemesterLessonNeighbors(acrossChapters, 'b').prevLesson?.id, 'a');
+assert.equal(getSemesterLessonNeighbors(semesters, 'math-high1-s2-prep-5').prevLesson, null, 'Second-semester preparation cannot link back to first semester');
+assert.equal(getSemesterLessonNeighbors(semesters, 'proof').nextLesson, null, 'First semester cannot link forward to second semester');
 assert.deepEqual(filterLessonOutline(semesters, '', 'second', getTitle).map(item => item.semester.id), ['second']);
 const acrossSemesters = filterLessonOutline(semesters, 'المنطق', 'second', getTitle);
 assert.equal(acrossSemesters[0].semester.id, 'first');
@@ -54,6 +74,8 @@ assert.ok(component.includes('getAttachmentUrl(kind, selectedSemesterIndex)'), '
 assert.ok(component.includes('onOpenAttachment(getAttachmentUrl(kind, selectedSemesterIndex), label); closeOnMobile();'), 'Opening resources retains viewer and mobile close behavior');
 for (const control of ['AdminLessonActions', 'AdminAddLessonButton', 'AdminChapterActions', 'AdminAddChapterButton']) assert.ok(component.includes('<' + control));
 const page = readFileSync('src/pages/Lesson.tsx', 'utf8');
+assert.ok(page.includes('getSemesterLessonNeighbors(semesters, lessonId)'), 'Live navigation uses semester-scoped data');
+assert.ok(!page.includes('lessons[currentLessonIndex'), 'No globally flattened cross-semester navigation');
 for (const destination of ['"/attachments/book-math-high1-s2.pdf"', 'currentLesson?.bookPdfUrl', 'currentLesson?.summaryPdfUrl', 'currentLesson?.worksheetsPdfUrl', 'currentLesson?.testQuestionsPdfUrl']) assert.ok(page.includes(destination));
 assert.ok(page.includes('getLessonProgress={(id) => getLessonProgress(subjectId, id)}'));
 console.log('PASS: Arabic search, separated preparations, instructional numbering, location, accessibility, mobile close, progress and attachment/admin wiring.');

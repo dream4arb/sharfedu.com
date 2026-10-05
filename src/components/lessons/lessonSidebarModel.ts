@@ -15,6 +15,17 @@ export function findLessonLocation(semesters: SemesterData[], lessonId: string |
   return undefined;
 }
 
+/** Previous/next follow chapter order, but never leave the current semester. */
+export function getSemesterLessonNeighbors(semesters: SemesterData[], lessonId: string | undefined) {
+  const location = findLessonLocation(semesters, lessonId);
+  const entries = location?.semester.chapters.flatMap(chapter => chapter.lessons) ?? [];
+  const index = entries.findIndex(lesson => lesson.id === lessonId);
+  return {
+    prevLesson: index > 0 ? entries[index - 1] : null,
+    nextLesson: index >= 0 && index < entries.length - 1 ? entries[index + 1] : null,
+  };
+}
+
 /** Number instructional entries before searching; preparation never takes a lesson number. */
 export function filterLessonOutline(
   semesters: SemesterData[], query: string, selectedSemesterId: string | undefined,

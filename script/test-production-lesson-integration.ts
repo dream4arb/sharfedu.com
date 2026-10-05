@@ -6,7 +6,9 @@ const baseline = execFileSync('git',['show','1d2176c:src/pages/Lesson.tsx'],{enc
 const source=readFileSync('src/pages/Lesson.tsx','utf8');
 const normalizePreparationChanges = (s: string) => s.replace(/\r\n/g, '\n')
   .replace('import UnitPreparationPage from "@/components/lessons/UnitPreparationPage";\n', '')
-  .replace('import { findLessonLocation } from "@/components/lessons/lessonSidebarModel";\n', '')
+  .replace('import { findLessonLocation, getSemesterLessonNeighbors } from "@/components/lessons/lessonSidebarModel";\n', '')
+  .replace('  const { prevLesson, nextLesson } = getSemesterLessonNeighbors(semesters, lessonId);', '  const nextLesson = currentLessonIndex >= 0 ? lessons[currentLessonIndex + 1] : null;\n  const prevLesson = currentLessonIndex >= 0 ? lessons[currentLessonIndex - 1] : null;')
+  .replace('  const currentLesson = lessonId && lessons.length > 0 ? (lessons.find(l => l.id === lessonId) || null) : null;\n', '  const currentLesson = lessonId && lessons.length > 0 ? (lessons.find(l => l.id === lessonId) || null) : null;\n  const currentLessonIndex = lessonId && lessons.length > 0 ? lessons.findIndex(l => l.id === lessonId) : -1;\n')
   .replace('import { instructionalLessons, isUnitPreparation } from "../../shared/curriculum/unit-preparation";\n', '')
   .replace('  const currentPreparation = isUnitPreparation(lessonId);\n', '')
   .replace('  const preparationLocation = currentPreparation ? findLessonLocation(semesters, lessonId) : undefined;\n', '')
@@ -27,7 +29,7 @@ const normalizePreparationChanges = (s: string) => s.replace(/\r\n/g, '\n')
   .replace('currentLesson && lessonIdFromParams && !currentPreparation', 'currentLesson && lessonIdFromParams')
   .replace('{isUnitPreparation(prevLesson.id) ? "تهيئة الوحدة" : "الدرس السابق"}', 'الدرس السابق')
   .replace('{isUnitPreparation(nextLesson.id) ? "تهيئة الوحدة التالية" : "الدرس التالي"}', 'الدرس التالي');
-assert.equal(normalizePreparationChanges(source), baseline.replace(/\r\n/g, '\n'), 'Only explicit preparation presentation/progress exceptions; normal lesson body and admin UI unchanged');
+assert.equal(normalizePreparationChanges(source), baseline.replace(/\r\n/g, '\n'), 'Only explicit preparation and semester-navigation exceptions; normal lesson body and admin UI unchanged');
 assert.ok(source.includes('<LessonSidebar'));
 assert.equal(readFileSync('shared/curriculum/math-high1-names.json','utf8').replace(/\r\n/g,'\n'),
   execFileSync('git',['show','364f773:shared/curriculum/math-high1-names.json'],{encoding:'utf8'}).replace(/\r\n/g,'\n'));

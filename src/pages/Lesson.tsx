@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import InteractiveLessonPage from "@/features/lesson-engine/InteractiveLessonPage";
 import LessonSidebar from "@/components/lessons/LessonSidebar";
 import UnitPreparationPage from "@/components/lessons/UnitPreparationPage";
-import { findLessonLocation } from "@/components/lessons/lessonSidebarModel";
+import { findLessonLocation, getSemesterLessonNeighbors } from "@/components/lessons/lessonSidebarModel";
 import { instructionalLessons, isUnitPreparation } from "../../shared/curriculum/unit-preparation";
 import { isPublishedLesson } from "@/features/lesson-engine/publishedLessons";
 import { useAuth } from "@/hooks/use-auth";
@@ -547,7 +547,6 @@ export default function Lesson() {
   
   // Only set currentLesson if lessonId is provided and valid
   const currentLesson = lessonId && lessons.length > 0 ? (lessons.find(l => l.id === lessonId) || null) : null;
-  const currentLessonIndex = lessonId && lessons.length > 0 ? lessons.findIndex(l => l.id === lessonId) : -1;
   const currentPreparation = isUnitPreparation(lessonId);
   const preparationLocation = currentPreparation ? findLessonLocation(semesters, lessonId) : undefined;
   const firstUnitLesson = preparationLocation ? instructionalLessons(preparationLocation.chapter.lessons)[0] : undefined;
@@ -1203,8 +1202,7 @@ export default function Lesson() {
     setLocation(`/lesson/${urlStage ?? ""}/${subjectId ?? ""}/${id}`);
   };
 
-  const nextLesson = currentLessonIndex >= 0 ? lessons[currentLessonIndex + 1] : null;
-  const prevLesson = currentLessonIndex >= 0 ? lessons[currentLessonIndex - 1] : null;
+  const { prevLesson, nextLesson } = getSemesterLessonNeighbors(semesters, lessonId);
 
   // Function to get the home navigation link based on current stage
   const getHomeLink = () => {
