@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import curriculum from '../shared/curriculum/math-high1-names.json';
 import { instructionalLessons, isUnitPreparation } from '../shared/curriculum/unit-preparation';
-import { unitPreparationReviews } from '../src/components/lessons/unitPreparationReview';
+import { unitPreparationIntroductions } from '../src/components/lessons/unitPreparationIntroduction';
 const ids = curriculum.chapters.flatMap(chapter => [
   ...chapter.lessons.map(lesson => ({ id: `math-high1-${chapter.semester}-${lesson.number}` })),
   ...curriculum.supplemental.filter(entry => entry.chapter === chapter.id).map(entry => ({ id: `math-high1-${chapter.semester}-${entry.number}` })),
@@ -25,22 +25,20 @@ const actual = instructionalLessons(Object.keys(historical).map(id => ({ id })))
 assert.equal(actual.reduce((sum, item) => sum + historical[item.id as keyof typeof historical], 0), 75);
 assert.equal(historical['math-high1-s2-prep-5'], 100);
 for (let unit = 1; unit <= 8; unit++) {
-  assert.ok(unitPreparationReviews[unit].reminders.length >= 2);
-  assert.equal(unitPreparationReviews[unit].questions.length, 2);
-  for (const question of unitPreparationReviews[unit].questions) {
-    assert.ok(question.correct >= 0 && question.correct < question.options.length);
-    assert.equal(new Set(question.options).size, question.options.length);
-    assert.ok(question.explanation.length > 20);
-  }
+  const introduction = unitPreparationIntroductions[unit];
+  assert.ok(introduction.idea.length > 100);
+  assert.ok(introduction.learning.length >= 2);
+  assert.ok(introduction.application.length > 60);
+  assert.equal(introduction.book, unit <= 4 ? 'الرياضيات 1-1' : 'الرياضيات 1-2');
+  assert.equal(introduction.page, [10, 84, 144, 212, 10, 70, 116, 176][unit - 1]);
+  assert.ok(!('questions' in introduction));
 }
-assert.equal(unitPreparationReviews[5].questions[0].options[unitPreparationReviews[5].questions[0].correct], `${180 - 65 - 45}°`);
-assert.equal(unitPreparationReviews[6].questions[1].options[unitPreparationReviews[6].questions[1].correct], `${2 / 3 * 12}`);
 const component = readFileSync('src/components/lessons/UnitPreparationPage.tsx', 'utf8');
-for (const forbidden of ['useLessonProgress', 'fetch(', 'localStorage', 'sessionStorage', 'InteractiveLessonPage', 'LessonRatingWidget']) assert.ok(!component.includes(forbidden), forbidden);
-assert.ok(component.includes('من إعداد منصة شارف'), 'Do not misattribute original warm-ups to the ministry');
-assert.ok(component.includes('aria-pressed={selected === optionIndex}') && component.includes('role="status"'));
+for (const forbidden of ['useLessonProgress', 'fetch(', 'localStorage', 'sessionStorage', 'InteractiveLessonPage', 'LessonRatingWidget', 'useState', 'fieldset', 'preparation-question-', 'جرّب بلا درجات']) assert.ok(!component.includes(forbidden), forbidden);
+assert.ok(component.includes('شرح مبسط مستند إلى مقدمة الوحدة'), 'Paraphrase attribution instead of claiming verbatim book content');
+assert.ok(component.indexOf('data-testid="preparation-main-idea"') < component.indexOf('preparation-learning-title'), 'Basic idea appears first');
 const sidebar = readFileSync('src/components/lessons/LessonSidebar.tsx', 'utf8');
 const card = sidebar.slice(sidebar.indexOf('const preparationCard'), sidebar.indexOf('\n  return (', sidebar.indexOf('const preparationCard')));
 assert.ok(!card.includes('getLessonProgress') && !card.includes('lesson-outline__number') && !card.includes('lesson-outline__percent'));
 assert.ok(sidebar.indexOf('{preparations.map') < sidebar.indexOf('>دروس الوحدة'));
-console.log('PASS: all eight preparations isolated, 65 instructional entries, historic records intact, ungraded review, no progress writes or four tabs.');
+console.log('PASS: eight book-grounded introductions, basic idea first, no questions, 65 instructional entries, records intact, no progress writes or four tabs.');
