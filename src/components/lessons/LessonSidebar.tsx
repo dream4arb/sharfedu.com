@@ -70,7 +70,8 @@ export default function LessonSidebar(props: SidebarProps) {
     if (!locateVersion || !activeLink.current || !scroller.current) return;
     const card = activeLink.current.getBoundingClientRect();
     const viewport = scroller.current.getBoundingClientRect();
-    scroller.current.scrollBy({ top: card.top - viewport.top - 16, behavior: "smooth" });
+    scroller.current.scrollBy({ top: card.top - viewport.top - 16,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, [locateVersion]);
 
   const closeOnMobile = () => { if (isMobile) setOpenMobile(false); };
@@ -168,7 +169,9 @@ export default function LessonSidebar(props: SidebarProps) {
               <span className="lesson-outline__chapter-icon"><Paperclip size={19} aria-hidden="true" /></span><span className="lesson-outline__chapter-text"><strong>المرفقات</strong><small>مصادر المادة</small></span><ChevronDown size={16} className="lesson-outline__chevron" aria-hidden="true" />
             </button>
             <div id={`${instanceId}-attachments`} hidden={!attachmentsOpen} className="lesson-outline__attachment-list">
-              {attachments.map(({ kind, label, description, icon: Icon }) => <button type="button" key={kind} className="lesson-outline__attachment" onClick={() => onOpenAttachment(getAttachmentUrl(kind, selectedSemesterIndex), label)}>
+              {attachments.map(({ kind, label, description, icon: Icon }) => <button type="button" key={kind} className="lesson-outline__attachment" onClick={() => {
+                onOpenAttachment(getAttachmentUrl(kind, selectedSemesterIndex), label); closeOnMobile();
+              }}>
                 <span className="lesson-outline__attachment-icon" data-kind={kind}><Icon size={21} aria-hidden="true" /></span><span><strong>{label}</strong><small>{description}</small></span>
               </button>)}
             </div>
