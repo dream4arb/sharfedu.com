@@ -96,7 +96,7 @@ export function LessonVideoPlayer({ video, onStarted, onCompleted }: { video: Le
   }
   return (
     <video className="h-full w-full" controls playsInline preload="metadata" poster={video.thumbnailUrl} onEnded={() => completedCallback.current?.()}
-      aria-label={video.title} onPlay={() => {
+      aria-label={video.title} onPlaying={() => {
         if (hostedStarted.current) return;
         hostedStarted.current = true;
         startedCallback.current();

@@ -26,7 +26,7 @@ declare global {
   }
 }
 
-function toPublicUser(u: typeof users.$inferSelect) {
+function toPublicUser(u: Pick<typeof users.$inferSelect, "id" | "email" | "firstName" | "lastName" | "profileImageUrl" | "role" | "stageSlug" | "gradeId">) {
   return {
     id: u.id,
     email: u.email,

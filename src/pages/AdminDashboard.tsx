@@ -93,9 +93,10 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { StructureManager } from "@/components/admin/StructureManager";
+import { LessonPublishingPanel } from "@/components/admin/LessonPublishingPanel";
 import { useToast } from "@/hooks/use-toast";
 
-type AdminSection = "home" | "content" | "users" | "school-year" | "seo" | "structure" | "prompt-files" | "ratings";
+type AdminSection = "home" | "content" | "publishing" | "users" | "school-year" | "seo" | "structure" | "prompt-files" | "ratings";
 
 interface Stats {
   studentCount: number;
@@ -956,6 +957,7 @@ export default function AdminDashboard() {
   const navItems: { id: AdminSection; label: string; icon: typeof LayoutDashboard }[] = [
     { id: "home", label: "الرئيسية", icon: LayoutDashboard },
     { id: "content", label: "المحتوى", icon: Upload },
+    { id: "publishing", label: "إعداد الدروس والنشر", icon: BookOpen },
     { id: "structure", label: "إدارة الهيكلية الدراسية", icon: Layers },
     { id: "users", label: "إدارة الأعضاء", icon: Users },
     { id: "school-year", label: "إعدادات السنة الدراسية", icon: Calendar },
@@ -1008,6 +1010,7 @@ export default function AdminDashboard() {
                 <h1 className="text-2xl font-bold">
                   {activeSection === "home" && "الرئيسية"}
                   {activeSection === "content" && "الرفع الذكي - إضافة محتوى"}
+                  {activeSection === "publishing" && "إعداد الدروس والنشر"}
                   {activeSection === "users" && "إدارة الأعضاء"}
                   {activeSection === "school-year" && "إعدادات السنة الدراسية"}
                   {activeSection === "seo" && "محرك السيو"}
@@ -1625,6 +1628,8 @@ export default function AdminDashboard() {
                   }}
                 />
               )}
+
+              {activeSection === "publishing" && <LessonPublishingPanel />}
 
               {activeSection === "users" && (
                 <Card>

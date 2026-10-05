@@ -5,6 +5,7 @@ export const POLYGON_ANGLES_LESSON_ID = "l-mm6el08l";
 export const polygonAnglesLesson: InteractiveLessonDefinition = {
   id: POLYGON_ANGLES_LESSON_ID,
   version: 6,
+  contentProfile: "math",
   slug: "polygon-angles",
   title: "زوايا المضلع",
   stage: "المرحلة الثانوية",

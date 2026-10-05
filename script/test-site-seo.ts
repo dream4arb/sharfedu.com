@@ -33,7 +33,7 @@ const second = resolveSeoPage("/lesson/secondary/math?grade=2");
 assert.ok(second.title.includes("ثاني ثانوي")); assert.ok(second.canonical.endsWith("?grade=2"));
 assert.ok(second.robots.startsWith("noindex")); assert.equal(second.links.length, 0);
 const paths = sitemapPaths(); assert.equal(paths.length, new Set(paths).size);
-const info = seoSitemapInfo();
+const info = await seoSitemapInfo();
 assert.equal(info.totalUrls, paths.length);
 assert.equal(info.totalUrls, info.staticPages.length + info.stagePages.length + info.subjectPages.length + info.lessonCount);
 assert.equal(info.lessonCount, 2);

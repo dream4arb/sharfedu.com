@@ -68,6 +68,12 @@ export interface LessonStepDefinition {
   formulaLabel?: string;
   questionIds?: string[];
   skillIds?: string[];
+  activity?: {
+    kind: "vocabulary" | "dialogue" | "experiment" | "reading" | "reflection" | "practice";
+    title: string;
+    instructions: string;
+    items: Array<{ prompt: string; explanation: string }>;
+  };
   visualKind?:
     | "polygon-pattern"
     | "polygon-discovery"
@@ -134,7 +140,7 @@ export interface LessonIntroductionDefinition {
   examples: LessonIntroductionExample[];
   takeawayLabel?: string;
   takeaway: string;
-  formula: {
+  formula?: {
     expression: string;
     label: string;
     eyebrow?: string;
@@ -144,12 +150,13 @@ export interface LessonIntroductionDefinition {
       meaning: string;
     }>;
   };
-  workedExample: {
+  workedExample?: {
     title: string;
     steps: string[];
     result: string;
+    direction?: "rtl" | "ltr" | "auto";
   };
-  commonMistake: {
+  commonMistake?: {
     wrong: string;
     correction: string;
   };
@@ -158,6 +165,7 @@ export interface LessonIntroductionDefinition {
 export interface InteractiveLessonDefinition {
   id: string;
   version: number;
+  contentProfile?: "math" | "english" | "science" | "islamic" | "arabic" | "general";
   slug: string;
   title: string;
   stage: string;

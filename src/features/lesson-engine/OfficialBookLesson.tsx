@@ -91,7 +91,20 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed, onComple
     let reachedEnd = false;
     let completed = false;
     let cancelled = false;
+    let scrolled = false;
     const requiredPages = excerpt.pages.map((page) => page.pageNumber);
+    const finish = () => {
+      if (!cancelled && !completed && scrolled && isBookReadingComplete(requiredPages, viewedPages.current, reachedEnd)) {
+        completed = true;
+        completedCallback.current?.();
+      }
+    };
+    const onScroll = (event: Event) => {
+      const target = event.target;
+      if (target !== document && target !== window && !(target instanceof HTMLElement && target.contains(readingEndRef.current))) return;
+      scrolled = true;
+      finish();
+    };
     const observer = new IntersectionObserver((entries) => {
       if (cancelled) return;
       for (const entry of entries) {
@@ -105,14 +118,12 @@ export function OfficialBookLesson({ source, lessonTitle, onPageViewed, onComple
         viewedPages.current.add(pageNumber);
         pageViewedCallback.current?.(pageNumber);
       }
-      if (!completed && isBookReadingComplete(requiredPages, viewedPages.current, reachedEnd)) {
-        completed = true;
-        completedCallback.current?.();
-      }
+      finish();
     }, { threshold: 0.1 });
     pageList.querySelectorAll("[data-book-page]").forEach((page) => observer.observe(page));
     if (readingEndRef.current) observer.observe(readingEndRef.current);
-    return () => { cancelled = true; observer.disconnect(); };
+    document.addEventListener("scroll", onScroll, true);
+    return () => { cancelled = true; observer.disconnect(); document.removeEventListener("scroll", onScroll, true); };
   }, [excerpt]);
 
   if (!excerpt?.pages.length) {

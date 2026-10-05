@@ -16,9 +16,9 @@ export function tabCompletionPercent(tabs: unknown): number {
   return normalizeCompletionTabs(tabs).length * 25;
 }
 
-/** Advancing through the header is the same completion action as the footer's Next. */
+/** Navigation is never evidence that content was read or a video actually played. */
 export function shouldCompleteContentTabOnAdvance(current: CompletionTabId, target: CompletionTabId): boolean {
-  return current !== "assessment" && COMPLETION_TABS.indexOf(target) > COMPLETION_TABS.indexOf(current);
+  return false;
 }
 
 export function updateTabCompletion(previous: FourTabCompletion | undefined, tab: CompletionTabId, completed: boolean, now = Date.now()): FourTabCompletion {

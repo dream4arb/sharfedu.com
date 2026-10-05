@@ -73,7 +73,7 @@ export type Course = typeof courses.$inferSelect;
 // Lesson Progress Tracking
 export const lessonProgress = sqliteTable("lesson_progress", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: integer("user_id").notNull(), // Reference to user
+  userId: text("user_id").notNull(), // Auth IDs are strings; SQLite also preserves existing numeric IDs.
   subjectSlug: text("subject_slug").notNull(), // e.g., 'math_high1_s2'
   lessonId: text("lesson_id").notNull(), // e.g., '5-1'
   lessonCompleted: integer("lesson_completed", { mode: "boolean" }).default(false),

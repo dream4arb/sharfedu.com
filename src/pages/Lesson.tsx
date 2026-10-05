@@ -5,6 +5,7 @@ import UnitPreparationPage from "@/components/lessons/UnitPreparationPage";
 import { findLessonLocation, getSemesterLessonNeighbors } from "@/components/lessons/lessonSidebarModel";
 import { instructionalLessons, isUnitPreparation } from "../../shared/curriculum/unit-preparation";
 import { isPublishedLesson } from "@/features/lesson-engine/publishedLessons";
+import { usePublishedLesson } from "@/features/lesson-engine/usePublishedLesson";
 import { useAuth } from "@/hooks/use-auth";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { useCmsTabContent } from "@/hooks/use-cms-tab-content";
@@ -523,6 +524,7 @@ export default function Lesson() {
   const firstGradeId = firstGradeKey?.slice(`${internalStage}_`.length, -`_${subjectId}`.length) || (internalStage === "paths" || internalStage === "qudurat" ? "general" : "1");
   const selectedGradeId = (lessonId ? lessonLocations[lessonId]?.gradeId : new URLSearchParams(routeSearch).get("grade")) || firstGradeId;
   const structureKey = `${internalStage}_${selectedGradeId}_${subjectId}`;
+  const publishedEntry = usePublishedLesson(lessonId, internalStage, selectedGradeId, subjectId);
   const apiStruct = displayStructure[structureKey] || (selectedGradeId === firstGradeId ? displayStructure[`${internalStage}_${subjectId}`] : undefined);
   let lessons: LessonData[] = [];
   let semesters: SemesterData[];
@@ -1437,7 +1439,7 @@ export default function Lesson() {
               </div>
               
               {/* Sticky Tab Navigation - Only show when lesson is selected */}
-              {currentLesson && !currentPreparation && !isPublishedLesson(params.lessonId) && (
+              {currentLesson && !currentPreparation && !publishedEntry && (
                 <div className="flex items-center justify-center gap-2 px-4 pb-3 bg-white/95 dark:bg-card/95 backdrop-blur-lg">
                   <div className="flex items-center gap-1 p-1.5 bg-accent/50 rounded-xl">
                     {tabs.map((tab) => {
@@ -1630,16 +1632,16 @@ export default function Lesson() {
                   unitName={preparationLocation.chapter.name}
                   firstLessonHref={firstUnitLesson ? `/lesson/${urlStage}/${subjectId}/${firstUnitLesson.id}` : undefined}
                   firstLessonTitle={firstUnitLesson ? getLessonDisplayTitle(firstUnitLesson, lessonTitlesFromApi) : undefined} />
-              ) : isPublishedLesson(lessonIdFromParams) ? (
+              ) : publishedEntry ? (
                 <>
-                  <InteractiveLessonPage key={lessonIdFromParams} embedded lessonId={lessonIdFromParams} progressSubjectSlug={subjectId} />
-                  <article className="rounded-2xl border border-border/50 bg-white p-6 sm:p-8 mt-8 leading-8" aria-label="ملخص زوايا المضلع" data-testid="public-lesson-summary">
-                    <h2 className="text-2xl font-bold mb-5">ملخص درس زوايا المضلع</h2>
-                    {lessonReadingSections(lessonIdFromParams).map(section => <section key={section.heading} className="mt-5">
+                  <InteractiveLessonPage key={`${lessonIdFromParams}:${publishedEntry.lesson.version}`} embedded lessonId={lessonIdFromParams} progressSubjectSlug={subjectId} publishedEntry={publishedEntry} />
+                  <article className="rounded-2xl border border-border/50 bg-white p-6 sm:p-8 mt-8 leading-8" aria-label={`ملخص ${publishedEntry.lesson.title}`} data-testid="public-lesson-summary">
+                    <h2 className="text-2xl font-bold mb-5">ملخص درس {publishedEntry.lesson.title}</h2>
+                    {lessonReadingSections(lessonIdFromParams, { [lessonIdFromParams!]: { lesson: publishedEntry.lesson, location: { stage: internalStage, grade: selectedGradeId, subject: subjectId } } }).map(section => <section key={section.heading} className="mt-5">
                       <h3 className="text-lg font-bold mb-2">{section.heading}</h3>
                       {section.paragraphs.map(paragraph => <p key={paragraph} className="mt-2 text-muted-foreground">{paragraph}</p>)}
                     </section>)}
-                    <p className="text-sm text-muted-foreground mt-5">المادة: الرياضيات 1-2، أول ثانوي · الوحدة: الأشكال الرباعية · صفحات الدرس في الكتاب: 12–19.</p>
+                    <p className="text-sm text-muted-foreground mt-5">المادة: {publishedEntry.lesson.subject}، {publishedEntry.lesson.grade} · الوحدة: {publishedEntry.lesson.unit} · صفحات الدرس في الكتاب: {publishedEntry.lesson.curriculumSource.lessonPages?.join("، ")}.</p>
                   </article>
                 </>
               ) : (

@@ -45,6 +45,10 @@ def check_candidate():
             for path in ('/login','/admin','/dashboard'):
                 page,_=read(path); assert 'content="noindex, nofollow' in page
             read('/api/admin/structure',401); read('/api/admin/sitemap-info',401)
+            read('/api/admin/lesson-publications',401); read('/api/progress/user',401)
+            package,_=read('/api/public/lesson-package/l-mm6el08l')
+            assert json.loads(package)['lesson']['id']=='l-mm6el08l'
+            read('/api/public/lesson-package/math-high1-s2-prep-5',404)
             xml,_=read('/sitemap.xml'); assert 'l-mm6el08l' in xml and 'math-high1-s2-prep-5' in xml and '/login' not in xml
             import xml.etree.ElementTree as ET
             locs=[el.text for el in ET.fromstring(xml).iter('{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
@@ -73,7 +77,11 @@ def main():
     parser.add_argument('--reset-button-size', action='store_true')
     parser.add_argument('--tab-progress-top', action='store_true')
     parser.add_argument('--remove-tab-completion-button', action='store_true')
-    parser.add_argument('--current-unit-highlight', action='store_true'); args = parser.parse_args()
+    parser.add_argument('--current-unit-highlight', action='store_true')
+    parser.add_argument('--readiness', action='store_true'); args = parser.parse_args()
+    if args.readiness:
+        BACKUP = ROOT.parent / 'tmp/readiness-backup-20261005'
+        EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
     if args.follow_up:
         BACKUP = ROOT.parent / 'tmp/seo-backup-20261005-final'
         EXPECTED = 'e8f8b03cef7a269d65edb68e24a19dbc02a71ee88509b1f7b14d64754deb1f27'
@@ -110,6 +118,7 @@ def main():
             shutil.copy2(BACKUP/name, str(target)+'.rollback'); os.replace(str(target)+'.rollback', target)
         for name in ('sitemap.xml','robots.txt'):
             if (BACKUP/name).is_file(): shutil.copy2(BACKUP/name, ROOT/name)
+        if (BACKUP/'pdf.worker.min.mjs').is_file(): shutil.copy2(BACKUP/'pdf.worker.min.mjs', PUBLIC/'pdf.worker.min.mjs')
         restart(); print('SEO_ROLLED_BACK'); return
     if args.prepare:
         assert sha(APP/'index.cjs') == EXPECTED, 'Backend changed since inspection'
@@ -118,7 +127,7 @@ def main():
         bundle = ROOT / args.bundle
         assert bundle.resolve().parent == ROOT and sha(bundle) == args.sha256
         BACKUP.mkdir(mode=0o700,exist_ok=True); os.chmod(BACKUP,0o700)
-        for source,name in [(APP/'index.cjs','backend.cjs'),(PUBLIC/'index.html','index.html'),(ROOT/'.htaccess','htaccess'),(ROOT/'sitemap.xml','sitemap.xml'),(ROOT/'robots.txt','robots.txt')]:
+        for source,name in [(APP/'index.cjs','backend.cjs'),(PUBLIC/'index.html','index.html'),(PUBLIC/'pdf.worker.min.mjs','pdf.worker.min.mjs'),(ROOT/'.htaccess','htaccess'),(ROOT/'sitemap.xml','sitemap.xml'),(ROOT/'robots.txt','robots.txt')]:
             if source.is_file() and not (BACKUP/name).exists(): shutil.copy2(source, BACKUP/name)
         # SQLite's own backup API creates a consistent private safety snapshot; never restored automatically.
         import sqlite3

@@ -5,15 +5,15 @@ import { eq, and } from "drizzle-orm";
 export interface IStorage {
   getCourses(gradeLevel?: string): Promise<Course[]>;
   createCourse(course: InsertCourse): Promise<Course>;
-  saveLessonProgress(userId: number, subjectSlug: string, lessonId: string, progress: {
+  saveLessonProgress(userId: string, subjectSlug: string, lessonId: string, progress: {
     lessonCompleted?: boolean;
     videoCompleted?: boolean;
     questionsScore?: number;
     questionsProgress?: string;
     totalProgress?: string;
   }): Promise<LessonProgress>;
-  getLessonProgress(userId: number, subjectSlug: string, lessonId: string): Promise<LessonProgress | null>;
-  getUserProgress(userId: number, subjectSlug?: string): Promise<LessonProgress[]>;
+  getLessonProgress(userId: string, subjectSlug: string, lessonId: string): Promise<LessonProgress | null>;
+  getUserProgress(userId: string, subjectSlug?: string): Promise<LessonProgress[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -33,7 +33,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveLessonProgress(
-    userId: number,
+    userId: string,
     subjectSlug: string,
     lessonId: string,
     progress: {
@@ -90,7 +90,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLessonProgress(
-    userId: number,
+    userId: string,
     subjectSlug: string,
     lessonId: string
   ): Promise<LessonProgress | null> {
@@ -108,7 +108,7 @@ export class DatabaseStorage implements IStorage {
     return result[0] || null;
   }
 
-  async getUserProgress(userId: number, subjectSlug?: string): Promise<LessonProgress[]> {
+  async getUserProgress(userId: string, subjectSlug?: string): Promise<LessonProgress[]> {
     if (subjectSlug) {
       return await db
         .select()

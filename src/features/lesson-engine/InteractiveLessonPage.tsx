@@ -16,7 +16,7 @@ import {
   Target,
 } from "lucide-react";
 import { POLYGON_ANGLES_LESSON_ID } from "@shared/lesson-engine/polygon-angles";
-import { getRegisteredLesson, lessonRegistry } from "@shared/lesson-engine/registry";
+import { getRegisteredLesson, lessonRegistry, type RegisteredLesson } from "@shared/lesson-engine/registry";
 import type { LessonStepDefinition, TutorVisualAction } from "@shared/lesson-engine/types";
 import { MasteryReport } from "./MasteryReport";
 import { StudioLessonIntroduction } from "./StudioLessonIntroduction";
@@ -51,14 +51,15 @@ import { ActivityReminder } from "./ActivityReminder";
 import { getLessonActivities, getPendingActivities } from "./lessonActivities";
 import { useActivityProgress } from "./useActivityProgress";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
-import { shouldCompleteContentTabOnAdvance, tabCompletionPercent } from "@shared/lesson-engine/tab-progress";
+import { tabCompletionPercent } from "@shared/lesson-engine/tab-progress";
+import { useContentEndCompletion } from "./useContentEndCompletion";
 import { useAuth } from "@/hooks/use-auth";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
-export default function InteractiveLessonPage({ embedded = false, lessonId, progressSubjectSlug = "math" }: { embedded?: boolean; lessonId?: string; progressSubjectSlug?: string }) {
+export default function InteractiveLessonPage({ embedded = false, lessonId, progressSubjectSlug = "math", publishedEntry }: { embedded?: boolean; lessonId?: string; progressSubjectSlug?: string; publishedEntry?: RegisteredLesson }) {
   const { lessonId: routeLessonId } = useParams<{ lessonId?: string }>();
   const requestedLessonId = lessonId ?? routeLessonId;
-  const requestedEntry = getRegisteredLesson(requestedLessonId);
+  const requestedEntry = publishedEntry ?? getRegisteredLesson(requestedLessonId);
   const registered = requestedEntry ?? lessonRegistry[POLYGON_ANGLES_LESSON_ID];
   const lesson = registered.lesson;
   const { user } = useAuth();
@@ -110,6 +111,13 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
   // Saved checked answers own result visibility, not the transient step or overall lesson completion.
   // Only restarting the assessment clears those answers and returns this tab to questions.
   const showReport = activeTabId === "assessment" && assessmentComplete;
+  // Radix mounts tab contents after selection; callback state observes that actual mount.
+  const [learningEnd, setLearningEnd] = useState<HTMLDivElement | null>(null);
+  const completeLearning = useRef(() => {});
+  completeLearning.current = () => {
+    if (activeTabRef.current === "learn" && progressReady) setLessonTabCompleted(progressSubjectSlug, lesson.id, "learn", true);
+  };
+  useContentEndCompletion(learningEnd, activeTabId === "learn" && progressReady, () => completeLearning.current());
 
   useEffect(() => {
     if (embedded) return;
@@ -125,7 +133,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
   }
 
   function recordVideoStarted() {
-    if (!selectedVideo) return;
+    if (!selectedVideo || activeTabRef.current !== "video") return;
     setPlayedVideoIds((ids) => ids.includes(selectedVideo.id) ? ids : [...ids, selectedVideo.id]);
     emitEvent({
       name: "video_started",
@@ -136,6 +144,10 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
       },
     });
   }
+
+  useEffect(() => {
+    if (progressReady && playedVideoIds.length > 0) setLessonTabCompleted(progressSubjectSlug, lesson.id, "video", true);
+  }, [progressReady, playedVideoIds, progressSubjectSlug, lesson.id, setLessonTabCompleted]);
 
   useEffect(() => {
     const key = `sharaf:started-event:${lesson.id}:${session.sessionId}`;
@@ -183,10 +195,6 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
   function selectTab(tabId: LessonTabId) {
     const tab = lessonTabs.find((item) => item.id === tabId);
     if (!tab || !tab.stepIndexes.length) return false;
-    if (shouldCompleteContentTabOnAdvance(activeTabRef.current, tabId)) {
-      if (!progressReady) return false;
-      setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabRef.current, true);
-    }
     const nextStepIndex = tabId === "learn" ? lastLearningStep.current
       : tabId === "assessment" && assessmentComplete ? reportStepIndex
       : tab.stepIndexes[0];
@@ -309,11 +317,19 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
             source={lesson.curriculumSource}
             lessonTitle={lesson.title}
             onPageViewed={(pageNumber) => emitEvent({ name: "book_page_viewed", stepId: step.id, metadata: { pageNumber } })}
-            onCompleted={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, "book", true)}
+            onCompleted={() => { if (activeTabRef.current === "book" && progressReady) setLessonTabCompleted(progressSubjectSlug, lesson.id, "book", true); }}
           />
         )}
 
         {step.visualKind && activity && <ActivityGuide activity={activity} tried={triedStepIds.includes(step.id)} onTry={markTried}>{visuals[step.visualKind]}</ActivityGuide>}
+        {step.activity && <section className="mb-5 rounded-3xl border border-cyan-200 bg-white p-5 sm:p-7" data-testid="subject-learning-activity">
+          <h2 className="text-xl font-black">{step.activity.title}</h2>
+          <p className="mt-3 leading-8 text-slate-700">{step.activity.instructions}</p>
+          <div className="mt-4 space-y-3">{step.activity.items.map((item, index) => <details key={index} className="rounded-xl bg-slate-50 p-4">
+            <summary className="cursor-pointer font-bold leading-8" dir="auto">{item.prompt}</summary>
+            <p className="mt-3 leading-8" dir="auto">{item.explanation}</p>
+          </details>)}</div>
+        </section>}
 
         {step.body && !step.visualKind?.startsWith("polygon-") && (
           <section className="studio-prose-block mb-5 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
@@ -500,6 +516,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
                       }}>{renderStep(step, false, step.type !== "objectives", content)}</LearningSection>;
                   })}
                 </div>
+                <div ref={setLearningEnd} className="h-px" aria-hidden="true" data-testid="learning-content-end" />
               </>}
 
               {tab.id === "assessment" && assessmentStep && <div id="lesson-assessment-start" tabIndex={-1} className="focus-visible:outline-none" data-testid="assessment-tab-content">

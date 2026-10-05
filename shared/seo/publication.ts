@@ -1,20 +1,42 @@
 import { polygonAnglesLesson } from "../lesson-engine/polygon-angles";
 import { isUnitPreparation } from "../curriculum/unit-preparation";
+import type { InteractiveLessonDefinition } from "../lesson-engine/types";
+
+export interface PublishedLesson {
+  lesson: InteractiveLessonDefinition;
+  location: { stage: string; grade: string; subject: string };
+  publishedAt?: string;
+}
+export type PublicationCatalog = Record<string, PublishedLesson>;
+// Existing reviewed production content is the initial seed, not a whitelist for new lessons.
+export const initialPublicationCatalog: PublicationCatalog = {
+  [polygonAnglesLesson.id]: { lesson: polygonAnglesLesson, location: { stage: "high", grade: "1", subject: "math" } },
+};
 
 // Publication is explicit: adding a name to the hierarchy does not publish content.
 export const publishedLessonIds: readonly string[] = [polygonAnglesLesson.id];
 export const publishedLessonLocations: Record<string, { stage: string; grade: string; subject: string }> = {
   [polygonAnglesLesson.id]: { stage: "high", grade: "1", subject: "math" },
 };
-export function hasPublishedContent(id: string, stage: string, grade: string, subject: string) {
-  const location = publishedLessonLocations[id];
-  return (publishedLessonIds.includes(id) && location?.stage === stage && location.grade === grade && location.subject === subject)
+export function hasPublishedContent(id: string, stage: string, grade: string, subject: string, catalog = initialPublicationCatalog) {
+  const location = catalog[id]?.location;
+  return (Boolean(catalog[id]) && location?.stage === stage && location.grade === grade && location.subject === subject)
     || (stage === "high" && grade === "1" && subject === "math" && isUnitPreparation(id));
 }
 
 // Every newly published lesson needs reviewed reading text as well as its activities.
-export function lessonReadingSections(id: string | undefined) {
-  return id === polygonAnglesLesson.id ? polygonReadingSections : [];
+export function lessonReadingSections(id: string | undefined, catalog = initialPublicationCatalog) {
+  const lesson = id ? catalog[id]?.lesson : undefined;
+  if (!lesson) return [];
+  if (lesson === polygonAnglesLesson) return polygonReadingSections;
+  return [
+    { heading: lesson.introduction.heading, paragraphs: lesson.introduction.paragraphs },
+    { heading: "أهداف الدرس", paragraphs: lesson.objectives },
+    ...lesson.steps.filter(s => ["concept", "worked_example", "practice", "warmup"].includes(s.type)).map(s => ({
+      heading: s.title, paragraphs: [...(s.body ?? []), ...(s.activity?.items.map(item => `${item.prompt} — ${item.explanation}`) ?? [])],
+    })),
+    { heading: "ملخص الدرس", paragraphs: lesson.teacherSummary.points },
+  ].filter(s => s.paragraphs.length);
 }
 
 // Unicode isolates keep formulas in mathematical order inside Arabic paragraphs.

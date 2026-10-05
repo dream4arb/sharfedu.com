@@ -74,7 +74,7 @@ export function LessonIntroduction({ introduction }: { introduction: LessonIntro
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="formula-preview-heading">
+        {introduction.formula && <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="formula-preview-heading">
           <p className="text-sm font-black text-violet-700">{introduction.formula.eyebrow ?? "معنى القانون، لا حفظه فقط"}</p>
           <h3 id="formula-preview-heading" className="mt-1 text-xl font-black text-slate-950">{introduction.formula.heading ?? "كل رمز يحكي جزءًا من الفكرة"}</h3>
           <MathFormula expression={introduction.formula.expression} label={introduction.formula.label} />
@@ -86,9 +86,9 @@ export function LessonIntroduction({ introduction }: { introduction: LessonIntro
               </div>
             ))}
           </dl>
-        </section>
+        </section>}
 
-        <section className="rounded-2xl bg-slate-950 p-5 text-white" aria-labelledby="intro-example-heading">
+        {introduction.workedExample && <section className="rounded-2xl bg-slate-950 p-5 text-white" aria-labelledby="intro-example-heading">
           <p className="text-sm font-black text-cyan-300">تطبيق أمامك خطوة بخطوة</p>
           <h3 id="intro-example-heading" className="mt-1 text-xl font-black">{introduction.workedExample.title}</h3>
           <ol className="mt-4 space-y-3">
@@ -99,17 +99,17 @@ export function LessonIntroduction({ introduction }: { introduction: LessonIntro
               </li>
             ))}
           </ol>
-          <p className="mt-5 rounded-xl bg-cyan-900/70 p-4 text-center text-xl font-black tabular-nums" dir="ltr">{introduction.workedExample.result}</p>
-        </section>
+          <p className="mt-5 rounded-xl bg-cyan-900/70 p-4 text-center text-xl font-black tabular-nums" dir={introduction.workedExample.direction ?? (introduction.formula ? "ltr" : "auto")}>{introduction.workedExample.result}</p>
+        </section>}
       </div>
 
-      <div className="mt-5 flex gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 leading-7 text-rose-950">
+      {introduction.commonMistake && <div className="mt-5 flex gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 leading-7 text-rose-950">
         <AlertTriangle className="mt-1 h-5 w-5 shrink-0 text-rose-600" />
         <div>
-          <p className="font-black">خطأ شائع: <span className="line-through" dir="ltr">{introduction.commonMistake.wrong}</span></p>
+          <p className="font-black">خطأ شائع: <span className="line-through" dir="auto">{introduction.commonMistake.wrong}</span></p>
           <p className="mt-1">{introduction.commonMistake.correction}</p>
         </div>
-      </div>
+      </div>}
     </section>
   );
 }

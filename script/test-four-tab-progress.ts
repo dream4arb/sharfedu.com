@@ -49,22 +49,26 @@ assert.ok(page.includes('"assessment", false'), 'Retest clears assessment comple
 assert.ok(page.includes('resetSession();') && page.includes('resetActivities();') && page.includes('resetLessonProgress(progressSubjectSlug, lesson.id);'), 'Whole reset clears quiz, activity and completion state for current lesson only');
 assert.ok(page.includes('data-testid="assessment-reset-actions"') && page.includes('data-testid="button-reset-lesson-progress"') && page.includes('data-testid="confirm-reset-lesson-progress"') && page.includes('data-testid="cancel-reset-lesson-progress"'), 'Adjacent reset action requires confirmation and supports cancel');
 for (const current of COMPLETION_TABS) for (const target of COMPLETION_TABS) {
-  assert.equal(shouldCompleteContentTabOnAdvance(current, target), current !== 'assessment' && COMPLETION_TABS.indexOf(target) > COMPLETION_TABS.indexOf(current));
+  assert.equal(shouldCompleteContentTabOnAdvance(current, target), false, 'Opening or switching tabs never awards completion');
 }
 const reportedCase = updateTabCompletion(undefined, 'video', true, 1);
 const withLearning = updateTabCompletion(reportedCase, 'learn', true, 2);
 const withAssessment = updateTabCompletion(withLearning, 'assessment', true, 3);
 assert.equal(tabCompletionPercent(withAssessment.completedTabs), 75);
 assert.equal(tabCompletionPercent(updateTabCompletion(withAssessment, 'book', true, 4).completedTabs), 100, 'Missing book completion repairs 75% without resetting answers or other tabs');
-assert.ok(page.includes('shouldCompleteContentTabOnAdvance(activeTabRef.current, tabId)'), 'Header and footer share forward-navigation completion');
-assert.ok(page.includes('onCompleted={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, "book", true)}'), 'Reading completion records book tab');
+assert.ok(!page.includes('shouldCompleteContentTabOnAdvance'), 'Navigation has no completion side effect');
+assert.ok(page.includes('activeTabRef.current === "book" && progressReady'), 'Reading completion is scoped to active reader');
+assert.ok(page.includes('useContentEndCompletion(learningEnd,') && page.includes('ref={setLearningEnd}') && page.includes('data-testid="learning-content-end"'), 'Learning completion observes the actual lazy tab mount and content end');
+assert.ok(page.includes('playedVideoIds.length > 0') && page.includes('activeTabRef.current !== "video"'), 'Video completion requires confirmed playback in active video tab');
+const player = readFileSync('src/features/lesson-engine/LessonVideoPlayer.tsx', 'utf8');
+assert.ok(player.includes('onPlaying=') && !player.includes('onPlay='), 'Hosted video grants progress only once frames are actually playing');
 assert.equal(isBookReadingComplete([12,13,14], new Set([12,13,14]), true), true);
 assert.equal(isBookReadingComplete([12,13,14], new Set([12,14]), true), false, 'Jump to end does not complete skipped pages');
 assert.equal(isBookReadingComplete([12,13,14], new Set([12,13,14]), false), false, 'All pages seen but not finished');
 assert.equal(isBookReadingComplete([], new Set(), true), false, 'Empty reader cannot auto-complete');
 const reader = readFileSync('src/features/lesson-engine/OfficialBookLesson.tsx', 'utf8');
 assert.ok(reader.includes('isBookReadingComplete(requiredPages, viewedPages.current, reachedEnd)'));
-assert.ok(reader.includes('if (!completed &&') && reader.includes('if (cancelled) return;'), 'Observer reports once and ignores queued callbacks after leaving the reader');
+assert.ok(reader.includes('!cancelled && !completed && scrolled') && reader.includes('if (cancelled) return;'), 'Observer requires scrolling and ignores queued callbacks after leaving reader');
 assert.ok(!page.includes('data-testid="button-complete-lesson-tab"'), 'No redundant manual completion control');
 const tabNavigation = page.slice(page.indexOf('aria-label="أقسام الدرس"'), page.indexOf('</nav>'));
 const tabFooter = page.slice(page.indexOf('<footer'), page.indexOf('</footer>'));

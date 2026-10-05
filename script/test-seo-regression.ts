@@ -9,14 +9,19 @@ const normalizeResetStyle = (source: string) => source.replace(/className="[^"]*
 const normalizeProgressPlacement = (source: string) => normalizeResetStyle(source)
   .replace(/        <nav[^>]*aria-label="أقسام الدرس">[\s\S]*?        <\/nav>/, '        TAB_NAVIGATION')
   .replace(/              \{activeTabId !== "assessment" && <div className="mb-4 flex justify-center">[\s\S]*?              <\/div>\}\n/, '');
-for (const path of ["src/App.tsx","src/index.css","src/components/lessons/LessonSidebar.tsx","src/components/lessons/UnitPreparationPage.tsx","src/features/lesson-engine/InteractiveLessonPage.tsx","src/hooks/use-lesson-progress.tsx","server/index.ts","server/auth/authRoutes.ts","server/auth/sessionStore.ts","server/storage.ts","server/admin/contentRoutes.ts","shared/curriculum/math-high1-names.json"]) {
-  const baseline = execFileSync("git",["show",`8e72c3c:${path}`],{encoding:"utf8"}).replace(/\r\n/g,"\n");
-  const expected = path === "src/components/lessons/LessonSidebar.tsx"
-    ? baseline.replace('            {active && <small>الدرس الحالي</small>}\n', '')
-      .replace('                const open = isSearching || openChapterId === chapter.id;', '                const currentChapter = activeLocation?.semester.id === semester.id && activeLocation?.chapter.id === chapter.id;\n                const open = isSearching || openChapterId === chapter.id;')
-      .replace('key={chapter.id} data-open={open}>', 'key={chapter.id} data-open={open} data-current={currentChapter || undefined}>') : baseline;
+for (const path of ["src/App.tsx","src/index.css","src/components/lessons/LessonSidebar.tsx","src/components/lessons/UnitPreparationPage.tsx","src/hooks/use-lesson-progress.tsx","server/index.ts","server/auth/sessionStore.ts","server/storage.ts","server/admin/contentRoutes.ts","shared/curriculum/math-high1-names.json"]) {
+  const baseline = execFileSync("git",["show",`61d9fa1:${path}`],{encoding:"utf8"}).replace(/\r\n/g,"\n");
+  const expected = path === "server/storage.ts" ? baseline.replaceAll("userId: number", "userId: string") : baseline;
   assert.equal(path.endsWith("InteractiveLessonPage.tsx") ? normalizeProgressPlacement(text(path)) : text(path),
     path.endsWith("InteractiveLessonPage.tsx") ? normalizeProgressPlacement(expected) : expected, path);
+}
+const authBaseline = execFileSync("git",["show","61d9fa1:server/auth/authRoutes.ts"],{encoding:"utf8"}).replace(/\r\n/g,"\n");
+assert.equal(text("server/auth/authRoutes.ts"), authBaseline.replace('function toPublicUser(u: typeof users.$inferSelect)', 'function toPublicUser(u: Pick<typeof users.$inferSelect, "id" | "email" | "firstName" | "lastName" | "profileImageUrl" | "role" | "stageSlug" | "gradeId">)'), "Only safe public-user typing changed in authentication");
+const interactive = text("src/features/lesson-engine/InteractiveLessonPage.tsx");
+const interactiveBaseline = execFileSync("git",["show","61d9fa1:src/features/lesson-engine/InteractiveLessonPage.tsx"],{encoding:"utf8"}).replace(/\r\n/g,"\n");
+for (const functionName of ["restartTest", "restartProgress", "reviewSkill"]) {
+  const pattern = new RegExp(`  function ${functionName}\\([\\s\\S]*?\\n  }`);
+  assert.equal(interactive.match(pattern)?.[0], interactiveBaseline.match(pattern)?.[0], `${functionName} preserved`);
 }
 const lesson = text("src/pages/Lesson.tsx");
 for (const guard of ["const legacyContentEnabled = false", "getSemesterLessonNeighbors(semesters, lessonId)", "data-testid=\"lesson-content-pending\"", "<UnitPreparationPage", "<LessonSidebar", "<InteractiveLessonPage", "getLessonProgress={(id) => getLessonProgress(subjectId, id)}"]) assert.ok(lesson.includes(guard),guard);

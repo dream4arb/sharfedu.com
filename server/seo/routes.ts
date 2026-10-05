@@ -3,10 +3,13 @@ import { readFile } from "node:fs/promises";
 import { getDisplayStructure, getAllLessons, getFullHierarchy } from "../data/cms-hierarchy";
 import { escapeHtml as e, pageWithOverrides, resolveSeoPage, sitemapPaths, sitemapXml, robotsTxt, ORIGIN, type SeoPage } from "./model";
 import { requireAdmin } from "../middleware/adminAuth";
+import { getPublicationCatalog } from "../lesson-publication/store";
+import { installLessonPublicationRoutes } from "../lesson-publication/routes";
 
-export function seoSitemapInfo() {
-  const paths = sitemapPaths();
-  const entries = paths.map(url => ({ url, label: resolveSeoPage(url).heading, priority: url === "/" ? "1.0" : "0.8" }));
+export async function seoSitemapInfo() {
+  const catalog = await getPublicationCatalog();
+  const paths = sitemapPaths(getFullHierarchy(), catalog);
+  const entries = paths.map(url => ({ url, label: resolveSeoPage(url, getFullHierarchy(), catalog).heading, priority: url === "/" ? "1.0" : "0.8" }));
   return {
     baseUrl: ORIGIN, sitemapUrl: `${ORIGIN}/sitemap.xml`, robotsUrl: `${ORIGIN}/robots.txt`,
     totalUrls: paths.length,
@@ -20,11 +23,16 @@ export function seoSitemapInfo() {
 
 // Register after session/passport middleware, preserving the existing admin access policy.
 export function installSeoAdminRoutes(app: Express) {
-  app.get("/api/admin/sitemap-info", requireAdmin, (_req, res) => res.set("Cache-Control", "no-store").json(seoSitemapInfo()));
+  installLessonPublicationRoutes(app);
+  app.get("/api/admin/sitemap-info", requireAdmin, async (_req, res, next) => {
+    try { res.set("Cache-Control", "no-store").json(await seoSitemapInfo()); } catch (error) { next(error); }
+  });
 }
 
 export function installSeoRoutes(app: Express) {
-  app.get("/sitemap.xml", (_req, res) => res.type("application/xml").set("Cache-Control", "no-cache").send(sitemapXml()));
+  app.get("/sitemap.xml", async (_req, res, next) => {
+    try { res.type("application/xml").set("Cache-Control", "no-cache").send(sitemapXml(await getPublicationCatalog())); } catch (error) { next(error); }
+  });
   app.get("/robots.txt", (_req, res) => res.type("text/plain").set("Cache-Control", "no-cache").send(robotsTxt));
   app.get("/api/seo", async (req, res, next) => {
     try { res.set("Cache-Control", "no-store").json(await pageWithOverrides(String(req.query.path || "/"))); }

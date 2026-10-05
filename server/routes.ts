@@ -12,7 +12,7 @@ import pdfExtractorRoutes from "./routes/pdf-extractor";
 import extractQuestionsRoutes from "./routes/extract-questions";
 import adminRoutes from "./admin/adminRoutes";
 import contentRoutes from "./admin/contentRoutes";
-import authRoutes from "./auth/authRoutes";
+import authRoutes, { requireAuth } from "./auth/authRoutes";
 import { createSessionStore } from "./auth/sessionStore";
 import { requireAdmin } from "./middleware/adminAuth";
 import path from "path";
@@ -388,11 +388,13 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     res.json(courses);
   });
 
-  app.post("/api/progress/lesson", async (req, res) => {
+  app.post("/api/progress/lesson", requireAuth, async (req, res) => {
     try {
-      const { userId, subjectSlug, lessonId, lessonCompleted, videoCompleted, questionsScore, questionsProgress, totalProgress } = req.body;
+      const { subjectSlug, lessonId, lessonCompleted, videoCompleted, questionsScore, questionsProgress, totalProgress } = req.body;
+      const userId = String((req.user as any).id);
+      if (req.body.userId !== undefined && String(req.body.userId) !== userId) return res.status(403).json({ error: "Progress belongs to the signed-in account" });
       
-      if (!userId || !subjectSlug || !lessonId) {
+      if (typeof subjectSlug !== "string" || !subjectSlug || typeof lessonId !== "string" || !lessonId) {
         return res.status(400).json({ error: "userId, subjectSlug, and lessonId are required" });
       }
 
@@ -410,9 +412,10 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     }
   });
 
-  app.get("/api/progress/lesson", async (req, res) => {
+  app.get("/api/progress/lesson", requireAuth, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
+      const userId = String((req.user as any).id);
+      if (req.query.userId !== undefined && String(req.query.userId) !== userId) return res.status(403).json({ error: "Progress belongs to the signed-in account" });
       const subjectSlug = req.query.subjectSlug as string;
       const lessonId = req.query.lessonId as string;
 
@@ -428,9 +431,10 @@ export async function registerRoutes(httpServer: Server, app: Express) {
     }
   });
 
-  app.get("/api/progress/user", async (req, res) => {
+  app.get("/api/progress/user", requireAuth, async (req, res) => {
     try {
-      const userId = parseInt(req.query.userId as string);
+      const userId = String((req.user as any).id);
+      if (req.query.userId !== undefined && String(req.query.userId) !== userId) return res.status(403).json({ error: "Progress belongs to the signed-in account" });
       const subjectSlug = req.query.subjectSlug as string | undefined;
 
       if (!userId) {

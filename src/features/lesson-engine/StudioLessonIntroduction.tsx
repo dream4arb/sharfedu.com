@@ -27,27 +27,27 @@ export function StudioLessonIntroduction({ introduction }: { introduction: Lesso
       <div className="studio-takeaway"><Check aria-hidden="true" /><p><strong>{introduction.takeawayLabel ?? "ما الذي نلاحظه؟"}</strong> {introduction.takeaway}</p></div>
 
       <div className="studio-concept-grid">
-        <section className="studio-formula-sheet" aria-labelledby="formula-preview-heading">
+        {introduction.formula && <section className="studio-formula-sheet" aria-labelledby="formula-preview-heading">
           <p className="studio-kicker">{introduction.formula.eyebrow ?? "معنى القانون، لا حفظه فقط"}</p>
           <h3 id="formula-preview-heading">{introduction.formula.heading ?? "كل رمز يحكي جزءًا من الفكرة"}</h3>
           <MathFormula expression={introduction.formula.expression} label={introduction.formula.label} />
           <dl className="studio-definitions">{introduction.formula.parts.map(part => <div key={part.symbol}>
             <dt dir="ltr">{part.symbol}</dt><dd>{part.meaning}</dd>
           </div>)}</dl>
-        </section>
-        <section className="studio-worked-example" aria-labelledby="intro-example-heading">
+        </section>}
+        {introduction.workedExample && <section className="studio-worked-example" aria-labelledby="intro-example-heading">
           <p className="studio-kicker">تطبيق أمامك خطوة بخطوة</p>
           <h3 id="intro-example-heading">{introduction.workedExample.title}</h3>
           <ol>{introduction.workedExample.steps.map((step, index) => <li key={step}>
             <span>{index + 1}</span><p>{step}</p>
           </li>)}</ol>
-          <p className="studio-example-result" dir="ltr">{introduction.workedExample.result}</p>
-        </section>
+          <p className="studio-example-result" dir={introduction.workedExample.direction ?? (introduction.formula ? "ltr" : "auto")}>{introduction.workedExample.result}</p>
+        </section>}
       </div>
-      <div className="studio-mistake"><AlertTriangle aria-hidden="true" /><div>
-        <p><strong>خطأ شائع:</strong> <span className="line-through" dir="ltr">{introduction.commonMistake.wrong}</span></p>
+      {introduction.commonMistake && <div className="studio-mistake"><AlertTriangle aria-hidden="true" /><div>
+        <p><strong>خطأ شائع:</strong> <span className="line-through" dir="auto">{introduction.commonMistake.wrong}</span></p>
         <p>{introduction.commonMistake.correction}</p>
-      </div></div>
+      </div></div>}
     </div>
   );
 }

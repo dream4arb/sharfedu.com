@@ -1,6 +1,7 @@
 import { getFullHierarchy, type HierarchyStage } from "../data/cms-hierarchy";
 import { getSeo } from "../admin/cmsStorage";
-import { hasPublishedContent, lessonReadingSections } from "../../shared/seo/publication";
+import { hasPublishedContent, lessonReadingSections, initialPublicationCatalog } from "../../shared/seo/publication";
+import { getPublicationCatalog } from "../lesson-publication/store";
 import { unitPreparationIntroductions } from "../../src/components/lessons/unitPreparationIntroduction";
 import { isUnitPreparation } from "../../shared/curriculum/unit-preparation";
 
@@ -19,7 +20,7 @@ export type SeoPage = {
 };
 const INDEX = "index, follow, max-image-preview:large";
 const NOINDEX = "noindex, follow";
-export function resolveSeoPage(input: string, hierarchy: HierarchyStage[] = getFullHierarchy()): SeoPage {
+export function resolveSeoPage(input: string, hierarchy: HierarchyStage[] = getFullHierarchy(), catalog = initialPublicationCatalog): SeoPage {
   const url = new URL(input.startsWith("/") ? input : `/${input}`, ORIGIN);
   const pathname = url.pathname.replace(/\/+$/, "") || "/";
   let canonicalPath = pathname;
@@ -74,8 +75,8 @@ export function resolveSeoPage(input: string, hierarchy: HierarchyStage[] = getF
         if (id) breadcrumbs.push({ title: `${subject.name} — ${grade.name}`, href: hub });
         heading = lesson?.title || `${subject.name} — ${grade.name}`;
         if (lesson) titleContext = ` — ${subject.name} ${grade.name}`;
-        const published = id ? hasPublishedContent(id, stage.slug, grade.id, subject.slug)
-          : subject.semesters.some(s => s.chapters.some(ch => ch.lessons.some(l => hasPublishedContent(l.id, stage.slug, grade.id, subject.slug))));
+        const published = id ? hasPublishedContent(id, stage.slug, grade.id, subject.slug, catalog)
+          : subject.semesters.some(s => s.chapters.some(ch => ch.lessons.some(l => hasPublishedContent(l.id, stage.slug, grade.id, subject.slug, catalog))));
         robots = published ? INDEX : NOINDEX; status = 200;
         description = lesson
           ? (published ? `شرح ${heading} في ${subject.name} ${grade.name}، ${sem?.name}، وحدة ${chapter?.name}. شرح الكتاب وأنشطة تفاعلية واختبار لمراجعة فهمك.`
@@ -93,7 +94,7 @@ export function resolveSeoPage(input: string, hierarchy: HierarchyStage[] = getF
               { heading: "ما الذي ستتعلمه في هذه الوحدة؟", paragraphs: intro.learning },
               { heading: "لماذا ندرس هذه الوحدة؟", paragraphs: [intro.application] },
             ];
-          } else sections = lessonReadingSections(id!);
+          } else sections = lessonReadingSections(id!, catalog);
           resource = { "@type": "LearningResource", "@id": `${ORIGIN}${canonicalPath}#lesson`, name: heading,
             description, url: `${ORIGIN}${canonicalPath}`, inLanguage: "ar-SA", learningResourceType: isUnitPreparation(id) ? "مقدمة وحدة" : "درس تفاعلي",
             educationalLevel: grade.name, about: [subject.name, chapter?.name].filter(Boolean), isAccessibleForFree: true,
@@ -117,7 +118,7 @@ export function resolveSeoPage(input: string, hierarchy: HierarchyStage[] = getF
 }
 
 export async function pageWithOverrides(input: string): Promise<SeoPage> {
-  const page = resolveSeoPage(input);
+  const page = resolveSeoPage(input, getFullHierarchy(), await getPublicationCatalog());
   // Exact-page overrides only. Parent/home metadata must not replace lesson metadata.
   const row = await getSeo(page.pagePath);
   if (row && page.status === 200) {
@@ -135,13 +136,13 @@ export async function pageWithOverrides(input: string): Promise<SeoPage> {
   return page;
 }
 
-export function sitemapPaths(hierarchy = getFullHierarchy()) {
+export function sitemapPaths(hierarchy = getFullHierarchy(), catalog = initialPublicationCatalog) {
   const paths = new Set(["/", "/features", "/stages", "/privacy"]);
   for (const stage of hierarchy) {
     paths.add(`/stage/${stage.slug}`);
     for (const grade of stage.grades) for (const subject of grade.subjects) {
       const lessons = subject.semesters.flatMap(s => s.chapters.flatMap(ch => ch.lessons));
-      const published = lessons.filter(l => hasPublishedContent(l.id, stage.slug, grade.id, subject.slug));
+      const published = lessons.filter(l => hasPublishedContent(l.id, stage.slug, grade.id, subject.slug, catalog));
       if (!published.length) continue;
       paths.add(subjectPath(stage.slug, subject.slug, grade.id, stage.grades[0].id));
       for (const lesson of published) paths.add(`/lesson/${routeStage(stage.slug)}/${subject.slug}/${lesson.id}`);
@@ -150,8 +151,8 @@ export function sitemapPaths(hierarchy = getFullHierarchy()) {
   return [...paths];
 }
 export const escapeHtml = (value: string) => value.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
-export function sitemapXml() {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapPaths().map(p => `<url><loc>${escapeHtml(ORIGIN + p)}</loc></url>`).join("\n")}</urlset>`;
+export function sitemapXml(catalog = initialPublicationCatalog) {
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${sitemapPaths(getFullHierarchy(), catalog).map(p => `<url><loc>${escapeHtml(ORIGIN + p)}</loc></url>`).join("\n")}</urlset>`;
 }
 // Do not block private pages here: crawlers need to see their noindex response.
 export const robotsTxt = `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /node_app/\nDisallow: /prompt-files/\n\nSitemap: ${ORIGIN}/sitemap.xml\n`;

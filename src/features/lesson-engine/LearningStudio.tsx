@@ -23,7 +23,7 @@ export function LearningSectionNavigation({ sections, onNavigate }: {
   return <nav className="studio-section-navigation" aria-label="التنقل بين أقسام الشرح" data-testid="learning-section-navigation">
     {sections.map(({ step, index, sectionNumber }) => <button key={step.id} type="button"
       aria-controls={`learning-section-${step.id}`} onClick={() => onNavigate(index, step.id)}>
-      <span aria-hidden="true">{sectionNumber}</span>{step.eyebrow.replace(/^\d+\.\s*/, "")}
+      <span aria-hidden="true">{sectionNumber}</span>{(step.eyebrow || step.title).replace(/^\d+\.\s*/, "")}
     </button>)}
   </nav>;
 }
@@ -43,7 +43,7 @@ export function LearningSection({ step, index, sectionNumber, onFocus, children 
       <header className="studio-section-head" data-learning-step-index={index}>
         <div className="studio-section-meta" data-testid={`learning-meta-${step.id}`}>
           <span className="studio-section-number" aria-hidden="true">{sectionNumber}</span>
-          <p className="studio-section-label">القسم {sectionNumber} · {step.eyebrow.replace(/^\d+\.\s*/, "")}</p>
+          <p className="studio-section-label">القسم {sectionNumber} · {(step.eyebrow || step.title).replace(/^\d+\.\s*/, "")}</p>
         </div>
         <h2 id={`learning-title-${step.id}`} className="studio-section-title">{step.title}</h2>
       </header>
