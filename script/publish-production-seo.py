@@ -66,7 +66,8 @@ def main():
     parser.add_argument('--rollback', action='store_true'); parser.add_argument('--check', action='store_true')
     parser.add_argument('--follow-up', action='store_true')
     parser.add_argument('--polish', action='store_true')
-    parser.add_argument('--grade-editor', action='store_true'); args = parser.parse_args()
+    parser.add_argument('--grade-editor', action='store_true')
+    parser.add_argument('--rating-heading', action='store_true'); args = parser.parse_args()
     if args.follow_up:
         BACKUP = ROOT.parent / 'tmp/seo-backup-20261005-final'
         EXPECTED = 'e8f8b03cef7a269d65edb68e24a19dbc02a71ee88509b1f7b14d64754deb1f27'
@@ -75,6 +76,9 @@ def main():
         EXPECTED = '1b09f4513ea86ea14c6c1a5ce658e306b0d185581c8884cc6de132f528f16fc0'
     if args.grade_editor:
         BACKUP = ROOT.parent / 'tmp/seo-backup-20261005-grade-editor'
+        EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
+    if args.rating_heading:
+        BACKUP = ROOT.parent / 'tmp/rating-heading-backup-20261005'
         EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
     assert ROOT.resolve() == ROOT and PUBLIC.is_dir()
     if args.rollback:

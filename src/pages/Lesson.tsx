@@ -250,11 +250,11 @@ function LessonRatingWidget({ lessonId, lessonTitle, stage, subject }: { lessonI
       className="bg-white dark:bg-card border border-border/50 rounded-2xl p-6 sm:p-8 shadow-sm mt-8"
       data-testid="rating-widget"
     >
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+      <div className="flex items-center justify-center gap-3 mb-5" data-testid="rating-heading">
+        <div className="w-10 h-10 shrink-0 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
           <Star className="w-5 h-5 text-amber-500" />
         </div>
-        <div>
+        <div className="text-center">
           <h3 className="font-bold text-base">قيّم هذا الدرس</h3>
           <p className="text-xs text-muted-foreground">رأيك يساعدنا في تحسين المحتوى</p>
         </div>
