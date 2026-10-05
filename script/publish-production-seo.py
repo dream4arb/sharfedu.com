@@ -69,7 +69,8 @@ def main():
     parser.add_argument('--grade-editor', action='store_true')
     parser.add_argument('--rating-heading', action='store_true')
     parser.add_argument('--sidebar-current-caption', action='store_true')
-    parser.add_argument('--end-dashboard-button', action='store_true'); args = parser.parse_args()
+    parser.add_argument('--end-dashboard-button', action='store_true')
+    parser.add_argument('--reset-button-size', action='store_true'); args = parser.parse_args()
     if args.follow_up:
         BACKUP = ROOT.parent / 'tmp/seo-backup-20261005-final'
         EXPECTED = 'e8f8b03cef7a269d65edb68e24a19dbc02a71ee88509b1f7b14d64754deb1f27'
@@ -87,6 +88,9 @@ def main():
         EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
     if args.end_dashboard_button:
         BACKUP = ROOT.parent / 'tmp/end-dashboard-button-backup-20261005'
+        EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
+    if args.reset_button_size:
+        BACKUP = ROOT.parent / 'tmp/reset-button-size-backup-20261005'
         EXPECTED = 'd7a51d9531a399dc16f88f7232770d5601b2a667f90b4d1422c17ad41211f034'
     assert ROOT.resolve() == ROOT and PUBLIC.is_dir()
     if args.rollback:

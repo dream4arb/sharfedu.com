@@ -71,4 +71,8 @@ assert.ok(provider.includes('${userId ?? "guest"}'), 'Guest and student records 
 assert.ok(provider.includes('hydratedKey !== storageKey'), 'No server write before successful hydration');
 assert.ok(provider.includes('writeQueue.current.catch'), 'Writes are serialized against stale completion overwrites');
 assert.ok(readFileSync('src/pages/Lesson.tsx', 'utf8').includes('if (!legacyContentEnabled || isPublishedLesson(lessonId)'), 'Legacy writer cannot overwrite the new model');
-console.log('PASS four-tab progress: 0/25/50/75/100, idempotence, full-score-independent completion, restart, persistence, scoped merge and integration guards.');
+for (const buttonId of ['button-restart-assessment', 'button-reset-lesson-progress']) {
+  const classes = page.match(new RegExp(`className="([^"]*)" data-testid="${buttonId}"`))?.[1] || '';
+  for (const size of ['h-12', 'w-[8.6rem]', 'sm:w-[9.6rem]', 'justify-center', 'shrink-0']) assert.ok(classes.split(' ').includes(size), `${buttonId}: ${size}`);
+}
+console.log('PASS four-tab progress: 0/25/50/75/100, idempotence, full-score-independent completion, restart, persistence, scoped merge, equal reset-button sizes and integration guards.');
