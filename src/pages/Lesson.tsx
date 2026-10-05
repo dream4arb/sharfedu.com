@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import InteractiveLessonPage from "@/features/lesson-engine/InteractiveLessonPage";
 import LessonSidebar from "@/components/lessons/LessonSidebar";
+import UnitPreparationPage from "@/components/lessons/UnitPreparationPage";
+import { findLessonLocation } from "@/components/lessons/lessonSidebarModel";
+import { instructionalLessons, isUnitPreparation } from "../../shared/curriculum/unit-preparation";
 import { isPublishedLesson } from "@/features/lesson-engine/publishedLessons";
 import { useAuth } from "@/hooks/use-auth";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
@@ -545,6 +548,10 @@ export default function Lesson() {
   // Only set currentLesson if lessonId is provided and valid
   const currentLesson = lessonId && lessons.length > 0 ? (lessons.find(l => l.id === lessonId) || null) : null;
   const currentLessonIndex = lessonId && lessons.length > 0 ? lessons.findIndex(l => l.id === lessonId) : -1;
+  const currentPreparation = isUnitPreparation(lessonId);
+  const preparationLocation = currentPreparation ? findLessonLocation(semesters, lessonId) : undefined;
+  const firstUnitLesson = preparationLocation ? instructionalLessons(preparationLocation.chapter.lessons)[0] : undefined;
+  const progressLessons = instructionalLessons(lessons);
 
   const stageShortNames: Record<string, string> = {
     elementary: "ابتدائي", middle: "متوسط", high: "ثانوي",
@@ -598,7 +605,7 @@ export default function Lesson() {
   let completedCount = 0;
   let progress = 0;
   try {
-    const progressData = getProgress(subjectId, lessons.length, lessons.map(lesson => lesson.id));
+    const progressData = getProgress(subjectId, progressLessons.length, progressLessons.map(lesson => lesson.id));
     completedCount = progressData.completed || 0;
     progress = progressData.percentage || 0;
   } catch (error) {
@@ -1418,7 +1425,9 @@ export default function Lesson() {
                     </h1>
                   </div>
                 </div>
-                {currentLesson && lessonId ? (
+                {currentPreparation ? (
+                  <span className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200" data-testid="preparation-status">تهيئة · دون درجات</span>
+                ) : currentLesson && lessonId ? (
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs sm:text-sm text-muted-foreground">
                       {Math.round(getLessonProgress(subjectId, lessonId))}%
@@ -1457,7 +1466,7 @@ export default function Lesson() {
               </div>
               
               {/* Sticky Tab Navigation - Only show when lesson is selected */}
-              {currentLesson && !isPublishedLesson(params.lessonId) && (
+              {currentLesson && !currentPreparation && !isPublishedLesson(params.lessonId) && (
                 <div className="flex items-center justify-center gap-2 px-4 pb-3 bg-white/95 dark:bg-card/95 backdrop-blur-lg">
                   <div className="flex items-center gap-1 p-1.5 bg-accent/50 rounded-xl">
                     {tabs.map((tab) => {
@@ -1503,7 +1512,7 @@ export default function Lesson() {
                 autoDescription={`درس ${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""} مادة ${subjectName || ""}${gradeShort ? ` ${gradeShort}` : ""}${currentSemesterName ? ` ${currentSemesterName}` : ""} - شرح الدرس والملخصات والاختبارات على منصة شارف التعليمية`}
                 autoKeywords={`${currentLesson ? getLessonDisplayTitle(currentLesson, lessonTitlesFromApi) : ""}, ${subjectName || ""}, منصة شارف`}
               />
-              {legacyContentEnabled && user?.role === "admin" && !isPublishedLesson(params.lessonId) && (
+              {legacyContentEnabled && user?.role === "admin" && !currentPreparation && !isPublishedLesson(params.lessonId) && (
                 <div className="flex justify-start px-1 pb-4 mt-2">
                   <Button
                     variant="outline"
@@ -1644,7 +1653,13 @@ export default function Lesson() {
                 </motion.div>
               ) : (
                 <>
-              {isPublishedLesson(lessonIdFromParams) ? (
+              {currentPreparation && preparationLocation ? (
+                <UnitPreparationPage key={lessonIdFromParams}
+                  unitNumber={preparationLocation.chapter.number ?? Number(preparationLocation.chapter.id.replace(/\D/g, ""))}
+                  unitName={preparationLocation.chapter.name}
+                  firstLessonHref={firstUnitLesson ? `/lesson/${urlStage}/${subjectId}/${firstUnitLesson.id}` : undefined}
+                  firstLessonTitle={firstUnitLesson ? getLessonDisplayTitle(firstUnitLesson, lessonTitlesFromApi) : undefined} />
+              ) : isPublishedLesson(lessonIdFromParams) ? (
                 <InteractiveLessonPage key={lessonIdFromParams} embedded lessonId={lessonIdFromParams} progressSubjectSlug={subjectId} />
               ) : (
                 <section className="rounded-2xl border border-border/50 bg-white p-8 text-center" data-testid="lesson-content-pending">
@@ -1653,7 +1668,7 @@ export default function Lesson() {
                 </section>
               )}
 
-              {currentLesson && lessonIdFromParams && (
+              {currentLesson && lessonIdFromParams && !currentPreparation && (
                 <div className="space-y-8">
                   <LessonRatingWidget
                     lessonId={lessonIdFromParams}
@@ -1682,7 +1697,7 @@ export default function Lesson() {
                   >
                     <ArrowRight className="w-5 h-5" />
                     <div className="text-right">
-                      <div className="text-xs text-muted-foreground">الدرس السابق</div>
+                      <div className="text-xs text-muted-foreground">{isUnitPreparation(prevLesson.id) ? "تهيئة الوحدة" : "الدرس السابق"}</div>
                       <div className="font-semibold text-sm truncate">{prevLesson.title}</div>
                     </div>
                   </Button>
@@ -1698,7 +1713,7 @@ export default function Lesson() {
                     data-testid="button-next-lesson"
                   >
                     <div className="text-right">
-                      <div className="text-xs text-muted-foreground">الدرس التالي</div>
+                      <div className="text-xs text-muted-foreground">{isUnitPreparation(nextLesson.id) ? "تهيئة الوحدة التالية" : "الدرس التالي"}</div>
                       <div className="font-semibold text-sm truncate">{nextLesson.title}</div>
                     </div>
                     <ArrowRight className="w-5 h-5 rotate-180" />

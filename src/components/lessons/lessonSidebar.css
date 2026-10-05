@@ -56,6 +56,17 @@
 .lesson-outline__percent[data-started=true] { background: #e6f2f5; color: #365f71; }
 .lesson-outline__item[data-complete=true] .lesson-outline__percent, .lesson-outline__item[data-complete=true] .lesson-outline__number { background: #e4f4eb; color: #367256; }
 .lesson-outline__admin:empty { display: none; }
+.lesson-outline__preparation-item { margin-bottom: 16px; }
+.lesson-outline__preparation { display: flex; align-items: center; gap: 10px; min-height: 68px; padding: 12px; border: 1px solid #e7d9bb; border-radius: 12px; background: #fffaf0; color: #78582b; }
+.lesson-outline__preparation > span:last-child { display: grid; gap: 4px; min-width: 0; }
+.lesson-outline__preparation strong { font-size: 13px; }
+.lesson-outline__preparation small { font-size: 10px; line-height: 1.6; }
+.lesson-outline__preparation-icon { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; background: #f6ead2; }
+.lesson-outline__preparation:hover, .lesson-outline__preparation[aria-current=page] { border-color: #b59c70; background: #fff3da; }
+.lesson-outline__preparation[aria-current=page] { box-shadow: inset -3px 0 #a6854f; }
+.dark .lesson-outline__preparation { background: #332e24; border-color: #64563d; color: #e5d0a7; }
+.dark .lesson-outline__preparation-icon { background: #51442c; }
+.dark .lesson-outline__preparation:hover, .dark .lesson-outline__preparation[aria-current=page] { background: #443825; }
 .lesson-outline__admin:not(:empty) { display: flex; justify-content: flex-end; padding: 2px 8px; }
 .lesson-outline__attachments { margin-top: 3px; border-top: 1px solid hsl(var(--border)); padding-top: 10px; }
 .lesson-outline__attachment-list { display: grid; gap: 8px; padding-top: 7px; }

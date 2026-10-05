@@ -1,10 +1,11 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "wouter";
-import { BookOpen, Check, ChevronDown, ClipboardList, FileText, Home, LayoutDashboard, LocateFixed, Paperclip, Search, X } from "lucide-react";
+import { BookOpen, Check, ChevronDown, ClipboardList, Compass, FileText, Home, LayoutDashboard, LocateFixed, Paperclip, Search, X } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from "@/components/ui/sidebar";
 import { AdminLessonActions, AdminAddLessonButton, AdminChapterActions, AdminAddChapterButton } from "@/components/admin/AdminSidebarControls";
 import type { LessonData, SemesterData } from "@/data/lessons";
 import { filterLessonOutline, findLessonLocation, normalizeLessonSearch } from "./lessonSidebarModel";
+import { instructionalLessons, isUnitPreparation } from "../../../shared/curriculum/unit-preparation";
 import "./lessonSidebar.css";
 
 type AttachmentKind = "book" | "summary" | "worksheets" | "test";
@@ -57,6 +58,7 @@ export default function LessonSidebar(props: SidebarProps) {
   const selectedSemesterIndex = Math.max(0, semesters.findIndex(semester => semester.id === selectedSemesterId));
   const isSearching = normalizeLessonSearch(query).length > 0;
   const outline = filterLessonOutline(semesters, query, selectedSemesterId, getLessonTitle);
+  const numberedLessons = instructionalLessons(lessons);
 
   useEffect(() => {
     setSelectedId(activeLocation?.semester.id ?? semesters[0]?.id);
@@ -103,6 +105,20 @@ export default function LessonSidebar(props: SidebarProps) {
       </li>
     );
   };
+  const preparationCard = (lesson: LessonData, semester?: SemesterData, chapterId?: string) => {
+    const active = lesson.id === lessonId;
+    const title = getLessonTitle(lesson);
+    return <div key={lesson.id} className="lesson-outline__preparation-item">
+      <Link href={`/lesson/${routeStage}/${subjectSlug}/${lesson.id}`} className="lesson-outline__preparation"
+        aria-label={`التهيئة للوحدة: ${title}`} aria-current={active ? "page" : undefined}
+        ref={active ? activeLink : undefined} onClick={closeOnMobile} data-testid={`sidebar-preparation-${lesson.id}`}>
+        <span className="lesson-outline__preparation-icon"><Compass size={19} aria-hidden="true" /></span>
+        <span><strong>التهيئة للوحدة</strong><small>مراجعة قبل البدء · دون درجات</small></span>
+      </Link>
+      {semester && chapterId && <div className="lesson-outline__admin"><AdminLessonActions semesterId={semester.id} chapterId={chapterId}
+        lessonId={lesson.id} lessonTitle={title} onEdit={adminHandlers.editLesson} onDelete={adminHandlers.deleteLesson} /></div>}
+    </div>;
+  };
 
   return (
     <Sidebar side="right" className="border-l border-border/50">
@@ -117,7 +133,7 @@ export default function LessonSidebar(props: SidebarProps) {
           <div className="lesson-outline__progress">
             <div><span>تقدمك في المادة</span><strong>{progress}%</strong></div>
             <div className="lesson-outline__track" role="progressbar" aria-label="تقدمك في المادة" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><span style={{ width: `${progress}%` }} /></div>
-            <small>{completedCount} من {lessons.length} درس مكتمل</small>
+            <small>{completedCount} من {numberedLessons.length} درس مكتمل</small>
           </div>
           <div className="lesson-outline__search"><Search size={17} aria-hidden="true" />
             <input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="ابحث عن درس" aria-label="ابحث عن درس" />
@@ -136,10 +152,10 @@ export default function LessonSidebar(props: SidebarProps) {
         </SidebarHeader>
         <SidebarContent ref={scroller} className="lesson-outline__content">
           <nav aria-label="فهرس دروس المادة">
-            {isSearching && <p className="lesson-outline__search-count" role="status">{outline.reduce((count, item) => count + item.chapters.reduce((sum, chapter) => sum + chapter.lessons.length, 0), 0)} نتيجة في جميع الفصول</p>}
+            {isSearching && <p className="lesson-outline__search-count" role="status">{outline.reduce((count, item) => count + item.chapters.reduce((sum, chapter) => sum + chapter.lessons.length + chapter.preparations.length, 0), 0)} نتيجة في جميع الفصول</p>}
             {outline.map(({ semester, chapters }) => <div key={semester.id}>
               {isSearching && <h2 className="lesson-outline__semester-label">{semester.name}</h2>}
-              {chapters.map(({ chapter, chapterIndex, lessons: chapterLessons }) => {
+              {chapters.map(({ chapter, chapterIndex, lessons: chapterLessons, preparations }) => {
                 const open = isSearching || openChapterId === chapter.id;
                 const panelId = `${instanceId}-${semester.id}-${chapter.id}`;
                 return <section className="lesson-outline__chapter" key={chapter.id} data-open={open}>
@@ -154,7 +170,8 @@ export default function LessonSidebar(props: SidebarProps) {
                       onEdit={adminHandlers.editChapter} onDelete={adminHandlers.deleteChapter} /></div>
                   </div>
                   <div id={panelId} hidden={!open} className="lesson-outline__chapter-body">
-                    <p className="lesson-outline__lesson-label">دروس الوحدة</p>
+                    {preparations.map(lesson => preparationCard(lesson, semester, chapter.id))}
+                    {chapterLessons.length > 0 && <p className="lesson-outline__lesson-label">دروس الوحدة</p>}
                     <ul className="lesson-outline__lessons">{chapterLessons.map(({ lesson, lessonIndex }) => lessonCard(lesson, lessonIndex, semester, chapter.id))}</ul>
                     {!isSearching && <AdminAddLessonButton semesterId={semester.id} chapterId={chapter.id} onAdd={adminHandlers.addLesson} />}
                   </div>
@@ -162,7 +179,10 @@ export default function LessonSidebar(props: SidebarProps) {
               })}
               {!isSearching && <AdminAddChapterButton semesterId={semester.id} onAdd={adminHandlers.addChapter} />}
             </div>)}
-            {semesters.length === 0 && <ul className="lesson-outline__lessons">{lessons.map((lesson, index) => ({ lesson, index })).filter(({ lesson }) => !isSearching || normalizeLessonSearch(getLessonTitle(lesson)).includes(normalizeLessonSearch(query))).map(({ lesson, index }) => lessonCard(lesson, index))}</ul>}
+            {semesters.length === 0 && <>
+              {lessons.filter(lesson => isUnitPreparation(lesson.id)).filter(lesson => !isSearching || normalizeLessonSearch(`${getLessonTitle(lesson)} التهيئة للوحدة`).includes(normalizeLessonSearch(query))).map(lesson => preparationCard(lesson))}
+              <ul className="lesson-outline__lessons">{numberedLessons.map((lesson, index) => ({ lesson, index })).filter(({ lesson }) => !isSearching || normalizeLessonSearch(getLessonTitle(lesson)).includes(normalizeLessonSearch(query))).map(({ lesson, index }) => lessonCard(lesson, index))}</ul>
+            </>}
             {((isSearching && outline.length === 0 && semesters.length > 0) || lessons.length === 0) && <div className="lesson-outline__empty"><BookOpen size={26} aria-hidden="true" /><p>{isSearching ? "لا توجد دروس مطابقة للبحث" : "لا توجد دروس متاحة حالياً"}</p>{isSearching && <button type="button" onClick={() => setQuery("")}>عرض جميع الدروس</button>}</div>}
           </nav>
           {semesters.length > 0 && !isSearching && <section className="lesson-outline__attachments">
