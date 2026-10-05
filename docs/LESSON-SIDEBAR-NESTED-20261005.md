@@ -28,3 +28,15 @@ Frontend-only publication retained old remote hash assets; no backend/database c
 Screenshots:
 C:/Users/سعيد/Documents/Codex/2026-08-31/new-chat-4/production-sidebar-nested-20261005.png
 C:/Users/سعيد/Documents/Codex/2026-08-31/new-chat-4/production-sidebar-nested-mobile-20261005.png
+
+## Follow-up: unit label only
+
+At the user's request, removed the lesson count from all unit headings, keeping unit number and title. Source commit 7cb4aaf. No other UI/progress/content change.
+
+Sidebar and production integration tests PASS; Vite build successful. Live browser verified units 1–4 and 5–8 display only the unit number and name. Final console error log empty; production GET 200.
+
+Backup: ../tmp/lesson-ui-backup-20261005-unit-label/
+Published index SHA256: d2ddaefc4afa13ef7e866fa698185a7dad07a9a87a03d86a20a7abb7b62b86af
+Bundle SHA256: 045ef9d1efd32cf4abdd504f4571d7a85faa65e468519c6f3dfae3445ee6d209
+Backend unchanged. Old remote assets retained; no restart or student data modification.
+Evidence: C:/Users/سعيد/Documents/Codex/2026-08-31/new-chat-4/production-sidebar-unit-label-20261005.png
