@@ -1700,15 +1700,7 @@ export default function Lesson() {
                     <ArrowRight className="w-5 h-5 rotate-180" />
                   </Button>
                 ) : (
-                  <Link href="/dashboard" className="flex-1">
-                    <Button className="w-full gap-2 rounded-xl h-14" data-testid="button-back-dashboard">
-                      <div className="text-right">
-                        <div className="text-xs opacity-80">أحسنت!</div>
-                        <div className="font-semibold text-sm">العودة للوحة التحكم</div>
-                      </div>
-                      <CheckCircle className="w-5 h-5" />
-                    </Button>
-                  </Link>
+                  <div className="flex-1" />
                 )}
                 </div>
               </motion.div>

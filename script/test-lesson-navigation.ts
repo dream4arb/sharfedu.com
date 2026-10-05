@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
 import { buildLessonTabs, getInitialLessonStepIndex, getLessonTabId, getReviewStepIndex } from "../src/features/lesson-engine/lessonNavigation";
+
+const page = readFileSync("src/pages/Lesson.tsx", "utf8");
+assert.ok(!page.includes('data-testid="button-back-dashboard"'), "No dashboard congratulation button at the end of a semester");
+assert.ok(page.includes('data-testid="button-prev-lesson"') && page.includes('data-testid="button-next-lesson"'), "Preserve normal lesson navigation");
 
 for (const { lesson } of Object.values(lessonRegistry)) {
   const tabs = buildLessonTabs(lesson);
