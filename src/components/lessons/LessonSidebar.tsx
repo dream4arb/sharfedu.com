@@ -153,9 +153,10 @@ export default function LessonSidebar(props: SidebarProps) {
             {outline.map(({ semester, chapters }) => <div key={semester.id}>
               {isSearching && <h2 className="lesson-outline__semester-label">{semester.name}</h2>}
               {chapters.map(({ chapter, chapterIndex, lessons: chapterLessons, preparations }) => {
+                const currentChapter = activeLocation?.semester.id === semester.id && activeLocation?.chapter.id === chapter.id;
                 const open = isSearching || openChapterId === chapter.id;
                 const panelId = `${instanceId}-${semester.id}-${chapter.id}`;
-                return <section className="lesson-outline__chapter" key={chapter.id} data-open={open}>
+                return <section className="lesson-outline__chapter" key={chapter.id} data-open={open} data-current={currentChapter || undefined}>
                   <div className="lesson-outline__chapter-heading">
                     <button type="button" className="lesson-outline__chapter-toggle" aria-expanded={open} aria-controls={panelId}
                       onClick={() => setOpenChapterId(open ? null : chapter.id)} disabled={isSearching}>

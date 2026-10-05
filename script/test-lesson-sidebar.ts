@@ -57,6 +57,8 @@ assert.ok(!component.includes('{active && <small>الدرس الحالي</small>
 assert.ok(component.includes('aria-expanded={open} aria-controls={panelId}'));
 assert.ok(component.includes('aria-label="ابحث عن درس"'));
 assert.ok(component.includes('key={chapter.id} data-open={open}'), 'One shared frame per chapter');
+assert.ok(component.includes('const currentChapter = activeLocation?.semester.id === semester.id && activeLocation?.chapter.id === chapter.id;'), 'Current unit follows the lesson location, including semester scope, never accordion state');
+assert.ok(component.includes('data-current={currentChapter || undefined}'), 'Current unit remains marked when its lessons are collapsed');
 assert.ok(component.includes('id={panelId} hidden={!open} className="lesson-outline__chapter-body"'), 'Lessons inside the chapter panel');
 assert.ok(component.includes('className="lesson-outline__lesson-label">دروس الوحدة'), 'Clear visual hierarchy label');
 assert.ok(component.includes('<small>الوحدة {chapter.number ?? chapterIndex + 1}</small>'), 'Unit number retained without lesson count');
@@ -64,6 +66,8 @@ assert.ok(!component.includes('{chapter.lessons.length} دروس'), 'No lesson c
 const sidebarCss = readFileSync('src/components/lessons/lessonSidebar.css', 'utf8');
 assert.match(sidebarCss, /\.lesson-outline__chapter \{[^}]*border: 1px[^}]*overflow: hidden/, 'The outer frame contains both heading and lesson panel');
 assert.match(sidebarCss, /\.lesson-outline__chapter\[data-open=true\] \.lesson-outline__chapter-heading/, 'Unit heading differs from nested lesson cards');
+assert.match(sidebarCss, /\.lesson-outline__chapter\[data-current=true\] \{[^}]*border-color/, 'Current unit retains its border independently of open state');
+assert.match(sidebarCss, /\.lesson-outline__chapter\[data-current=true\] \.lesson-outline__chapter-heading \{[^}]*background: var\(--outline-soft\)[^}]*box-shadow/, 'Current unit retains shading and an accent edge after collapse');
 assert.ok(component.includes('if (isMobile) setOpenMobile(false)'));
 assert.ok(component.includes('scroller.current.scrollBy'));
 assert.ok(!component.includes('attachmentsOpen'), 'Resources have no collapsed state');

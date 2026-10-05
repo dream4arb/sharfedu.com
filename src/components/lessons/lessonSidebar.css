@@ -26,6 +26,8 @@
 .lesson-outline__chapter[data-open=true] { border-color: #9bb8c3; }
 .lesson-outline__chapter-heading { background: hsl(var(--card)); }
 .lesson-outline__chapter[data-open=true] .lesson-outline__chapter-heading { background: var(--outline-soft); border-bottom: 1px solid #9bb8c350; }
+.lesson-outline__chapter[data-current=true] { border-color: #8dafbc; }
+.lesson-outline__chapter[data-current=true] .lesson-outline__chapter-heading { background: var(--outline-soft); box-shadow: inset -3px 0 var(--outline-accent); }
 .lesson-outline__chapter-body { padding: 10px 10px 12px; background: hsl(var(--muted) / .45); }
 .lesson-outline__lesson-label { margin: 0 2px 8px; font-size: 11px; font-weight: 600; color: hsl(var(--muted-foreground)); }
 .lesson-outline__chapter-body .lesson-outline__lessons { padding-top: 0; }

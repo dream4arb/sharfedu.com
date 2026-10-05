@@ -12,7 +12,9 @@ const normalizeProgressPlacement = (source: string) => normalizeResetStyle(sourc
 for (const path of ["src/App.tsx","src/index.css","src/components/lessons/LessonSidebar.tsx","src/components/lessons/UnitPreparationPage.tsx","src/features/lesson-engine/InteractiveLessonPage.tsx","src/hooks/use-lesson-progress.tsx","server/index.ts","server/auth/authRoutes.ts","server/auth/sessionStore.ts","server/storage.ts","server/admin/contentRoutes.ts","shared/curriculum/math-high1-names.json"]) {
   const baseline = execFileSync("git",["show",`8e72c3c:${path}`],{encoding:"utf8"}).replace(/\r\n/g,"\n");
   const expected = path === "src/components/lessons/LessonSidebar.tsx"
-    ? baseline.replace('            {active && <small>الدرس الحالي</small>}\n', '') : baseline;
+    ? baseline.replace('            {active && <small>الدرس الحالي</small>}\n', '')
+      .replace('                const open = isSearching || openChapterId === chapter.id;', '                const currentChapter = activeLocation?.semester.id === semester.id && activeLocation?.chapter.id === chapter.id;\n                const open = isSearching || openChapterId === chapter.id;')
+      .replace('key={chapter.id} data-open={open}>', 'key={chapter.id} data-open={open} data-current={currentChapter || undefined}>') : baseline;
   assert.equal(path.endsWith("InteractiveLessonPage.tsx") ? normalizeProgressPlacement(text(path)) : text(path),
     path.endsWith("InteractiveLessonPage.tsx") ? normalizeProgressPlacement(expected) : expected, path);
 }
