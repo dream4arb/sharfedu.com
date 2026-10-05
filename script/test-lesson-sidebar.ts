@@ -31,6 +31,12 @@ const component = readFileSync('src/components/lessons/LessonSidebar.tsx', 'utf8
 assert.ok(component.includes('aria-current={active ? "page"'));
 assert.ok(component.includes('aria-expanded={open} aria-controls={panelId}'));
 assert.ok(component.includes('aria-label="ابحث عن درس"'));
+assert.ok(component.includes('key={chapter.id} data-open={open}'), 'One shared frame per chapter');
+assert.ok(component.includes('id={panelId} hidden={!open} className="lesson-outline__chapter-body"'), 'Lessons inside the chapter panel');
+assert.ok(component.includes('className="lesson-outline__lesson-label">دروس الوحدة'), 'Clear visual hierarchy label');
+const sidebarCss = readFileSync('src/components/lessons/lessonSidebar.css', 'utf8');
+assert.match(sidebarCss, /\.lesson-outline__chapter \{[^}]*border: 1px[^}]*overflow: hidden/, 'The outer frame contains both heading and lesson panel');
+assert.match(sidebarCss, /\.lesson-outline__chapter\[data-open=true\] \.lesson-outline__chapter-heading/, 'Unit heading differs from nested lesson cards');
 assert.ok(component.includes('if (isMobile) setOpenMobile(false)'));
 assert.ok(component.includes('scroller.current.scrollBy'));
 for (const control of ['AdminLessonActions', 'AdminAddLessonButton', 'AdminChapterActions', 'AdminAddChapterButton']) assert.ok(component.includes('<' + control));

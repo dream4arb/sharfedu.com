@@ -142,7 +142,7 @@ export default function LessonSidebar(props: SidebarProps) {
               {chapters.map(({ chapter, chapterIndex, lessons: chapterLessons }) => {
                 const open = isSearching || openChapterId === chapter.id;
                 const panelId = `${instanceId}-${semester.id}-${chapter.id}`;
-                return <section className="lesson-outline__chapter" key={chapter.id}>
+                return <section className="lesson-outline__chapter" key={chapter.id} data-open={open}>
                   <div className="lesson-outline__chapter-heading">
                     <button type="button" className="lesson-outline__chapter-toggle" aria-expanded={open} aria-controls={panelId}
                       onClick={() => setOpenChapterId(open ? null : chapter.id)} disabled={isSearching}>
@@ -153,7 +153,8 @@ export default function LessonSidebar(props: SidebarProps) {
                     <div className="lesson-outline__admin"><AdminChapterActions semesterId={semester.id} chapterId={chapter.id} chapterName={chapter.name}
                       onEdit={adminHandlers.editChapter} onDelete={adminHandlers.deleteChapter} /></div>
                   </div>
-                  <div id={panelId} hidden={!open}>
+                  <div id={panelId} hidden={!open} className="lesson-outline__chapter-body">
+                    <p className="lesson-outline__lesson-label">دروس الوحدة</p>
                     <ul className="lesson-outline__lessons">{chapterLessons.map(({ lesson, lessonIndex }) => lessonCard(lesson, lessonIndex, semester, chapter.id))}</ul>
                     {!isSearching && <AdminAddLessonButton semesterId={semester.id} chapterId={chapter.id} onAdd={adminHandlers.addLesson} />}
                   </div>
