@@ -35,7 +35,8 @@ for (let unit = 1; unit <= 8; unit++) {
 }
 const component = readFileSync('src/components/lessons/UnitPreparationPage.tsx', 'utf8');
 for (const forbidden of ['useLessonProgress', 'fetch(', 'localStorage', 'sessionStorage', 'InteractiveLessonPage', 'LessonRatingWidget', 'useState', 'fieldset', 'preparation-question-', 'جرّب بلا درجات']) assert.ok(!component.includes(forbidden), forbidden);
-assert.ok(component.includes('شرح مبسط مستند إلى مقدمة الوحدة'), 'Paraphrase attribution instead of claiming verbatim book content');
+assert.ok(!component.includes('preparation-source') && !component.includes('شرح مبسط مستند'), 'Requested source caption is removed from preparation UI; book references remain in data');
+assert.ok(!component.includes('button-start-unit') && !component.includes('ابدأ أول درس'), 'No duplicate first-lesson CTA; existing page-level next-lesson navigation is retained');
 assert.ok(component.indexOf('data-testid="preparation-main-idea"') < component.indexOf('preparation-learning-title'), 'Basic idea appears first');
 const sidebar = readFileSync('src/components/lessons/LessonSidebar.tsx', 'utf8');
 const card = sidebar.slice(sidebar.indexOf('const preparationCard'), sidebar.indexOf('\n  return (', sidebar.indexOf('const preparationCard')));

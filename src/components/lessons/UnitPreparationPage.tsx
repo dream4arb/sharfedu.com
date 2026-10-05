@@ -1,8 +1,7 @@
-import { ArrowLeft, Check, Compass, Lightbulb } from "lucide-react";
-import { Link } from "wouter";
+import { Check, Compass, Lightbulb } from "lucide-react";
 import { unitPreparationIntroductions } from "./unitPreparationIntroduction";
 
-export default function UnitPreparationPage({ unitNumber, unitName, firstLessonHref, firstLessonTitle }: {
+export default function UnitPreparationPage({ unitNumber, unitName }: {
   unitNumber: number; unitName: string; firstLessonHref?: string; firstLessonTitle?: string;
 }) {
   const introduction = unitPreparationIntroductions[unitNumber];
@@ -28,10 +27,6 @@ export default function UnitPreparationPage({ unitNumber, unitName, firstLessonH
         <h3 id="preparation-application-title" className="text-lg font-bold">لماذا ندرس هذه الوحدة؟</h3>
         <p className="mt-3 text-base leading-8">{introduction.application}</p>
       </section>
-      <p className="text-center text-xs leading-6 text-muted-foreground" data-testid="preparation-source">شرح مبسط مستند إلى مقدمة الوحدة في كتاب {introduction.book}، صفحة {introduction.page}.</p>
     </>}
-    {firstLessonHref && <div className="text-center"><Link href={firstLessonHref} className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-primary px-6 py-3 text-primary-foreground font-semibold" data-testid="button-start-unit">
-      ابدأ أول درس{firstLessonTitle ? `: ${firstLessonTitle}` : ""}<ArrowLeft className="h-5 w-5 shrink-0" aria-hidden="true" />
-    </Link></div>}
   </section>;
 }
