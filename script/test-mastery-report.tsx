@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { lessonRegistry } from "../shared/lesson-engine/registry";
@@ -6,6 +7,13 @@ import { MasteryReport } from "../src/features/lesson-engine/MasteryReport";
 import { getReviewStepIndex } from "../src/features/lesson-engine/lessonNavigation";
 import { calculateAttemptMastery, calculateSkillMastery } from "../shared/lesson-engine/grade";
 import { restartLessonAssessment, useLessonSession, type StoredLessonSession } from "../src/features/lesson-engine/useLessonSession";
+
+const page = readFileSync("src/features/lesson-engine/InteractiveLessonPage.tsx", "utf8");
+assert.match(page, /const showReport = activeTabId === "assessment" && assessmentComplete;/,
+  "Saved checked answers show results even when the current step is assessment and other tabs are incomplete");
+assert.match(page, /tabId === "assessment" && assessmentComplete \? reportStepIndex/,
+  "Returning from any tab restores the report without requiring whole-lesson completedAt");
+assert.ok(!page.includes('button-show-results'), "No redundant show-results gate after returning");
 
 for (const attemptNumber of [1, 2, 3, 10, 1000]) {
   for (const hintsUsed of [0, 1, 10]) {
@@ -70,6 +78,24 @@ for (const { lesson } of Object.values(lessonRegistry)) {
     })),
   };
   const restarted = restartLessonAssessment(lesson, prior);
+  // Completed quiz from an earlier 75% session must survive reload/navigation,
+  // even without a completedAt timestamp and with a non-report saved step.
+  const returningSession = { ...prior, completedAt: undefined, stepIndex: 0 };
+  const returningStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: { getItem: () => JSON.stringify(returningSession) } });
+  function ReturningResultProbe() {
+    const { session } = useLessonSession(lesson);
+    assert.equal(session.completedAt, undefined);
+    assert.equal(session.stepIndex, 0);
+    assert.ok(assessmentIds.every(id => session.questions[id]?.attempts > 0), "All checked answers persist and automatically qualify for the report");
+    assert.deepEqual(session.questions, returningSession.questions, "Showing results does not mutate answers");
+    return null;
+  }
+  try { renderToStaticMarkup(createElement(ReturningResultProbe)); }
+  finally {
+    if (returningStorage) Object.defineProperty(globalThis, "localStorage", returningStorage);
+    else Reflect.deleteProperty(globalThis, "localStorage");
+  }
   assert.deepEqual(restarted.questions, {}, "Restart removes all exam answers, feedback, attempts, hints and scores");
   assert.equal(restarted.completedAt, undefined);
   assert.equal(restarted.stepIndex, assessmentIndex);

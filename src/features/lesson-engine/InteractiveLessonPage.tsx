@@ -105,7 +105,9 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
     .map((id) => questionMap[id]).filter(Boolean), [assessmentStep, lesson.assessmentQuestionIds, questionMap]);
   const answeredCount = assessmentQuestions.filter((question) => (session.questions[question.id]?.attempts ?? 0) > 0).length;
   const assessmentComplete = assessmentQuestions.length > 0 && answeredCount === assessmentQuestions.length;
-  const showReport = activeTabId === "assessment" && currentStep.type === "report" && assessmentComplete;
+  // Saved checked answers own result visibility, not the transient step or overall lesson completion.
+  // Only restarting the assessment clears those answers and returns this tab to questions.
+  const showReport = activeTabId === "assessment" && assessmentComplete;
 
   useEffect(() => {
     if (embedded) return;
@@ -184,7 +186,7 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
       setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabRef.current, true);
     }
     const nextStepIndex = tabId === "learn" ? lastLearningStep.current
-      : tabId === "assessment" && session.completedAt && assessmentComplete ? reportStepIndex
+      : tabId === "assessment" && assessmentComplete ? reportStepIndex
       : tab.stepIndexes[0];
     activeTabRef.current = tabId;
     setStepIndex(nextStepIndex >= 0 ? nextStepIndex : tab.stepIndexes[0]);
@@ -195,12 +197,6 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
     const nextTab = lessonTabs[activeTabIndex + direction];
     if (!nextTab) return;
     if (selectTab(nextTab.id)) window.scrollTo({ top: 0 });
-  }
-
-  function showResults() {
-    if (!assessmentComplete || reportStepIndex < 0) return;
-    setStepIndex(reportStepIndex);
-    requestAnimationFrame(() => document.getElementById("lesson-result")?.focus());
   }
 
   function restartTest() {
@@ -517,13 +513,11 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
                   className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-5 font-bold text-emerald-800 hover:bg-emerald-100 disabled:cursor-default disabled:opacity-70"
                   data-testid="button-complete-lesson-tab"><Check className="h-5 w-5" />{completedTabIds.includes(activeTabId) ? "أكملت هذا التبويب · 25%" : "أكملت هذا التبويب"}</button>
               </div>}
-              {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600">{assessmentComplete ? "نتيجتك جاهزة للعرض هنا." : "أجب عن جميع الأسئلة لإظهار نتيجتك."}</p>}
+              {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600">أجب عن جميع الأسئلة لتظهر نتيجتك تلقائيًا.</p>}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <button type="button" onClick={() => navigateTab(-1)} disabled={activeTabIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>
                 <span className="hidden text-sm font-bold text-slate-500 sm:inline">{activeTabIndex + 1} من 4</span>
-                {activeTabId === "assessment" ? !showReport && (
-                  <button type="button" onClick={showResults} disabled={!assessmentComplete} className="flex min-h-12 items-center gap-2 rounded-xl bg-slate-950 px-5 font-black text-white hover:bg-cyan-800 disabled:cursor-not-allowed disabled:opacity-35" data-testid="button-show-results">اعرض نتيجتي<ArrowLeft className="h-5 w-5" /></button>
-                ) : (
+                {activeTabId !== "assessment" && (
                   <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-4 gap-y-2" data-testid="next-step-area">
                     {activeTabId === "learn" && !assessmentComplete && <ActivityReminder pendingCount={pendingActivities.length} />}
                     <button type="button" onClick={() => navigateTab(1)} disabled={!progressReady} className="flex min-h-12 shrink-0 items-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-black text-white hover:bg-cyan-800 disabled:opacity-35" data-testid="button-next-step">
