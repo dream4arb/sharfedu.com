@@ -45,6 +45,13 @@ assert.match(sidebarCss, /\.lesson-outline__chapter \{[^}]*border: 1px[^}]*overf
 assert.match(sidebarCss, /\.lesson-outline__chapter\[data-open=true\] \.lesson-outline__chapter-heading/, 'Unit heading differs from nested lesson cards');
 assert.ok(component.includes('if (isMobile) setOpenMobile(false)'));
 assert.ok(component.includes('scroller.current.scrollBy'));
+assert.ok(!component.includes('attachmentsOpen'), 'Resources have no collapsed state');
+assert.ok(!component.includes('<strong>المرفقات</strong>'), 'No separate attachments menu heading');
+assert.ok(component.replace(/\r\n/g, '\n').includes('</nav>\n          {semesters.length > 0 && !isSearching && <div className="lesson-outline__attachments"'), 'Resources follow the unit navigation at the same level');
+assert.ok(component.includes('<hr className="lesson-outline__resources-divider" />'), 'Only a divider separates units and resource cards');
+for (const kind of ['book', 'summary', 'worksheets', 'test']) assert.ok(component.includes(`kind: "${kind}" as const`), `Retain ${kind} resource`);
+assert.ok(component.includes('getAttachmentUrl(kind, selectedSemesterIndex)'), 'Resource destination still follows selected semester');
+assert.ok(component.includes('onOpenAttachment(getAttachmentUrl(kind, selectedSemesterIndex), label); closeOnMobile();'), 'Opening resources retains viewer and mobile close behavior');
 for (const control of ['AdminLessonActions', 'AdminAddLessonButton', 'AdminChapterActions', 'AdminAddChapterButton']) assert.ok(component.includes('<' + control));
 const page = readFileSync('src/pages/Lesson.tsx', 'utf8');
 for (const destination of ['"/attachments/book-math-high1-s2.pdf"', 'currentLesson?.bookPdfUrl', 'currentLesson?.summaryPdfUrl', 'currentLesson?.worksheetsPdfUrl', 'currentLesson?.testQuestionsPdfUrl']) assert.ok(page.includes(destination));

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "wouter";
-import { BookOpen, Check, ChevronDown, ClipboardList, Compass, FileText, Home, LayoutDashboard, LocateFixed, Paperclip, Search, X } from "lucide-react";
+import { BookOpen, Check, ChevronDown, ClipboardList, Compass, FileText, Home, LayoutDashboard, LocateFixed, Search, X } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from "@/components/ui/sidebar";
 import { AdminLessonActions, AdminAddLessonButton, AdminChapterActions, AdminAddChapterButton } from "@/components/admin/AdminSidebarControls";
 import type { LessonData, SemesterData } from "@/data/lessons";
@@ -48,7 +48,6 @@ export default function LessonSidebar(props: SidebarProps) {
   const [selectedId, setSelectedId] = useState(activeLocation?.semester.id ?? semesters[0]?.id);
   const [openChapterId, setOpenChapterId] = useState<string | null>(activeLocation?.chapter.id ?? null);
   const [query, setQuery] = useState("");
-  const [attachmentsOpen, setAttachmentsOpen] = useState(false);
   const [locateVersion, setLocateVersion] = useState(0);
   const activeLink = useRef<HTMLAnchorElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
@@ -64,7 +63,6 @@ export default function LessonSidebar(props: SidebarProps) {
     setSelectedId(activeLocation?.semester.id ?? semesters[0]?.id);
     setOpenChapterId(activeLocation?.chapter.id ?? null);
     setQuery("");
-    setAttachmentsOpen(false);
   }, [subjectSlug, lessonId, activeLocation?.semester.id, activeLocation?.chapter.id]);
 
   // Scroll the outline only; never move the lesson content or page position.
@@ -142,7 +140,7 @@ export default function LessonSidebar(props: SidebarProps) {
           {semesters.length > 0 && <div className="lesson-outline__semesters" aria-label="الفصول الدراسية">
             {semesters.map((semester, index) => <button key={semester.id} type="button" aria-pressed={selectedSemesterId === semester.id}
               aria-label={semester.name} onClick={() => {
-                setSelectedId(semester.id); setQuery(""); setAttachmentsOpen(false);
+                setSelectedId(semester.id); setQuery("");
                 setOpenChapterId(activeLocation?.semester.id === semester.id ? activeLocation.chapter.id : null);
               }}>{index === 0 ? "الفصل الأول" : index === 1 ? "الفصل الثاني" : semester.name}</button>)}
           </div>}
@@ -185,18 +183,16 @@ export default function LessonSidebar(props: SidebarProps) {
             </>}
             {((isSearching && outline.length === 0 && semesters.length > 0) || lessons.length === 0) && <div className="lesson-outline__empty"><BookOpen size={26} aria-hidden="true" /><p>{isSearching ? "لا توجد دروس مطابقة للبحث" : "لا توجد دروس متاحة حالياً"}</p>{isSearching && <button type="button" onClick={() => setQuery("")}>عرض جميع الدروس</button>}</div>}
           </nav>
-          {semesters.length > 0 && !isSearching && <section className="lesson-outline__attachments">
-            <button type="button" className="lesson-outline__chapter-toggle" aria-expanded={attachmentsOpen} aria-controls={`${instanceId}-attachments`} onClick={() => setAttachmentsOpen(!attachmentsOpen)}>
-              <span className="lesson-outline__chapter-icon"><Paperclip size={19} aria-hidden="true" /></span><span className="lesson-outline__chapter-text"><strong>المرفقات</strong><small>مصادر المادة</small></span><ChevronDown size={16} className="lesson-outline__chevron" aria-hidden="true" />
-            </button>
-            <div id={`${instanceId}-attachments`} hidden={!attachmentsOpen} className="lesson-outline__attachment-list">
-              {attachments.map(({ kind, label, description, icon: Icon }) => <button type="button" key={kind} className="lesson-outline__attachment" onClick={() => {
+          {semesters.length > 0 && !isSearching && <div className="lesson-outline__attachments" data-testid="sidebar-material-resources">
+            <hr className="lesson-outline__resources-divider" />
+            <div className="lesson-outline__attachment-list">
+              {attachments.map(({ kind, label, description, icon: Icon }) => <button type="button" key={kind} className="lesson-outline__attachment" data-testid={`sidebar-resource-${kind}`} onClick={() => {
                 onOpenAttachment(getAttachmentUrl(kind, selectedSemesterIndex), label); closeOnMobile();
               }}>
                 <span className="lesson-outline__attachment-icon" data-kind={kind}><Icon size={21} aria-hidden="true" /></span><span><strong>{label}</strong><small>{description}</small></span>
               </button>)}
             </div>
-          </section>}
+          </div>}
         </SidebarContent>
       </div>
     </Sidebar>

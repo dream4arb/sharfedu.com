@@ -68,8 +68,9 @@
 .dark .lesson-outline__preparation-icon { background: #51442c; }
 .dark .lesson-outline__preparation:hover, .dark .lesson-outline__preparation[aria-current=page] { background: #443825; }
 .lesson-outline__admin:not(:empty) { display: flex; justify-content: flex-end; padding: 2px 8px; }
-.lesson-outline__attachments { margin-top: 3px; border-top: 1px solid hsl(var(--border)); padding-top: 10px; }
-.lesson-outline__attachment-list { display: grid; gap: 8px; padding-top: 7px; }
+.lesson-outline__attachments { margin-top: 3px; }
+.lesson-outline__resources-divider { margin: 0 0 16px; border: 0; border-top: 1px solid hsl(var(--border)); }
+.lesson-outline__attachment-list { display: grid; gap: 8px; }
 .lesson-outline [hidden] { display: none; }
 .lesson-outline__attachment { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; min-height: 72px; text-align: right; border: 1px solid hsl(var(--border) / .6); border-radius: 13px; background: hsl(var(--card)); }
 .lesson-outline__attachment:hover { border-color: #9bb8c3; }
