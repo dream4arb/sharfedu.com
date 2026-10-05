@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import InteractiveLessonPage from "@/features/lesson-engine/InteractiveLessonPage";
+import LessonSidebar from "@/components/lessons/LessonSidebar";
 import { isPublishedLesson } from "@/features/lesson-engine/publishedLessons";
 import { useAuth } from "@/hooks/use-auth";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
@@ -20,26 +21,15 @@ import {
   Star, MessageSquare, Send
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-  SidebarHeader,
 } from "@/components/ui/sidebar";
 import PolygonAnglesQuizSSA from "@/components/lessons/PolygonAnglesQuizSSA";
 import { InlineAdminToolbar } from "@/components/admin/InlineAdminToolbar";
 import { InlineSeoEditor } from "@/components/admin/InlineSeoEditor";
-import { AdminSidebarControls, AdminLessonActions, AdminAddLessonButton, AdminChapterActions, AdminAddChapterButton } from "@/components/admin/AdminSidebarControls";
 
 type TabType = "lesson" | "video" | "summary" | "education" | "ssa";
 
@@ -340,11 +330,6 @@ export default function Lesson() {
   const params = useParams<{ stage: string; subject: string; lessonId?: string }>();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>("lesson");
-  const [openSemesters, setOpenSemesters] = useState<Record<string, boolean>>({});
-  const [openChapters, setOpenChapters] = useState<Record<string, boolean>>({});
-  const [openTestsSection, setOpenTestsSection] = useState(false);
-  const [openAttachmentsSection, setOpenAttachmentsSection] = useState(false);
-  const [openAttachmentsFirstSemester, setOpenAttachmentsFirstSemester] = useState(false);
   const [activeTest, setActiveTest] = useState<MathTestData | null>(null);
   const [testAnswers, setTestAnswers] = useState<Record<string, string>>({});
   const [showTestResults, setShowTestResults] = useState(false);
@@ -750,61 +735,6 @@ export default function Lesson() {
       .catch(() => setPageMeta(autoTitle, autoDesc, autoKw));
   }, [currentLesson, subjectName, lessonTitlesFromApi, gradeShort, currentSemesterName]);
 
-  const toggleSemester = (semesterId: string) => {
-    setOpenSemesters(prev => {
-      const isCurrentlyOpen = prev[semesterId];
-      // Close all, then open only this one if it was closed (accordion: one open at a time)
-      return isCurrentlyOpen ? {} : { [semesterId]: true };
-    });
-    setOpenChapters({});
-    setOpenTestsSection(false);
-    setOpenAttachmentsSection(false);
-    setOpenAttachmentsFirstSemester(false);
-  };
-
-  const toggleTestsSection = () => {
-    const willOpen = !openTestsSection;
-    setOpenTestsSection(willOpen);
-    if (willOpen) {
-      setOpenSemesters({});
-      setOpenChapters({});
-      setOpenAttachmentsSection(false);
-    }
-  };
-
-  const toggleAttachmentsSection = () => {
-    const willOpen = !openAttachmentsSection;
-    setOpenAttachmentsSection(willOpen);
-    if (willOpen) {
-      setOpenSemesters({});
-      setOpenChapters({});
-      setOpenTestsSection(false);
-      setOpenAttachmentsFirstSemester(false);
-    }
-  };
-
-  const toggleAttachmentsFirstSemester = () => {
-    const willOpen = !openAttachmentsFirstSemester;
-    setOpenAttachmentsFirstSemester(willOpen);
-    if (willOpen) {
-      setOpenSemesters({});
-      setOpenChapters({});
-      setOpenTestsSection(false);
-      setOpenAttachmentsSection(false);
-    }
-  };
-
-  const toggleChapter = (chapterId: string) => {
-    setOpenChapters(prev => {
-      const isCurrentlyOpen = prev[chapterId];
-      // Close all, then open only this one if it was closed
-      return isCurrentlyOpen ? {} : { [chapterId]: true };
-    });
-  };
-
-  const isChapterOpen = (chapterId: string) => {
-    return openChapters[chapterId] === true;
-  };
 
   // Reset state when lesson changes
   useEffect(() => {
@@ -1458,326 +1388,21 @@ export default function Lesson() {
       <SidebarProvider style={sidebarStyle}>
         <div className="flex min-h-screen w-full">
           {/* Lessons Sidebar - إعادة تصميم */}
-          <Sidebar side="right" className="border-l border-border/50 bg-background/95">
-            <SidebarHeader className="p-5 border-b border-border/50 bg-card/50">
-              <div className="flex items-center gap-3">
-                <Link href="/" aria-label="الصفحة الرئيسية" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/60 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors border border-border/50" data-testid="link-home">
-                  <Home className="w-5 h-5" />
-                </Link>
-                <Link href={homeLink} aria-label="الرجوع للمرحلة" className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/60 hover:bg-accent text-muted-foreground hover:text-foreground transition-colors border border-border/50" data-testid="link-stage">
-                  <LayoutDashboard className="w-5 h-5" />
-                </Link>
-                <div className="flex-1 min-w-0">
-                  <span className="font-bold text-base truncate">{subjectName}</span>
-                </div>
-              </div>
-              {/* شريط التقدم */}
-              <div className="mt-4 p-3 rounded-xl bg-accent/30 border border-border/50">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground font-medium">التقدم</span>
-                  <span className={`font-bold tabular-nums ${progress > 95 ? "text-emerald-600" : "text-rose-600"}`}>{progress}%</span>
-                </div>
-                <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full transition-all duration-500 ${progress > 95 ? "bg-emerald-500" : "bg-rose-500"}`}
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-            </SidebarHeader>
-
-            <SidebarContent className="p-3 gap-4 flex flex-col">
-              {semesters.length > 0 ? (
-                <>
-                  {semesters.map((semester, semesterIndex) => (
-                    <div
-                      key={semester.id}
-                      className="rounded-2xl border border-violet-200/50 bg-violet-50/50 dark:border-violet-500/25 dark:bg-violet-500/10 p-3 space-y-2 mb-4 pt-2"
-                    >
-                      <div className="flex justify-center mb-1">
-                        <div className="w-full text-center px-5 py-2.5 rounded-lg text-sm font-bold bg-violet-100/80 text-indigo-500 dark:bg-violet-500/20 dark:text-violet-300">
-                          {semesterIndex === 0 ? "الفصل الدراسي الأول" : "الفصل الدراسي الثاني"}
-                        </div>
-                      </div>
-                      <Collapsible open={openSemesters[semester.id]}>
-                        <SidebarGroup className="space-y-0">
-                          <SidebarGroupLabel
-                            className="flex items-center justify-between w-full gap-3 px-3 py-2.5 min-h-[2.75rem] rounded-xl border border-gray-200/60 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50/50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200"
-                            onClick={() => toggleSemester(semester.id)}
-                          >
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className="w-8 h-8 rounded-lg bg-violet-400 text-white flex items-center justify-center shrink-0">
-                                <BookOpen className="w-4 h-4" />
-                              </div>
-                              <span className="font-bold text-[13px] text-foreground">الدروس</span>
-                            </div>
-                            {openSemesters[semester.id] ? (
-                              <ChevronUp className="w-4 h-4 shrink-0 text-gray-400" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4 shrink-0 text-gray-400" />
-                            )}
-                          </SidebarGroupLabel>
-                          <CollapsibleContent>
-                            <SidebarGroupContent className="pt-3 px-1 pb-4 space-y-5">
-                              {semester.chapters?.map((chapter, chapterIndex) => (
-                                  <div key={chapter.id} className="space-y-2">
-                                    {/* عنوان الوحدة — شكل تاب/وسم في المنتصف */}
-                                    <div className="relative flex items-center justify-center gap-2 pr-1">
-                                      <div className="flex-1 h-px bg-border" aria-hidden />
-                                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold shrink-0 shadow-sm bg-violet-100/80 text-violet-700 dark:text-violet-300 dark:bg-violet-500/15 border border-violet-200/60 dark:border-violet-500/25">
-                                        <span className="opacity-80">{chapter.number ?? chapterIndex + 1}</span>
-                                        <span className="w-px h-3 bg-current opacity-30" />
-                                        <span className="truncate max-w-[140px]">{chapter.name}</span>
-                                        <AdminChapterActions
-                                          semesterId={semester.id}
-                                          chapterId={chapter.id}
-                                          chapterName={chapter.name}
-                                          onEdit={adminHandlers.editChapter}
-                                          onDelete={adminHandlers.deleteChapter}
-                                        />
-                                      </div>
-                                      <div className="flex-1 h-px bg-border" aria-hidden />
-                                    </div>
-                                    {/* قائمة الدروس داخل الوحدة */}
-                                    <div className="space-y-1 pr-2">
-                                      {chapter.lessons.map((lesson, lessonIndex) => {
-                                        const isActive = lesson.id === lessonId;
-                                        const lessonProg = getLessonProgress(subjectId, lesson.id);
-                                        const lessonProgRounded = Math.round(lessonProg);
-                                        const lessonCompleted = lessonProgRounded >= 100;
-                                        return (
-                                          <SidebarMenuItem key={`${chapter.id}-${lesson.id}`} className="list-none">
-                                            <SidebarMenuButton
-                                              asChild
-                                              isActive={isActive}
-                                              className="gap-3 h-auto py-2.5 px-3 rounded-lg data-[active]:ring-[0.5px] data-[active]:ring-violet-400/40"
-                                              data-testid={`sidebar-lesson-${chapter.id}-${lesson.id}`}
-                                            >
-                                              <Link href={`/lesson/${urlStage}/${subjectId}/${lesson.id}`}>
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
-                                                  lessonCompleted ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" :
-                                                  isActive ? "bg-violet-500 text-white" :
-                                                  "bg-muted text-muted-foreground"
-                                                }`}>
-                                                  {lessonCompleted ? <Check className="w-4 h-4" /> : lessonIndex + 1}
-                                                </div>
-                                                <div className="flex-1 text-right min-w-0">
-                                                  <div className="font-medium text-xs break-words">{getLessonDisplayTitle(lesson, lessonTitlesFromApi)}</div>
-                                                </div>
-                                                <AdminLessonActions
-                                                  semesterId={semester.id}
-                                                  chapterId={chapter.id}
-                                                  lessonId={lesson.id}
-                                                  lessonTitle={getLessonDisplayTitle(lesson, lessonTitlesFromApi)}
-                                                  onEdit={adminHandlers.editLesson}
-                                                  onDelete={adminHandlers.deleteLesson}
-                                                />
-                                                <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${lessonProgRounded > 95 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"}`}>
-                                                  {lessonProgRounded}%
-                                                </span>
-                                              </Link>
-                                            </SidebarMenuButton>
-                                          </SidebarMenuItem>
-                                        );
-                                      })}
-                                      <AdminAddLessonButton
-                                        semesterId={semester.id}
-                                        chapterId={chapter.id}
-                                        onAdd={adminHandlers.addLesson}
-                                      />
-                                    </div>
-                                  </div>
-                              ))}
-                              <AdminAddChapterButton
-                                semesterId={semester.id}
-                                onAdd={adminHandlers.addChapter}
-                              />
-                            </SidebarGroupContent>
-                          </CollapsibleContent>
-                        </SidebarGroup>
-                      </Collapsible>
-                      {/* مرفقات نفس الفصل - داخل نفس الإطار */}
-                      {semesterIndex === 0 && (
-                        <Collapsible open={openAttachmentsFirstSemester}>
-                          <SidebarGroup>
-                            <SidebarGroupLabel
-                              className="flex items-center justify-between w-full gap-3 px-3 py-2.5 min-h-[2.75rem] rounded-xl border border-gray-200/60 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50/50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200"
-                              onClick={toggleAttachmentsFirstSemester}
-                            >
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <div className="w-8 h-8 rounded-lg bg-violet-400 text-white flex items-center justify-center shrink-0">
-                                  <Paperclip className="w-4 h-4" />
-                                </div>
-                                <span className="font-bold text-[13px] text-foreground">المرفقات</span>
-                              </div>
-                              {openAttachmentsFirstSemester ? <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
-                            </SidebarGroupLabel>
-                            <CollapsibleContent>
-                              <SidebarGroupContent className="pt-3 px-1 pb-4 space-y-2">
-                                <div className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer" onClick={() => openAttachmentPdfInPage(currentLesson?.bookPdfUrl, "كتاب المادة")}>
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-blue-100 dark:bg-blue-900/30">
-                                    <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">كتاب المادة</div>
-                                    <div className="text-xs text-muted-foreground">الكتاب الدراسي</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer" onClick={() => openAttachmentPdfInPage(currentLesson?.summaryPdfUrl, "الملخص")}>
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-purple-100 dark:bg-purple-900/30">
-                                    <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">الملخص</div>
-                                    <div className="text-xs text-muted-foreground">ملخص شامل للمادة</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer" onClick={() => openAttachmentPdfInPage(currentLesson?.worksheetsPdfUrl, "أوراق العمل")}>
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
-                                    <ClipboardList className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">أوراق العمل</div>
-                                    <div className="text-xs text-muted-foreground">تمارين وأنشطة</div>
-                                  </div>
-                                </div>
-                                <div
-                                  className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer"
-                                  onClick={() => openAttachmentPdfInPage(currentLesson?.testQuestionsPdfUrl, "أسئلة الاختبار")}
-                                >
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-amber-100 dark:bg-amber-900/30">
-                                    <ClipboardList className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">أسئلة الاختبار</div>
-                                    <div className="text-xs text-muted-foreground">اختبارات المادة</div>
-                                  </div>
-                                </div>
-                              </SidebarGroupContent>
-                            </CollapsibleContent>
-                          </SidebarGroup>
-                        </Collapsible>
-                      )}
-                      {semesterIndex === 1 && (
-                        <Collapsible open={openAttachmentsSection}>
-                          <SidebarGroup>
-                            <SidebarGroupLabel
-                              className="flex items-center justify-between w-full gap-3 px-3 py-2.5 min-h-[2.75rem] rounded-xl border border-gray-200/60 bg-white dark:bg-card dark:border-violet-500/20 hover:bg-gray-50/50 dark:hover:bg-violet-500/5 cursor-pointer transition-all duration-200"
-                              onClick={toggleAttachmentsSection}
-                            >
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <div className="w-8 h-8 rounded-lg bg-violet-400 text-white flex items-center justify-center shrink-0">
-                                  <Paperclip className="w-4 h-4" />
-                                </div>
-                                <span className="font-bold text-[13px] text-foreground">المرفقات</span>
-                              </div>
-                              {openAttachmentsSection ? <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
-                            </SidebarGroupLabel>
-                            <CollapsibleContent>
-                              <SidebarGroupContent className="pt-3 px-1 pb-4 space-y-2">
-                                <div className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer" onClick={() => openAttachmentPdfInPage((internalStage === "high" && subjectId === "math") ? "/attachments/book-math-high1-s2.pdf" : currentLesson?.bookPdfUrl, "كتاب المادة")}>
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-blue-100 dark:bg-blue-900/30">
-                                    <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">كتاب المادة</div>
-                                    <div className="text-xs text-muted-foreground">الكتاب الدراسي</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer" onClick={() => openAttachmentPdfInPage(currentLesson?.summaryPdfUrl, "الملخص")}>
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-purple-100 dark:bg-purple-900/30">
-                                    <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">الملخص</div>
-                                    <div className="text-xs text-muted-foreground">ملخص شامل للمادة</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer" onClick={() => openAttachmentPdfInPage(currentLesson?.worksheetsPdfUrl, "أوراق العمل")}>
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
-                                    <ClipboardList className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">أوراق العمل</div>
-                                    <div className="text-xs text-muted-foreground">تمارين وأنشطة</div>
-                                  </div>
-                                </div>
-                                <div
-                                  className="flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-primary/20 transition-all cursor-pointer"
-                                  onClick={() => openAttachmentPdfInPage(currentLesson?.testQuestionsPdfUrl, "أسئلة الاختبار")}
-                                >
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-amber-100 dark:bg-amber-900/30">
-                                    <ClipboardList className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-bold text-sm">أسئلة الاختبار</div>
-                                    <div className="text-xs text-muted-foreground">اختبارات المادة</div>
-                                  </div>
-                                </div>
-                              </SidebarGroupContent>
-                            </CollapsibleContent>
-                          </SidebarGroup>
-                        </Collapsible>
-                      )}
-                    </div>
-                  ))}
-                </>
-              ) : lessons.length > 0 ? (
-                <SidebarGroup>
-                  <div className="px-4 py-3 rounded-xl border border-border/60 bg-card mb-3">
-                    <span className="font-bold text-base">قائمة الدروس</span>
-                    <p className="text-xs text-muted-foreground mt-0.5">{completedCount} من {lessons.length} مكتمل</p>
-                  </div>
-                  <SidebarGroupContent className="space-y-1">
-                    <SidebarMenu className="space-y-1">
-                      {lessons.map((lesson, index) => {
-                        const isActive = lesson.id === lessonId;
-                        const lessonProg = getLessonProgress(subjectId, lesson.id);
-                        const lessonProgRounded = Math.round(lessonProg);
-                        const lessonCompleted = lessonProgRounded >= 100;
-                        return (
-                          <SidebarMenuItem key={lesson.id} className="list-none">
-                            <SidebarMenuButton
-                              asChild
-                              isActive={isActive}
-                              className="gap-3 h-auto py-2.5 px-3 rounded-lg data-[active]:ring-[0.5px] data-[active]:ring-primary/30"
-                              data-testid={`sidebar-lesson-${lesson.id}`}
-                            >
-                              <Link href={`/lesson/${urlStage}/${subjectId}/${lesson.id}`}>
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
-                                  lessonCompleted ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" :
-                                  isActive ? "bg-primary text-primary-foreground" :
-                                  "bg-muted text-muted-foreground"
-                                }`}>
-                                  {lessonCompleted ? <Check className="w-4 h-4" /> : index + 1}
-                                </div>
-                                <div className="flex-1 text-right min-w-0">
-                                  <div className="font-semibold text-xs break-words">{getLessonDisplayTitle(lesson, lessonTitlesFromApi)}</div>
-                                </div>
-                                <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${lessonProgRounded > 95 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"}`}>
-                                  {lessonProgRounded}%
-                                </span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        );
-                      })}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-              ) : (
-                <SidebarGroup>
-                  <SidebarGroupContent className="p-4">
-                    <div className="p-6 rounded-xl border border-dashed border-border bg-muted/30 text-center">
-                      <BookOpen className="w-10 h-10 mx-auto mb-3 text-muted-foreground/60" />
-                      <p className="text-sm font-medium text-muted-foreground">لا توجد دروس متاحة حالياً</p>
-                    </div>
-                  </SidebarGroupContent>
-                </SidebarGroup>
-              )}
-
-            </SidebarContent>
-          </Sidebar>
+          <LessonSidebar
+            subjectName={subjectName} gradeName={gradeName ?? undefined} stageLink={homeLink}
+            subjectSlug={subjectId} routeStage={urlStage} lessonId={lessonId}
+            semesters={semesters} lessons={lessons} progress={progress} completedCount={completedCount}
+            getLessonTitle={(lesson) => getLessonDisplayTitle(lesson, lessonTitlesFromApi)}
+            getLessonProgress={(id) => getLessonProgress(subjectId, id)}
+            getAttachmentUrl={(kind, semesterIndex) => ({
+              book: semesterIndex === 1 && internalStage === "high" && subjectId === "math"
+                ? "/attachments/book-math-high1-s2.pdf" : currentLesson?.bookPdfUrl,
+              summary: currentLesson?.summaryPdfUrl,
+              worksheets: currentLesson?.worksheetsPdfUrl,
+              test: currentLesson?.testQuestionsPdfUrl,
+            }[kind])}
+            onOpenAttachment={openAttachmentPdfInPage} adminHandlers={adminHandlers}
+          />
 
           {/* Main Content */}
           <main className="flex-1 min-w-0 overflow-x-hidden">
