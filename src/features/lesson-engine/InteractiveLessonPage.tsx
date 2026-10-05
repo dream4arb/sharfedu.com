@@ -470,11 +470,20 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
               className="min-h-12 min-w-0 gap-2 whitespace-normal rounded-2xl border border-slate-200 bg-white px-3 py-2 text-center text-xs font-bold leading-5 text-slate-600 hover:bg-cyan-50 data-[state=active]:border-cyan-800 data-[state=active]:bg-cyan-800 data-[state=active]:text-white data-[state=active]:shadow-none sm:text-sm"
             >
               <span aria-hidden="true" data-testid={`lesson-tab-number-${tab.id}`} className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${activeTabId === tab.id ? "border-white/20 bg-slate-100/20" : "border-slate-200 bg-slate-100"}`}>{index + 1}</span>
-              <span>{tab.title}</span>
+              <span className="flex min-w-0 flex-col items-center gap-1">
+                <span>{tab.title}</span>
+                <span className="text-xs font-bold opacity-80" data-testid={`lesson-tab-progress-${tab.id}`} aria-label={`مساهمة هذا التبويب في تقدم الدرس: ${completedTabIds.includes(tab.id) ? 25 : 0}% من 25%`}>{completedTabIds.includes(tab.id) ? "25%" : "0%"}</span>
+              </span>
               {completedTabIds.includes(tab.id) && <Check className="h-4 w-4 shrink-0" aria-label="مكتمل" data-testid={`lesson-tab-completed-${tab.id}`} />}
             </TabsTrigger>
           ))}
           </TabsList>
+          {activeTabId !== "assessment" && <div className="mt-3 flex justify-center">
+            <button type="button" disabled={!progressReady || completedTabIds.includes(activeTabId)}
+              onClick={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabId, true)}
+              className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-5 font-bold text-emerald-800 hover:bg-emerald-100 disabled:cursor-default disabled:opacity-70"
+              data-testid="button-complete-lesson-tab"><Check className="h-5 w-5" />{completedTabIds.includes(activeTabId) ? "أكملت هذا التبويب" : "تأكيد إكمال هذا التبويب"}</button>
+          </div>}
         </nav>
       </div>
 
@@ -540,12 +549,6 @@ export default function InteractiveLessonPage({ embedded = false, lessonId, prog
           ))}
 
             <footer className={`mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 ${activeTabId === "learn" ? "studio-footer" : ""}`}>
-              {activeTabId !== "assessment" && <div className="mb-4 flex justify-center">
-                <button type="button" disabled={!progressReady || completedTabIds.includes(activeTabId)}
-                  onClick={() => setLessonTabCompleted(progressSubjectSlug, lesson.id, activeTabId, true)}
-                  className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-5 font-bold text-emerald-800 hover:bg-emerald-100 disabled:cursor-default disabled:opacity-70"
-                  data-testid="button-complete-lesson-tab"><Check className="h-5 w-5" />{completedTabIds.includes(activeTabId) ? "أكملت هذا التبويب · 25%" : "أكملت هذا التبويب"}</button>
-              </div>}
               {activeTabId === "assessment" && !showReport && <p className="mb-3 text-center text-sm font-bold text-slate-600">أجب عن جميع الأسئلة لتظهر نتيجتك تلقائيًا.</p>}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <button type="button" onClick={() => navigateTab(-1)} disabled={activeTabIndex === 0} className="flex min-h-12 items-center gap-2 rounded-xl border border-slate-300 px-4 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30"><ArrowRight className="h-5 w-5" /> السابق</button>

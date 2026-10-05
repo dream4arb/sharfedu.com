@@ -66,6 +66,14 @@ const reader = readFileSync('src/features/lesson-engine/OfficialBookLesson.tsx',
 assert.ok(reader.includes('isBookReadingComplete(requiredPages, viewedPages.current, reachedEnd)'));
 assert.ok(reader.includes('if (!completed &&') && reader.includes('if (cancelled) return;'), 'Observer reports once and ignores queued callbacks after leaving the reader');
 assert.ok(page.includes('data-testid="button-complete-lesson-tab"'));
+const tabNavigation = page.slice(page.indexOf('aria-label="أقسام الدرس"'), page.indexOf('</nav>'));
+const tabFooter = page.slice(page.indexOf('<footer'), page.indexOf('</footer>'));
+assert.ok(tabNavigation.includes('data-testid={`lesson-tab-progress-${tab.id}`}'), 'Each tab exposes its own progress directly under the title');
+assert.ok(tabNavigation.includes('completedTabIds.includes(tab.id) ? "25%" : "0%"'), 'Top indicators use the same persisted completion flags');
+assert.ok(tabNavigation.includes('data-testid="button-complete-lesson-tab"'), 'Manual confirmation is still available at the top');
+assert.ok(tabNavigation.includes('activeTabId !== "assessment"') && tabNavigation.includes('disabled={!progressReady || completedTabIds.includes(activeTabId)}'), 'Quiz is automatic; completed or unhydrated tabs cannot be submitted manually');
+assert.ok(!tabFooter.includes('button-complete-lesson-tab') && !tabFooter.includes('25%'), 'No duplicated completion indicator in the footer');
+assert.ok(tabFooter.includes('navigateTab(-1)') && tabFooter.includes('navigateTab(1)'), 'Footer navigation remains intact');
 const provider = readFileSync('src/hooks/use-four-tab-progress.ts', 'utf8');
 assert.ok(provider.includes('${userId ?? "guest"}'), 'Guest and student records are isolated');
 assert.ok(provider.includes('hydratedKey !== storageKey'), 'No server write before successful hydration');
